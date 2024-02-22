@@ -1,0 +1,143 @@
+
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: Inter, sans-serif;
+    box-sizing: border-box;
+    list-style-type: none ;
+    text-decoration: none;
+}
+.admin-page{
+    width: 100vw;
+    height: 100vh;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    width: 16vw;
+    height: 100%;
+    background-color: var(--main-color);
+    transition: width 0.5s ease;
+    overflow: clip;
+}
+.sidebar-title {
+    font-size: 30px;
+    padding: 20px 20px;
+    color: var(--text-color);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.sidebar-menu li{
+    color: var(--text-color);
+    margin-bottom: 20px;
+    font-size: 20px;
+    width: 100%;
+    padding-left: 20px;
+    white-space: nowrap;
+}
+.sidebar-menu a{
+    color: var(--text-color);
+    font-size: 20px;
+    display: block;
+    padding: 8px 0 8px 20px;
+}
+.sidebar-menu a:hover{
+    background-color: var(--text-color);
+    color: var(--main-color);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 40px 0 0 40px;
+    transition: all 0.4s ease;
+}
+.sidebar-menu a i{
+    padding-right: 10px;
+}
+
+
+.main-content{
+    margin-left: 16vw;
+    height: 100%;
+    background-color: #ebebeb;
+    transition: margin-left 0.5s ease;
+}
+
+.header {
+    top: 0;
+    width: 100%;
+    background-color: var(--main-color);
+}
+
+.header__container {
+    height: 7vh;
+    font-size: 20px;
+    color: var(--text-color);
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.header__logo i{
+    margin-right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/*Home page css*/
+.page{
+    width: 82vw;
+    margin: 0 auto;
+}
+.overview{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+.card{
+    width: 25%;
+    height: 22vh;
+    color: var(--text-color);
+    margin: 2vh;
+    position: relative;
+}
+.card__detail{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 85%;
+}
+.card-info h1{
+    font-size: 40px;
+}
+.card-icon{
+    font-size: 70px;
+}
+.card__link{
+    width: 100%;
+    height: 20%;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-color);
+}
+.card__link a{
+    color: var(--text-color);
+}
+.overview-list{
+    height: 67vh;
+    display: flex;
+    justify-content: space-between;
+}
+.room-list,.statistic{
+    width: 50%;
+    margin: 2vh;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px 0px lightgrey;
+}
