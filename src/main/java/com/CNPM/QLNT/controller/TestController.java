@@ -9,8 +9,12 @@ public class TestController {
     public String login(){
         return "login";
     }
-    @RequestMapping("/admin")
-    public String admin(){
-        return "admin/admin";
+    @RequestMapping("/admin/home")
+    public String homePage(){
+        return "admin/home";
+    }
+    @RequestMapping("/admin/roomCategory")
+    public String roomCategoryPage(){
+        return "admin/roomCategory";
     }
 }

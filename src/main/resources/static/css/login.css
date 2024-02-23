@@ -1,3 +1,28 @@
+/*Base css*/
+:root{
+    /*Tùy màu mọi người thích*/
+    --main-color: #163056;
+    --text-color: white;
+}
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    list-style: none;
+    text-decoration: none;
+    font-family: Inter,sans-serif;
+}
+
+.m-10{
+    margin: 10px;
+}
+.p-10{
+    padding: 10px;
+}
+
+/*Main home page css*/
 .login{
     display: flex;
     justify-content: center;
