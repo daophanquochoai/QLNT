@@ -13,3 +13,10 @@
     text-decoration: none;
     font-family: Inter,sans-serif;
 }
+
+.m-10{
+    margin: 10px;
+}
+.p-10{
+    padding: 10px;
+}

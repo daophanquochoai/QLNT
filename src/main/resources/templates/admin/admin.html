@@ -12,46 +12,9 @@
       crossorigin="anonymous" referrerpolicy="no-referrer"/>
 <body>
 <div class="admin-page">
-    <div class="sidebar">
-        <div class="sidebar-title">
-            <i class="fa-solid fa-hotel"></i> Motel
-        </div>
-        <div class="sidebar-menu">
-            <ul>
-                <li>
-                    <a href="#"><i class="fa-solid fa-house"></i>Home</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-list-ul"></i>Room Category</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-bed"></i>Rooms</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-user-group"></i>Users</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-message"></i>Requests</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-money-bill-wave"></i>Invoice</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-chart-column"></i>Statistic</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa-solid fa-gear"></i>Setting</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <div th:replace="fragments/adminFragment :: sidebar" class="sidebar"></div>
     <div class="main-content">
-        <header class="header">
-            <div class="header__container">
-                <div class="header__logo" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i>Dashboard</div>
-                <div class="header__user">Hello Administrator</div>
-            </div>
-        </header>
+        <header th:replace="fragments/adminFragment :: header"></header>
         <div class="page">
             <div class="overview">
                 <div class="card" style="background-color: #358ed9">
@@ -78,9 +41,9 @@
                     <div class="card__detail">
                         <div class="card-info">
                             <h1>4</h1>
-                            <span>Accounts</span>
+                            <span>Request</span>
                         </div>
-                        <div class="card-icon"><i class="fa-solid fa-circle-user"></i></div>
+                        <div class="card-icon"><i class="fa-solid fa-envelope"></i></div>
                     </div>
                     <div class="card__link"><a href="#">Request List <i class="fa-solid fa-arrow-right"></i></a></div>
                 </div>
@@ -97,12 +60,45 @@
             </div>
             <div class="overview-list">
                 <div class="room-list">
-                    <div class="room-list__name">Occpied Room</div>
-                    <div class="room-list__table">
-
-                    </div>
+                    <div class="room-list__name p-10">Occupied Room</div>
+                    <table class="room-list__table p-10">
+                        <tr>
+                            <th style="width: 15%">ID</th>
+                            <th style="width: 15%">RoomID</th>
+                            <th style="width: 35%">Room Renter</th>
+                            <th style="width: 35%">Room Price</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>101</td>
+                            <td>Võ Gia Bảo</td>
+                            <td>3000000 VND</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>103</td>
+                            <td>Võ Gia Huy</td>
+                            <td>3400000 VND</td>
+                        </tr>
+                    </table>
                 </div>
-                <div class="statistic"></div>
+                <div class="request-list">
+                    <div class="room-list__name p-10">Unresolved Request</div>
+                    <table class="room-list__table p-10">
+                        <tr>
+                            <th style="width: 10%">ID</th>
+                            <th style="width: 25%">Sender</th>
+                            <th style="width: 40%">Message</th>
+                            <th style="width: 25%">Date Created</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Võ Gia Bảo</td>
+                            <td>Fix the bathtub onegai :v</td>
+                            <td>11/11/2000</td>
+                        </tr>
+                    </table>
+                </div>
 
             </div>
         </div>
