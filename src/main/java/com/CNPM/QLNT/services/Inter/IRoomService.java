@@ -1,4 +1,4 @@
-package com.CNPM.QLNT.services;
+package com.CNPM.QLNT.services.Inter;
 
 import com.CNPM.QLNT.model.room;
 

@@ -18,10 +18,10 @@ import java.util.Date;
 @Data
 public class donGia {
     @Column(name = "giaDien")
-    private BigDecimal giaDien;
+    private int giaDien;
 
     @Column(name = "giaNuoc")
-    private BigDecimal giaNuoc;
+    private int giaNuoc;
 
     @Id
     @Column(name = "timeChange")

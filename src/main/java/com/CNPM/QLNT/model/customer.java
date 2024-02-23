@@ -2,6 +2,7 @@ package com.CNPM.QLNT.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Date;
 
@@ -16,10 +17,12 @@ public class customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     @Column(name = "customer_id")
     private int customer_id;
 
     @Column(name = "first_name")
+    @NotNull
     private String first_name;
 
     @Column(name = "last_name")
@@ -43,8 +46,8 @@ public class customer {
     @Column(name = "email")
     private String email;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_detail_id", referencedColumnName = "room_id")
+    @ManyToOne
+    @JoinColumn(name = "room_id")
     private room Room;
 
     @OneToOne(mappedBy = "Customer", cascade = CascadeType.ALL)

@@ -9,5 +9,4 @@ public class QlntApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(QlntApplication.class, args);
 	}
-
 }

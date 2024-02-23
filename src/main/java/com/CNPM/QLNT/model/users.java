@@ -24,7 +24,4 @@ public class users {
 
     @Column(name = "active")
     private Boolean active;
-
-    @OneToOne(mappedBy = "users_id", cascade = CascadeType.ALL)
-    private user_auth UA;
 }

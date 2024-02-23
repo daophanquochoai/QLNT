@@ -1,5 +1,6 @@
 package com.CNPM.QLNT.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,14 +19,15 @@ public class user_auth {
     private int id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "users_id", referencedColumnName = "id")
+    @JoinColumn(name = "users_id")
     private users users_id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "auth_id", referencedColumnName = "id")
+    @JoinColumn(name = "auth_id")
     private auth auth_id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    @JsonIgnore
     private customer Customer;
 }

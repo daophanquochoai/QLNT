@@ -21,7 +21,7 @@ public class bill {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
-    private room room;
+    private room Room;
 
     @Column(name = "begin_date")
     private Date begin_date;
@@ -42,7 +42,7 @@ public class bill {
     private int water_number_end;
 
     @Column(name = "other_price")
-    private long other_price;
+    private int other_price;
 
     @Column(name = "status")
     private Boolean status;

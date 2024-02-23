@@ -19,7 +19,4 @@ public class auth {
 
     @Column(name = "role")
     private String role;
-
-    @OneToOne(mappedBy = "auth_id", cascade = CascadeType.ALL)
-    private user_auth us;
 }

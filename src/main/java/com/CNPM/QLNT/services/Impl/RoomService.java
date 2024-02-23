@@ -1,19 +1,17 @@
-package com.CNPM.QLNT.services;
+package com.CNPM.QLNT.services.Impl;
 
-import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.room;
 import com.CNPM.QLNT.repository.RoomResitory;
+import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class RoomService implements IRoomService{
+public class RoomService implements IRoomService {
 
     private final RoomResitory roomRepository;
 
