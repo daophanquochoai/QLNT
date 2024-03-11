@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "bill")
+@Table(name = "Bill")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,37 +16,41 @@ public class bill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bill_id")
-    private int bill_id;
+    @Column(name = "billId")
+    private int billId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_id")
-    private room Room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    private room roomId;
 
-    @Column(name = "begin_date")
-    private Date begin_date;
+    @Column(name = "beginDate", nullable = false)
+    private Date beginDate;
 
-    @Column(name = "end_date")
-    private Date end_date;
+    @Column(name = "endDate", nullable = false)
+    private Date endDate;
 
-    @Column(name = "electric_number_begin")
-    private int electric_number_begin;
+    @Column(name = "electricNumberBegin", nullable = false)
+    private int electricNumberBegin;
 
-    @Column(name = "electric_number_end")
-    private int electric_number_end;
+    @Column(name = "electricNumberEnd", nullable = false)
+    private int electricNumberEnd;
 
-    @Column(name = "water_number_begin")
-    private int water_number_begin;
+    @Column(name = "waterNumberBegin", nullable = false)
+    private int waterNumberBegin;
 
-    @Column(name = "water_number_end")
-    private int water_number_end;
+    @Column(name = "waterNumberEnd", nullable = false)
+    private int waterNumberEnd;
 
-    @Column(name = "other_price")
-    private int other_price;
+    @Column(name = "otherPrice", nullable = false)
+    private int otherPrice;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private Boolean status;
 
     @Column(name = "ghiChu")
     private String ghiChu;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "donGiaId")
+    private donGia donGiaId;
 }

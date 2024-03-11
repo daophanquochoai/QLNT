@@ -17,9 +17,4 @@ public class BillService implements IBillService {
     public List<bill> getAllBill() {
         return billRepo.findAll();
     }
-
-    @Override
-    public Optional<bill> getBill(int room_id) {
-        return Optional.of(billRepo.findBillByRoomId(room_id));
-    }
 }

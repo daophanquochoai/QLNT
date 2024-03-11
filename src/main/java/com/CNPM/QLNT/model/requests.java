@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "requests")
+@Table(name = "Requests")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -15,15 +15,15 @@ import java.util.Date;
 public class requests {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "requests_id")
-    private int requests_id;
+    @Column(name = "requestsId", nullable = false)
+    private int requestsId;
 
-    @Column(name = "created_datatime")
-    private Date created_datatime;
+    @Column(name = "createdDatatime", nullable = false)
+    private Date createdDatatime;
 
-    @Column(name="status")
+    @Column(name="status", nullable = false)
     private Boolean status;
 
-    @Column(name = "message")
+    @Column(name = "message", nullable = false)
     private String message;
 }

@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.misc.NotNull;
 import java.util.Date;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "Customer")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -17,39 +17,38 @@ public class customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
-    @Column(name = "customer_id")
-    private int customer_id;
+    @Column(name = "customerId", nullable = false)
+    private int customerId;
 
-    @Column(name = "first_name")
-    @NotNull
-    private String first_name;
+    @Column(name = "firstName", nullable = false)
+    private String firstName;
 
-    @Column(name = "last_name")
-    private String last_name;
+    @Column(name = "lastName", nullable = false)
+    private String lastName;
 
-    @Column(name = "CCCD")
+    @Column(name = "cccd", nullable = false, unique = true)
     private String CCCD;
 
-    @Column(name = "date_of_birth")
+    @Column(name = "dateOfBirth", nullable = false)
     private Date date_of_birth;
 
-    @Column(name = "sex")
+    @Column(name = "sex", nullable = false)
     private Boolean sex;
 
-    @Column(name = "info_address")
-    private String info_address;
+    @Column(name = "infoAddress", nullable = false)
+    private String infoAddress;
 
-    @Column(name = "phone_number")
-    private String phone_number;
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
 
     @Column(name = "email")
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id")
     private room Room;
 
-    @OneToOne(mappedBy = "Customer", cascade = CascadeType.ALL)
-    private user_auth UA;
+    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "userAuthId")
+    private user_auth userAuthId;
 }

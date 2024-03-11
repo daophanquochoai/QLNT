@@ -14,18 +14,18 @@ public class communication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CommunicationID")
-    private int CommunicationID;
+    @Column(name = "CommunicationID", nullable = false)
+    private int communicationID;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "SenderID", referencedColumnName = "customerId")
+    private customer senderId;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ReceiverID", referencedColumnName = "customerId")
+    private customer receiverID;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "SenderID_id", referencedColumnName = "customer_id")
-    private customer SenderId;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ReceiverID_id", referencedColumnName = "customer_id")
-    private customer ReceiverID;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "MessageID_id", referencedColumnName = "requests_id")
-    private requests MessageID;
+    @JoinColumn(name = "MessageID", referencedColumnName = "requestsId", nullable = false)
+    private requests messageID;
 }

@@ -1,29 +1,29 @@
 package com.CNPM.QLNT.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "donGia")
+@Table(name = "DonGia")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Data
 public class donGia {
-    @Column(name = "giaDien")
-    private int giaDien;
-
-    @Column(name = "giaNuoc")
-    private int giaNuoc;
 
     @Id
-    @Column(name = "timeChange")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "electricityPrice", nullable = false, columnDefinition = "CHECK (electricityPrice>0)")
+    private int electricityPrice;
+
+    @Column(name = "waterPrice", nullable = false, columnDefinition = "CHECK (waterPrice > 0)")
+    private int waterPrice;
+
+    @Column(name = "timeChange", nullable = false)
     private Date timeChange;
 }

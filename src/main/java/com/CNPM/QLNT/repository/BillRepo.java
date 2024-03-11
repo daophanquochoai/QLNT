@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BillRepo extends JpaRepository<bill, Integer> {
-    @Query("select b from bill b where b.Room.room_id = :roomId")
-    bill findBillByRoomId(@Param("roomId") int roomId);
 }

@@ -3,6 +3,7 @@ package com.CNPM.QLNT.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 @Entity
 @Table(name = "user_auth")
@@ -15,19 +16,17 @@ public class user_auth {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private int id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "users_id")
-    private users users_id;
+    @JoinColumn(name = "usersId", nullable = false)
+    private users usersId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "auth_id")
-    private auth auth_id;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    @JsonIgnore
-    private customer Customer;
+    @ManyToOne
+    @Cascade({org.hibernate.annotations.CascadeType.DETACH,
+    org.hibernate.annotations.CascadeType.MERGE,
+    org.hibernate.annotations.CascadeType.REFRESH})
+    @JoinColumn(name = "authId", nullable = false)
+    private auth authId;
 }

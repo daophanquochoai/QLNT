@@ -1,10 +1,14 @@
 package com.CNPM.QLNT.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Entity
-@Table(name = "room")
+@Table(name = "Room")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -14,17 +18,23 @@ public class room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
-    private int room_id;
+    @Column(name = "id")
+    private int id;
+    @ManyToOne( cascade = CascadeType.ALL)
+    @JoinColumn(name = "homeCategoryId", referencedColumnName = "homeCategoryId", nullable = false)
+    private home_category homeCategoryId;
 
-    @OneToOne( cascade = CascadeType.ALL)
-    @JoinColumn(name = "home_category_id", referencedColumnName = "home_category_id")
-    private home_category home_category_id;
-
-    @Column(name = "limit")
+    @Column(name = "limit", nullable = false)
     private int limit;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private Boolean status;
+
+    @Column(name = "price", nullable = false, columnDefinition = "CHECK (price>0)")
+    private BigDecimal price;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId")
+    @JsonIgnore
+    private List<bill> Bill;
 
 }

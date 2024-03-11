@@ -1,36 +1,44 @@
 package com.CNPM.QLNT.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.Date;
 
+@Entity
+@Table(name = "Contracts")
+@Getter
+@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class contracts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contracts_id")
-    private int contracts_id;
+    @Column(name = "contractsId")
+    private int contractsId;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id")
-    private int cus_id;
+    @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
+    private customer cusId;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "onwer_id", referencedColumnName = "customer_id")
-    private int own_id;
+    @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false)
+    private customer ownId;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_id", referencedColumnName = "room_id")
-    private int room_id;
+    @JoinColumn(name = "roomId", referencedColumnName = "id", nullable = false)
+    private room Room;
 
-    @Column(name = "con_date")
-    private Date con_date;
+    @Column(name = "conDate", nullable = false, columnDefinition = "default getdate()")
+    private Date conDate;
 
-    @Column(name = "begin_date")
-    private Date begin_date;
+    @Column(name = "beginDate", nullable = false)
+    private Date beginDate;
 
-    @Column(name = "end_date")
-    private Date end_date;
+    @Column(name = "endDate" ,nullable = false, columnDefinition = "CHECK (endDate>beginDate)")
+    private Date endDate;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false, columnDefinition = "default false")
     private Boolean status;
 }

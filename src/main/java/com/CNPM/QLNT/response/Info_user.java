@@ -13,6 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class Info_user {
+    private int id;
     private String first_name;
     private String last_name;
     private String CCCD;

@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface IBillService {
     List<bill> getAllBill();
-    Optional<bill> getBill(int room_id);
 }
