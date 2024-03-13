@@ -1,8 +1,8 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.home_category;
-import com.CNPM.QLNT.model.room;
+import com.CNPM.QLNT.model.HomeCategory;
+import com.CNPM.QLNT.model.Room;
 import com.CNPM.QLNT.repository.RoomResitory;
 import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.IHomeCategory;
@@ -10,7 +10,6 @@ import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,7 +23,7 @@ public class RoomService implements IRoomService {
 
     @Override
     public List<RoomRes> allRoom() {
-        List<room> list = roomRepository.findAll();
+        List<Room> list = roomRepository.findAll();
         List<RoomRes> l = list.stream().map(
                 r ->
                 {
@@ -40,15 +39,15 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public Optional<room> getRoom(Integer room_id){
+    public Optional<Room> getRoom(Integer room_id){
         return Optional.of(roomRepository.findById(room_id).get());
     }
 
     @Override
     public void addRoom(RoomRes roomRes) {
         try{
-            home_category homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
-            room Room = new room();
+            HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
+            Room Room = new Room();
             Room.setLimit(roomRes.getLimit());
             Room.setStatus(false);
             Room.setPrice(roomRes.getPrice());
@@ -64,8 +63,8 @@ public class RoomService implements IRoomService {
     @Override
     public void updateRoom(int id, RoomRes roomRes) {
         try{
-            room R = getRoom(id).get();
-            home_category homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
+            Room R = getRoom(id).get();
+            HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
             R.setLimit(roomRes.getLimit());
             R.setStatus(false);
             R.setPrice(roomRes.getPrice());
@@ -80,14 +79,14 @@ public class RoomService implements IRoomService {
 
     @Override
     public void deleteRoom(int id) throws Exception {
-        room Room = getRoom(id).get();
+        Room Room = getRoom(id).get();
         Room.setHomeCategoryId(null);
         roomRepository.delete(Room);
     }
 
     @Override
     public List<RoomRes> getAllRoomByStatus(boolean status) {
-        List<room> listRoom = roomRepository.getRoomByStatus(status);
+        List<Room> listRoom = roomRepository.getRoomByStatus(status);
         List<RoomRes> l = listRoom.stream().map(
                 r ->
                 {

@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Data
-public class room {
+public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class room {
     private int id;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(name = "homeCategoryId", referencedColumnName = "homeCategoryId", nullable = false)
-    private home_category homeCategoryId;
+    private HomeCategory homeCategoryId;
 
     @Column(name = "limit", nullable = false)
     private int limit;
@@ -30,11 +30,11 @@ public class room {
     @Column(name = "status", nullable = false)
     private Boolean status;
 
-    @Column(name = "price", nullable = false, columnDefinition = "CHECK (price>0)")
+    @Column(name = "price", nullable = false, columnDefinition = "money")
     private BigDecimal price;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId",  fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<bill> Bill;
+    private List<com.CNPM.QLNT.model.Bill> Bill;
 
 }

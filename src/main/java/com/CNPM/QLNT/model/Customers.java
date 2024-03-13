@@ -2,7 +2,6 @@ package com.CNPM.QLNT.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Date;
 
@@ -13,7 +12,7 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-public class customer {
+public class Customers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,10 +44,10 @@ public class customer {
     private String email;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
-    private room Room;
+    @JoinColumn(name = "idRoom")
+    private com.CNPM.QLNT.model.Room Room;
 
     @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "userAuthId")
-    private user_auth userAuthId;
+    private UserAuth userAuthId;
 }

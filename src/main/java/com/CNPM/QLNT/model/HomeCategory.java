@@ -3,8 +3,6 @@ package com.CNPM.QLNT.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "HomeCategory")
 @AllArgsConstructor
@@ -12,7 +10,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Data
-public class home_category {
+public class HomeCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

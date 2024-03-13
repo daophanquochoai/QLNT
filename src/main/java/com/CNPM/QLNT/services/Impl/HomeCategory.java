@@ -1,6 +1,5 @@
 package com.CNPM.QLNT.services.Impl;
 
-import com.CNPM.QLNT.model.home_category;
 import com.CNPM.QLNT.repository.homeCategoryRepo;
 import com.CNPM.QLNT.services.Inter.IHomeCategory;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,8 @@ import java.util.List;
 public class HomeCategory implements IHomeCategory {
     private final homeCategoryRepo homeCaRepo;
     @Override
-    public void addHomeCate(home_category homeCate) {
-        List<home_category> homeCategory = homeCaRepo.findAll();
+    public void addHomeCate(com.CNPM.QLNT.model.HomeCategory homeCate) {
+        List<com.CNPM.QLNT.model.HomeCategory> homeCategory = homeCaRepo.findAll();
 
         // Kiểm tra xem homeCate đã tồn tại trong danh sách chưa
         boolean isDuplicate = homeCategory.stream()
@@ -30,12 +29,12 @@ public class HomeCategory implements IHomeCategory {
 
 
     @Override
-    public List<home_category> getAllHomeCate() {
+    public List<com.CNPM.QLNT.model.HomeCategory> getAllHomeCate() {
         return homeCaRepo.findAll();
     }
 
     @Override
-    public home_category getHomeCategory(String home_name) {
+    public com.CNPM.QLNT.model.HomeCategory getHomeCategory(String home_name) {
         return homeCaRepo.findAll().stream().filter(h->h.getHome_category_name().equals(home_name)).findFirst().get();
     }
 }

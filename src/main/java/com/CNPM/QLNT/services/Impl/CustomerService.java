@@ -10,7 +10,6 @@ import com.CNPM.QLNT.services.Inter.ICustomerService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,7 @@ public class CustomerService implements ICustomerService {
     private authRepo auth_repo;
     @Override
     public List<Info_user> getAllCustomer() {
-        List<customer> list = customerRepository.findAll();
+        List<Customers> list = customerRepository.findAll();
         List<Info_user> l = list.stream()
                 .filter(c-> c.getUserAuthId().getAuthId().getRole().equals("USER"))
                 .map(
@@ -61,14 +60,14 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public Optional<customer> getCustomer(int cus_id) {
+    public Optional<Customers> getCustomer(int cus_id) {
         return Optional.of(customerRepository.findById(cus_id).get());
     }
 
     @Override
-    public customer getAdmin() {
-        List<customer> list = customerRepository.findAll();
-        Optional<customer> adminOptional = list.stream()
+    public Customers getAdmin() {
+        List<Customers> list = customerRepository.findAll();
+        Optional<Customers> adminOptional = list.stream()
                 .filter(c -> c.getUserAuthId().getAuthId().getRole().equals("ADMIN"))
                 .findFirst();
 
@@ -77,7 +76,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public List<Info_user> getCustomerByRoomId(int room_id) {
-        List<customer> list = customerRepository.getCustomerByRoomId(room_id);
+        List<Customers> list = customerRepository.getCustomerByRoomId(room_id);
         List<Info_user> l = list.stream().map(
                 c->
                 {
@@ -107,17 +106,17 @@ public class CustomerService implements ICustomerService {
         boolean check = getAllCustomer().stream().anyMatch(
                 c -> ( c.getCCCD().equals(info.getCCCD())|| c.getTaikhoan().equals(info.getTaikhoan()))
         );
-        customer admin = getAdmin();
+        Customers admin = getAdmin();
         if(info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan()))){
             check = true;
         }
         if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
         List<Info_user> list = getCustomerByRoomId(info.getRoom());
-        customer c = new customer();
+        Customers c = new Customers();
         System.out.println(info.getRoom());
         if( info.getRoom() != 0){
             c.setRoom(iRoomService.getRoom(info.getRoom()).get());
-            room Room = iRoomService.getRoom(info.getRoom()).get();
+            Room Room = iRoomService.getRoom(info.getRoom()).get();
             if( Room.getLimit() == list.size()){
                 return false;
             }
@@ -142,12 +141,12 @@ public class CustomerService implements ICustomerService {
             c.setEmail(info.getEmail());
         }
 
-        users u = new users();
+        Users u = new Users();
         u.setUsername(info.getTaikhoan());
         u.setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
         u.setActive(true);
-        auth a =  auth_repo.getAuth();
-        user_auth ua = new user_auth();
+        Auth a =  auth_repo.getAuth();
+        UserAuth ua = new UserAuth();
         ua.setUsersId(u);
         ua.setAuthId(a);
         c.setUserAuthId(ua);
@@ -157,11 +156,11 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public void updateCustomer(int id, Info_user info) {
-        customer Customer = getCustomer(id).get();
+        Customers Customer = getCustomer(id).get();
         boolean check = getAllCustomer().stream().anyMatch(
                 c -> (c.getId() != id && ( c.getCCCD().equals(info.getCCCD())|| c.getTaikhoan().equals(info.getTaikhoan())))
         );
-        customer admin = getAdmin();
+        Customers admin = getAdmin();
         if(info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan()))){
             check = true;
         }
@@ -203,13 +202,13 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public void deleteCustomer(int id) {
-        List<contracts> listCT = iContracService.getAllContract();
+        List<Contracts> listCT = iContracService.getAllContract();
         listCT.stream().forEach( c ->{
             if( c.getCusId().getCustomerId() == id && c.getEndDate().before(new Date()) ){
                 throw new ResourceNotFoundException("Con rang buoc boi bill");
             }
         });
-        customer Customer = getCustomer(id).get();
+        Customers Customer = getCustomer(id).get();
         customerRepository.delete(Customer);
     }
 

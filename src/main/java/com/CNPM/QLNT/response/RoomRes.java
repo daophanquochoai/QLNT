@@ -1,12 +1,9 @@
 package com.CNPM.QLNT.response;
 
-import com.CNPM.QLNT.model.bill;
-import com.CNPM.QLNT.model.home_category;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

@@ -1,11 +1,11 @@
 package com.CNPM.QLNT.services.Inter;
 
-import com.CNPM.QLNT.model.home_category;
+import com.CNPM.QLNT.model.HomeCategory;
 
 import java.util.List;
 
 public interface IHomeCategory {
-    void addHomeCate(home_category homeCate);
-    List<home_category> getAllHomeCate();
-    home_category getHomeCategory(String home_name);
+    void addHomeCate(HomeCategory homeCate);
+    List<HomeCategory> getAllHomeCate();
+    HomeCategory getHomeCategory(String home_name);
 }

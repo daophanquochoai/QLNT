@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Data
-public class communication {
+public class Communication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,13 +19,13 @@ public class communication {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "SenderID", referencedColumnName = "customerId")
-    private customer senderId;
+    private Customers senderId;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ReceiverID", referencedColumnName = "customerId")
-    private customer receiverID;
+    private Customers receiverID;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "MessageID", referencedColumnName = "requestsId", nullable = false)
-    private requests messageID;
+    private Requests messageID;
 }

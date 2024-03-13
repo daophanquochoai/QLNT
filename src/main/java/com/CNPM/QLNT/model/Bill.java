@@ -1,5 +1,6 @@
 package com.CNPM.QLNT.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Data
-public class bill {
+public class Bill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +21,9 @@ public class bill {
     private int billId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    private room roomId;
+    @JoinColumn(name = "idRoom")
+    @JsonIgnore
+    private Room roomId;
 
     @Column(name = "beginDate", nullable = false)
     private Date beginDate;
@@ -52,5 +54,5 @@ public class bill {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "donGiaId")
-    private donGia donGiaId;
+    private PriceQuotation priceQuotationId;
 }

@@ -5,13 +5,13 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
-@Table(name="users")
+@Table(name="Users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Getter
 @Setter
-public class users {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")

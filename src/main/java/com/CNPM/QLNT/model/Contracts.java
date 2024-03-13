@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class contracts {
+public class Contracts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "contractsId")
@@ -20,25 +20,25 @@ public class contracts {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
-    private customer cusId;
+    private Customers cusId;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false)
-    private customer ownId;
+    private Customers ownId;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "roomId", referencedColumnName = "id", nullable = false)
-    private room Room;
+    private com.CNPM.QLNT.model.Room Room;
 
-    @Column(name = "conDate", nullable = false, columnDefinition = "default getdate()")
+    @Column(name = "conDate", nullable = false, columnDefinition = "DATE")
     private Date conDate;
 
     @Column(name = "beginDate", nullable = false)
     private Date beginDate;
 
-    @Column(name = "endDate" ,nullable = false, columnDefinition = "CHECK (endDate>beginDate)")
+    @Column(name = "endDate" ,nullable = false)
     private Date endDate;
 
-    @Column(name = "status", nullable = false, columnDefinition = "default false")
+    @Column(name = "status", nullable = false, columnDefinition = "BIT DEFAULT 0")
     private Boolean status;
 }

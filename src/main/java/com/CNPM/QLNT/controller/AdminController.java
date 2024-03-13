@@ -3,22 +3,22 @@ package com.CNPM.QLNT.controller;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.response.Info_user;
+import com.CNPM.QLNT.response.Report;
 import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.apache.coyote.http11.Constants.a;
+import java.util.logging.Logger;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +29,9 @@ public class AdminController {
     private final IDonGiaService iDonGiaService;
     private final IRoomService iRoomService;
     private final IHomeCategory iHomeCategory;
+    private final IBillService iBillService;
+    private final ICommuService iCommuService;
+
     // lay tat ca phong
     @GetMapping("/getAllRoom")
     public ResponseEntity<List<RoomRes>> getAllRoom() throws SQLException {
@@ -40,22 +43,22 @@ public class AdminController {
         return ResponseEntity.ok(iCustomerService.getAllCustomer());
     }
 
-    // 1. lay thong tin ng dung
+    // 8. lay thong tin ng dung
     @GetMapping("/customer/{cus_id}")
     public ResponseEntity<?> getCustomerById(@PathVariable int cus_id){
        try{
-           Optional<customer> theCustomer = iCustomerService.getCustomer(cus_id);
+           Optional<Customers> theCustomer = iCustomerService.getCustomer(cus_id);
            if(theCustomer.isEmpty() ){
                throw new ResourceNotFoundException("Khong tim  thay");
            }
-           customer Customer = theCustomer.get();
+           Customers Customers = theCustomer.get();
            int room;
-           if(Customer.getRoom() == null) {
+           if(Customers.getRoom() == null) {
                room = 0;
            }else {
-               room = Customer.getRoom().getId();
+               room = Customers.getRoom().getId();
            }
-           Info_user user = new Info_user(Customer.getCustomerId(),Customer.getFirstName(), Customer.getLastName(), Customer.getCCCD(), Customer.getDate_of_birth(), Customer.getSex(), Customer.getInfoAddress(), Customer.getPhoneNumber(), Customer.getEmail(), room, Customer.getUserAuthId().getUsersId().getUsername(), Customer.getUserAuthId().getUsersId().getPassword());
+           Info_user user = new Info_user(Customers.getCustomerId(), Customers.getFirstName(), Customers.getLastName(), Customers.getCCCD(), Customers.getDate_of_birth(), Customers.getSex(), Customers.getInfoAddress(), Customers.getPhoneNumber(), Customers.getEmail(), room, Customers.getUserAuthId().getUsersId().getUsername(), Customers.getUserAuthId().getUsersId().getPassword());
            return ResponseEntity.of(Optional.of(user));
        }
        catch (Exception ex){
@@ -65,15 +68,21 @@ public class AdminController {
     // 9. thay doi don gia
     @PostMapping("/dongia/add")
     @Transactional
-    public String saveDonGia(@RequestBody donGia dg){
-        iDonGiaService.saveDonGia(dg);
-        return "Chinh sua thanh cong";
+    public ResponseEntity<?> saveDonGia(@RequestBody PriceQuotation dg){
+        try{
+            iDonGiaService.saveDonGia(dg);
+            return ResponseEntity.ok("Chinh sua thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loi he thong");
+        }
     }
     // 13. lay don gia
     @GetMapping("/dongia/all")
-    public List<donGia> getAllDonGia(){
-        return iDonGiaService.getDonGia();
+    public ResponseEntity<List<?>> getAllDonGia(){
+        return ResponseEntity.ok(iDonGiaService.getDonGia());
     }
+
+
     //1 .lay customer theo so phong
     @GetMapping("/customer/room/{roomd}")
     public ResponseEntity<?> getAllCustomeByRoomId(@PathVariable int roomd){
@@ -133,9 +142,9 @@ public class AdminController {
     //4.them phong///////////////////////////////////////////////////////////////////////////
     @GetMapping("/get/room/{idRoom}")
     public ResponseEntity<?> getRoom(@PathVariable int idRoom){
-        Optional<room> Room = iRoomService.getRoom(idRoom);
+        Optional<Room> Room = iRoomService.getRoom(idRoom);
         if(Room.isPresent()){
-            room R = Room.get();
+            com.CNPM.QLNT.model.Room R = Room.get();
             return ResponseEntity.ok(new RoomRes(R.getId(),R.getLimit(),R.getHomeCategoryId().getHome_category_name(),R.getPrice(),R.getStatus()));
         }
         else{
@@ -159,7 +168,7 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> updateRoom( @PathVariable int id, @RequestBody RoomRes roomRes){
         try{
-            Optional<room> Room = iRoomService.getRoom(id);
+            Optional<Room> Room = iRoomService.getRoom(id);
             if(Room.isPresent()){
                 iRoomService.updateRoom(id,roomRes);
                 return ResponseEntity.ok("Update thanh cong");
@@ -203,7 +212,7 @@ public class AdminController {
     //4. them home cate
     @PostMapping("/add/home_category")
     @Transactional
-    public ResponseEntity<?> addHomeCate(@RequestBody home_category homeCategory){
+    public ResponseEntity<?> addHomeCate(@RequestBody HomeCategory homeCategory){
         try {
             iHomeCategory.addHomeCate(homeCategory);
             return ResponseEntity.ok("Them loai phong thanh cong");
@@ -231,4 +240,25 @@ public class AdminController {
         }
     }
 
+    //12 . Xem bao cao phong chua dong va so tien nhan duọuocj trong thang
+    @GetMapping("get/report/{month}/{year}")
+    public ResponseEntity<?> getReport(@PathVariable int month, @PathVariable int year){
+        try {
+            Report r = iBillService.getReport(month, year);
+            return ResponseEntity.ok(r);
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    // lay yeu cau nguoi thue gui
+    @GetMapping("get/notice")
+    public ResponseEntity<?> getRequest(){
+        try {
+            return ResponseEntity.ok(iCommuService.getRequest(iCustomerService.getAdmin().getCustomerId()));
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
 }

@@ -1,8 +1,5 @@
 package com.CNPM.QLNT.response;
 
-import com.CNPM.QLNT.model.room;
-import com.CNPM.QLNT.model.user_auth;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;

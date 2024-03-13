@@ -1,6 +1,6 @@
 package com.CNPM.QLNT.services.Impl;
 
-import com.CNPM.QLNT.model.users;
+import com.CNPM.QLNT.model.Users;
 import com.CNPM.QLNT.repository.userRepo;
 import com.CNPM.QLNT.services.Inter.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class UserService implements IUserService {
     @Autowired
     private final userRepo UserRepo;
     @Override
-    public List<users> getAllUser() {
+    public List<Users> getAllUser() {
         return UserRepo.findAll();
     }
 }

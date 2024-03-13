@@ -3,8 +3,6 @@ package com.CNPM.QLNT.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "auth")
 @NoArgsConstructor
@@ -12,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Data
-public class auth {
+public class Auth {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

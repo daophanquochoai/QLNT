@@ -12,16 +12,16 @@ import java.util.Date;
 @Getter
 @Setter
 @Data
-public class donGia {
+public class PriceQuotation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "electricityPrice", nullable = false, columnDefinition = "CHECK (electricityPrice>0)")
+    @Column(name = "electricityPrice", nullable = false, columnDefinition = "money")
     private int electricityPrice;
 
-    @Column(name = "waterPrice", nullable = false, columnDefinition = "CHECK (waterPrice > 0)")
+    @Column(name = "waterPrice", nullable = false, columnDefinition = "money")
     private int waterPrice;
 
     @Column(name = "timeChange", nullable = false)

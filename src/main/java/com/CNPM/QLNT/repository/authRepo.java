@@ -1,10 +1,10 @@
 package com.CNPM.QLNT.repository;
 
-import com.CNPM.QLNT.model.auth;
+import com.CNPM.QLNT.model.Auth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface authRepo extends JpaRepository<auth, Integer> {
-    @Query("SELECT a FROM auth a WHERE a.id = 2")
-    auth getAuth();
+public interface authRepo extends JpaRepository<Auth, Integer> {
+    @Query("SELECT a FROM Auth a WHERE a.id = 2")
+    Auth getAuth();
 }

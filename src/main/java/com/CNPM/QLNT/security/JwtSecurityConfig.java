@@ -22,6 +22,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -79,6 +80,7 @@ public class JwtSecurityConfig{
         );
         return jdbcUserDetailsManager;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(JdbcUserDetailsManager jdbcUserDetailsManager) {
         var authenticationProvider = new DaoAuthenticationProvider();
@@ -134,7 +136,6 @@ public class JwtSecurityConfig{
         // Password encoder, để Spring Security sử dụng mã hóa mật khẩu người dùng
         return new BCryptPasswordEncoder();
     }
-
 
 }
 
