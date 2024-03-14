@@ -1,5 +1,8 @@
 package com.CNPM.QLNT.security;
 
+import com.CNPM.QLNT.response.InfoLogin;
+import com.CNPM.QLNT.services.Inter.ICustomerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class JwtAuthenticationController {
     
     private final JwtTokenService tokenService;
+    @Autowired
+    private ICustomerService iCustomerService;
     
     private final AuthenticationManager authenticationManager;
 
@@ -33,8 +38,8 @@ public class JwtAuthenticationController {
                 authenticationManager.authenticate(authenticationToken);
         
         var token = tokenService.generateToken(authentication);
-        
-        return ResponseEntity.ok(new JwtTokenResponse(token));
+        InfoLogin info = iCustomerService.getLogin(jwtTokenRequest.username());
+        return ResponseEntity.ok(new JwtTokenResponse(token, info));
     }
 }
 

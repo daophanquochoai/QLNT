@@ -1,6 +1,7 @@
 package com.CNPM.QLNT.services.Inter;
 
 import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.response.InfoLogin;
 import com.CNPM.QLNT.response.Info_user;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public interface ICustomerService {
     Boolean addCustomer(Info_user info) throws Exception;
     void updateCustomer(int id, Info_user info);
     void deleteCustomer(int id);
+    InfoLogin getLogin(String name);
 }

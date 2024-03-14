@@ -107,11 +107,12 @@ public class AdminController {
     }
     // 3.Sua nguoi thua
     @PutMapping("/update/customer/{id}")
+    @Transactional
     public ResponseEntity<?> updateCustomer(@PathVariable int id,
                                             @RequestBody Info_user info){
         try {
             iCustomerService.updateCustomer(id,info);
-            return ResponseEntity.ok("Cap nhat thanh cong");
+            return ResponseEntity.ok("Them thanh cong");
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

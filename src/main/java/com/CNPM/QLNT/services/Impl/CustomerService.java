@@ -4,6 +4,7 @@ import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.repository.CustomerRepository;
 import com.CNPM.QLNT.repository.authRepo;
+import com.CNPM.QLNT.response.InfoLogin;
 import com.CNPM.QLNT.response.Info_user;
 import com.CNPM.QLNT.services.Inter.IContracService;
 import com.CNPM.QLNT.services.Inter.ICustomerService;
@@ -161,7 +162,7 @@ public class CustomerService implements ICustomerService {
                 c -> (c.getId() != id && ( c.getCCCD().equals(info.getCCCD())|| c.getTaikhoan().equals(info.getTaikhoan())))
         );
         Customers admin = getAdmin();
-        if(info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan()))){
+        if(Customer.getCustomerId() != admin.getCustomerId() && (info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan())))){
             check = true;
         }
         if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
@@ -196,7 +197,8 @@ public class CustomerService implements ICustomerService {
         if( info.getMatkhau() !=  null) {
             Customer.getUserAuthId().getUsersId().setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
         }
-        Customer.setRoom(iRoomService.getRoom(info.getRoom()).get());
+        if( info.getRoom() != 0 )
+            Customer.setRoom(iRoomService.getRoom(info.getRoom()).get());
         customerRepository.save(Customer);
     }
 
@@ -210,6 +212,11 @@ public class CustomerService implements ICustomerService {
         });
         Customers Customer = getCustomer(id).get();
         customerRepository.delete(Customer);
+    }
+
+    @Override
+    public InfoLogin getLogin(String name) {
+        return customerRepository.getLogin(name);
     }
 
 }
