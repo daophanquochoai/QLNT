@@ -3,25 +3,20 @@ package com.CNPM.QLNT.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
-@Table(name = "home_category")
+@Table(name = "HomeCategory")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Data
-public class home_category {
+public class HomeCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "home_category_id")
+    @Column(name = "homeCategoryId", nullable = false)
     private int home_category_id;
 
-    @Column(name = "home_category_name")
+    @Column(name = "homeCategoryName", nullable = false, columnDefinition = "nvarchar(55)")
     private String home_category_name;
-
-    @Column(name = "price")
-    private BigDecimal price;
 }

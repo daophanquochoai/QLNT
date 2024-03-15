@@ -12,7 +12,6 @@ import java.util.Date;
 @Setter
 public class BIllInRoom {
     private int numberBill;
-    private int numberRoom;
     private Date day_Begin;
     private Date day_End;
     private int number_E_Begin;
@@ -22,4 +21,5 @@ public class BIllInRoom {
     private int other_Price;
     private String ghi_Chu;
     private BigInteger thanh_Tien;
+    private boolean dong_tien;
 }

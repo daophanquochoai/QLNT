@@ -1,13 +1,17 @@
 package com.CNPM.QLNT.repository;
 
-import com.CNPM.QLNT.model.bill;
+import com.CNPM.QLNT.model.Bill;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface BillRepo extends JpaRepository<bill, Integer> {
-    @Query("select b from bill b where b.Room.room_id = :roomId")
-    bill findBillByRoomId(@Param("roomId") int roomId);
+public interface BillRepo extends JpaRepository<Bill, Integer> {
+    @Query("select b from Bill b where b.roomId.id = :room")
+    List<Bill> getBillByIdRoom(int room);
+
+    @Query("select b from Bill b where b.status = :status and b.roomId.id = :room")
+    List<Bill> getBillByStatus(boolean status, int room);
 }

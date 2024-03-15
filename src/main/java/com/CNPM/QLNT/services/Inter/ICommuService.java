@@ -1,8 +1,13 @@
 package com.CNPM.QLNT.services.Inter;
 
-import com.CNPM.QLNT.model.customer;
-import com.CNPM.QLNT.model.requests;
+import com.CNPM.QLNT.model.Communication;
+import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.Requests;
+
+import java.util.List;
 
 public interface ICommuService {
-    void addMessage(requests mess_id, customer sender_id, customer receiver_id );
+    void addMessage(Requests mess_id, Customers sender_id, Customers receiver_id );
+    List<Communication> getNoticeBySender(int id);
+    List<Communication> getRequest(int id);
 }

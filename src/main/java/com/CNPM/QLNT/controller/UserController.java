@@ -1,25 +1,20 @@
 package com.CNPM.QLNT.controller;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.bill;
-import com.CNPM.QLNT.model.customer;
-import com.CNPM.QLNT.model.donGia;
-import com.CNPM.QLNT.model.room;
-import com.CNPM.QLNT.response.BIllInRoom;
+import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.PriceQuotation;
+import com.CNPM.QLNT.model.Requests;
+import com.CNPM.QLNT.model.Room;
 import com.CNPM.QLNT.response.Info_user;
-import com.CNPM.QLNT.services.Inter.IBillService;
-import com.CNPM.QLNT.services.Inter.ICustomerService;
+import com.CNPM.QLNT.services.Inter.*;
 import com.CNPM.QLNT.services.Impl.RoomService;
-import com.CNPM.QLNT.services.Inter.IDonGiaService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,68 +26,97 @@ public class UserController {
     private final ICustomerService iCustomerService;
     private final IDonGiaService iDonGiaService;
     private final IBillService iBillService;
+    private final ICommuService  iCommuService;
+    private final IContracService iContracService;
 
-    @GetMapping("/getAllRoom")
-    public ResponseEntity<List<room>> getAllRoom() throws SQLException{
-        return ResponseEntity.ok(roomService.allRoom());
-    }
-
+    // 3. xem thong tin phong
     @GetMapping("/room/{room_id}")
-    public ResponseEntity<Optional<room>> getRoom(@PathVariable int room_id){
-        Optional<room> theRoom =roomService.getRoom(room_id);
+    public ResponseEntity<Optional<Room>> getRoom(@PathVariable int room_id){
+        Optional<Room> theRoom =roomService.getRoom(room_id);
         if( theRoom.isEmpty() ){
             throw new ResourceNotFoundException("Not Found Room");
         }
         return ResponseEntity.ok(Optional.of(theRoom.get()));
     }
-
+    // 1/2. xem thong tin cua minh va ng khac
     @GetMapping("/customer/{cus_id}")
     public Optional<Info_user> getCustomerById(@PathVariable int cus_id){
-        Optional<customer> theCustomer = iCustomerService.getCustomer(cus_id);
+        Optional<Customers> theCustomer = iCustomerService.getCustomer(cus_id);
         if(theCustomer.isEmpty() ){
             throw new ResourceNotFoundException("Not Found Customer");
         }
-        customer Customer = theCustomer.get();
-        Info_user user = new Info_user(Customer.getFirst_name(), Customer.getLast_name(), Customer.getCCCD(), Customer.getDate_of_birth(), Customer.getSex(), Customer.getInfo_address(), Customer.getPhone_number(), Customer.getEmail(), Customer.getRoom().getRoom_id(), Customer.getUA().getUsers_id().getUsername(), Customer.getUA().getUsers_id().getPassword());
+        Customers Customer = theCustomer.get();
+        Info_user user = new Info_user(Customer.getCustomerId(),Customer.getFirstName(), Customer.getFirstName(), Customer.getCCCD(), Customer.getDate_of_birth(), Customer.getSex(), Customer.getInfoAddress(), Customer.getPhoneNumber(), Customer.getEmail(), Customer.getRoom().getId(), Customer.getUserAuthId().getUsersId().getUsername(), Customer.getUserAuthId().getUsersId().getPassword());
         return Optional.of(user);
     }
 
-    //xem gia dien, nuoc
+    // 4. xem gia dien, nuoc
     @GetMapping("/dongia/getAll")
-    public List<donGia> getAll(){
+    public List<PriceQuotation> getAll(){
         return iDonGiaService.getDonGia();
     }
-
+    // 1. lay thong tin chu tro
     @GetMapping("/getAdmin")
     public Info_user getAdmin(){
-        customer c = iCustomerService.getAdmin();
-        Info_user admin = new Info_user(c.getFirst_name(), c.getLast_name(),c.getCCCD(),c.getDate_of_birth(),c.getSex(),c.getInfo_address(), c.getPhone_number(),c.getEmail(),0,null,null);
+        Customers c = iCustomerService.getAdmin();
+        Info_user admin = new Info_user(c.getCustomerId(),c.getFirstName(), c.getLastName(),c.getCCCD(),c.getDate_of_birth(),c.getSex(),c.getInfoAddress(), c.getPhoneNumber(),c.getEmail(),0,null,null);
         return admin;
     }
-
-    @GetMapping("/bill/{room_id}")
-    public BIllInRoom getBillInRoom(@PathVariable int room_id){
-        Optional<bill> b = iBillService.getBill(room_id);
-        if( b.isEmpty() ) throw new ResourceNotFoundException("Not found bill");
-        bill b1 = b.get();
-        BIllInRoom Br = new BIllInRoom();
-        Br.setNumberBill(b1.getBill_id());
-        Br.setNumberRoom(b1.getRoom().getRoom_id());
-        Br.setDay_Begin(b1.getBegin_date());
-        Br.setDay_End(b1.getEnd_date());
-        Br.setNumber_E_Begin(b1.getElectric_number_begin());
-        Br.setNumber_E_End(b1.getElectric_number_end());
-        Br.setNumber_W_Begin(b1.getWater_number_begin());
-        Br.setNumber_W_End(b1.getWater_number_end());
-        Br.setOther_Price(b1.getOther_price());
-        Br.setGhi_Chu(b1.getGhiChu());
-        donGia dg = iDonGiaService.getDonGiaNow();
-        BigInteger numberE = BigInteger.valueOf(Br.getNumber_E_End() - Br.getNumber_E_Begin());
-        BigInteger numberW = BigInteger.valueOf(Br.getNumber_W_End() - Br.getNumber_W_Begin());
-        BigInteger giaDien = numberE.multiply(BigInteger.valueOf(dg.getGiaDien()));
-        BigInteger giaNuoc = numberW.multiply(BigInteger.valueOf(dg.getGiaNuoc()));
-        BigInteger result = giaDien.add(giaNuoc).add(BigInteger.valueOf(Br.getOther_Price()));
-        Br.setThanh_Tien(result);
-        return Br;
+    // 5. Xem hoa don cua phong minh
+    @GetMapping("get/bill/{room}")
+    public ResponseEntity<?>  getAllBillByRoom(@PathVariable int room){
+        try {
+            return ResponseEntity.ok(iBillService.getAllBillByRoom(room));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
+
+    //6 Tra cuu hoa don dong chua
+    @GetMapping("get/bill/{room}/{status}")
+    public ResponseEntity<?>  getAllBillByStatus(@PathVariable int room, @PathVariable boolean status){
+        try {
+            return ResponseEntity.ok(iBillService.getAllBillByStatus(room,status));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    //7 . Nhan thong bao tu chu tro
+    @GetMapping("get/notice/{id}")
+    public ResponseEntity<?> getNoticce(@PathVariable int id){
+        try {
+            return ResponseEntity.ok(iCommuService.getNoticeBySender(id));
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    // 8. Gui yeu cau den chu tro
+    @PostMapping("add/notice/{id}")
+    @Transactional
+    public ResponseEntity<?> addNotice(@PathVariable int id, @RequestBody String mess){
+        try{
+            Requests request = new Requests();
+            request.setCreatedDatatime(new Date());
+            request.setStatus(true);
+            request.setMessage(mess);
+            iCommuService.addMessage(request,  iCustomerService.getCustomer(id).get(),iCustomerService.getAdmin());
+            return ResponseEntity.ok("Them thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Khong the them");
+        }
+    }
+
+    //9. Xem hopv dong cua  minh
+    @GetMapping("get/contract/{id}")
+    public ResponseEntity<?> getContract(@PathVariable int id){
+        try{
+            return ResponseEntity.ok(iContracService.getContractById(id));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
 }

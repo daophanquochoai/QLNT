@@ -1,8 +1,5 @@
 package com.CNPM.QLNT.response;
 
-import com.CNPM.QLNT.model.room;
-import com.CNPM.QLNT.model.user_auth;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -13,6 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class Info_user {
+    private int id;
     private String first_name;
     private String last_name;
     private String CCCD;

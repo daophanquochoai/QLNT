@@ -1,7 +1,7 @@
 package com.CNPM.QLNT.services.Inter;
 
-import com.CNPM.QLNT.model.requests;
+import com.CNPM.QLNT.model.Requests;
 
 public interface IRequestService {
-    void addRequest_DonGia(requests re);
+    void addRequest_DonGia(Requests re);
 }
