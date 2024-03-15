@@ -3,21 +3,10 @@
     height: 100vh;
 }
 
-.main-content{
-    margin-left: 16vw;
-    height: 100%;
-    background-color: #ebebeb;
-    transition: margin-left 0.5s ease;
-}
-
-.wrapper{
-    width: 82vw;
-    margin: 2vh auto;
-}
 .overview{
     display: flex;
     justify-content: space-around;
-    width: 100%;
+    margin: 2vh;
 }
 .card{
     width: 25%;
@@ -52,32 +41,32 @@
 .card__link a{
     color: var(--text-color);
 }
+
 .overview-list{
-    height: 63vh;
-    display: flex;
-    justify-content: space-between;
+    max-height: 67vh;
+    margin: 2vh;
 }
 .room-list,.request-list{
-    width: 50%;
-    margin: 2vh;
-    padding: 2vh;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 2px 2px 20px 10px lightgrey;
+    width: 39vw;
+    margin: 0 2vh;
+    display: inline-block;
 }
-.room-list__name{
+.request-list{
+    float: right;
+}
+.overview-list__name{
     font-size: 30px;
     text-align: center;
     border-bottom: 1px solid grey;
 }
-.room-list__table{
+.overview-list__table{
     width: 100%;
 }
-.room-list__table th{
+.overview-list__table th{
     font-size: 20px;
     height: 5vh;
 }
-.room-list__table td{
+.overview-list__table td{
     text-align: center;
     padding: 4px;
     text-overflow: ellipsis;

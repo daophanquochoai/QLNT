@@ -15,6 +15,7 @@
     <div th:replace="~{fragments/adminFragment :: sidebar}" class="sidebar"></div>
     <div class="main-content">
         <header th:replace="~{fragments/adminFragment :: header}"></header>
+        <!--Code ở đây-->
         <div class="wrapper">
             <div class="overview">
                 <div class="card" style="background-color: #358ed9">
@@ -59,9 +60,9 @@
                 </div>
             </div>
             <div class="overview-list">
-                <div class="room-list">
-                    <div class="room-list__name p-10">Occupied Room</div>
-                    <table class="room-list__table p-10">
+                <div class="room-list table-frame">
+                    <div class="overview-list__name p-10">Occupied Room</div>
+                    <table class="overview-list__table p-10">
                         <tr>
                             <th style="width: 15%">ID</th>
                             <th style="width: 15%">RoomID</th>
@@ -80,11 +81,29 @@
                             <td>Võ Gia Huy</td>
                             <td>3400000 VND</td>
                         </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>103</td>
+                            <td>Võ Gia Huy</td>
+                            <td>3400000 VND</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>103</td>
+                            <td>Võ Gia Huy</td>
+                            <td>3400000 VND</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>103</td>
+                            <td>Võ Gia Huy</td>
+                            <td>3400000 VND</td>
+                        </tr>
                     </table>
                 </div>
-                <div class="request-list">
-                    <div class="room-list__name p-10">Unresolved Request</div>
-                    <table class="room-list__table p-10">
+                <div class="request-list table-frame">
+                    <div class="overview-list__name p-10">Unresolved Request</div>
+                    <table class="overview-list__table p-10">
                         <tr>
                             <th style="width: 10%">ID</th>
                             <th style="width: 25%">Sender</th>
@@ -104,17 +123,5 @@
     </div>
 </div>
 </body>
-<script>
-    function toggleSidebar() {
-        const sidebar = document.querySelector(".sidebar")
-        const mainContent = document.querySelector(".main-content")
-        if (sidebar.offsetWidth !== 0) {
-            sidebar.style.width = 0
-            mainContent.style.marginLeft = 0
-        } else {
-            sidebar.style.width = "16vw"
-            mainContent.style.marginLeft = "16vw"
-        }
-    }
-</script>
+<script th:replace="~{fragments/adminFragment :: script}"></script>
 </html>

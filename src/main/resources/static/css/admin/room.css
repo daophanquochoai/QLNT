@@ -1,0 +1,26 @@
+.room-tool{
+    height: 14vh;
+    margin: 4vh;
+    display: flex;
+    align-items: center;
+}
+.filter-section form,
+
+.search-section form{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    margin-right: 4vw;
+}
+#filter-list,#search-field{
+    border: 1px solid gray;
+    font-size: 16px;
+    width: 14vw;
+    padding: 1vh;
+    border-radius: 4px;
+}
+
+.room-list{
+    margin: 4vh;
+    height: 67vh;
+}

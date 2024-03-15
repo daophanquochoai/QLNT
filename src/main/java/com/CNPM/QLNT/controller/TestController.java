@@ -1,6 +1,7 @@
 package com.CNPM.QLNT.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -9,12 +10,13 @@ public class TestController {
     public String login(){
         return "login";
     }
-    @RequestMapping("/admin/home")
+    @RequestMapping("/admin")
     public String homePage(){
-        return "admin/home";
+        return "redirect:/admin/home";
     }
-    @RequestMapping("/admin/roomCategory")
-    public String roomCategoryPage(){
-        return "admin/roomCategory";
+    @RequestMapping("/admin/{menu}")
+    public String getMenuPage(@PathVariable String menu){
+        System.out.println("admin/"+menu);
+        return "admin/"+menu;
     }
 }

@@ -25,7 +25,7 @@
                 <a href="./roomCategory"><i class="fa-solid fa-list-ul"></i>Room Category</a>
             </li>
             <li>
-                <a href="#"><i class="fa-solid fa-bed"></i>Rooms</a>
+                <a href="./room"><i class="fa-solid fa-bed"></i>Rooms</a>
             </li>
             <li>
                 <a href="#"><i class="fa-solid fa-user-group"></i>Users</a>
@@ -46,4 +46,17 @@
     </div>
 </div>
 </body>
+<script th:fragment = "script">
+    function toggleSidebar() {
+        const sidebar = document.querySelector(".sidebar")
+        const mainContent = document.querySelector(".main-content")
+        if (sidebar.offsetWidth !== 0) {
+            sidebar.style.width = 0
+            mainContent.style.marginLeft = 0
+        } else {
+            sidebar.style.width = "16vw"
+            mainContent.style.marginLeft = "16vw"
+        }
+    }
+</script>
 </html>

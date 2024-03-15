@@ -75,6 +75,8 @@
     font-size: 20px;
     display: block;
     padding: 8px 0 8px 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .sidebar-menu a:hover{
     background-color: var(--text-color);
@@ -86,4 +88,22 @@
 }
 .sidebar-menu a i{
     padding-right: 10px;
+}
+/* Wrapper content*/
+.main-content{
+    margin-left: 16vw;
+    height: 100vh;
+    background-color: #ebebeb;
+    transition: margin-left 0.5s ease;
+}
+.wrapper{
+    max-width: 84vw;
+    margin: auto;
+}
+/* Khung bảng nền trắng*/
+.table-frame{
+    padding: 2vh;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 2px 2px 20px 10px lightgrey;
 }
