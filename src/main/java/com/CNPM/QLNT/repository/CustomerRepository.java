@@ -11,9 +11,11 @@ import java.util.List;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customers, Integer> {
-    @Query("SELECT c FROM Customers c WHERE c.Room.id = :rd")
+    @Query("SELECT c FROM Customers c WHERE c.room.id = :rd")
     List<Customers> getCustomerByRoomId(@Param("rd") int rd);
 
-    @Query("select new com.CNPM.QLNT.response.InfoLogin(c.customerId,CONCAT(c.firstName, ' ', c.lastName)) from Customers c where c.userAuthId.usersId.username = :name")
+    @Query("select new com.CNPM.QLNT.response.InfoLogin(c.userAuthId.authId.role, c.customerId, concat(c.firstName,' ',c.lastName) ) from Customers c where c.userAuthId.usersId.username = :name")
     InfoLogin getLogin(String name);
+    @Query("select c from Customers c where  c.userAuthId.authId.role = 'ADMIN'")
+    Customers getAdmin();
 }

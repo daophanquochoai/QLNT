@@ -8,13 +8,14 @@ import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
+@Slf4j
 public class AdminController {
     private final ICustomerService iCustomerService;
     private final IContracService iContracService;
@@ -62,7 +64,7 @@ public class AdminController {
            return ResponseEntity.of(Optional.of(user));
        }
        catch (Exception ex){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
        }
     }
     // 9. thay doi don gia
@@ -73,7 +75,7 @@ public class AdminController {
             iDonGiaService.saveDonGia(dg);
             return ResponseEntity.ok("Chinh sua thanh cong");
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loi he thong");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
         }
     }
     // 13. lay don gia
@@ -90,11 +92,10 @@ public class AdminController {
             return ResponseEntity.ok(iCustomerService.getCustomerByRoomId(roomd));
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
     // 3.them ng thue
-    @Transactional
     @PostMapping("/add/customer")
     public ResponseEntity<?> addCustomer(@RequestBody Info_user info){
         try{
@@ -102,12 +103,11 @@ public class AdminController {
             return check ?  ResponseEntity.ok("Them thanh cong")
                     : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phong day");
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
     // 3.Sua nguoi thua
     @PutMapping("/update/customer/{id}")
-    @Transactional
     public ResponseEntity<?> updateCustomer(@PathVariable int id,
                                             @RequestBody Info_user info){
         try {
@@ -115,7 +115,7 @@ public class AdminController {
             return ResponseEntity.ok("Them thanh cong");
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
     // 3.Xoa khach thue
@@ -127,7 +127,7 @@ public class AdminController {
             }
             iContracService.getAllContract().stream().forEach(
                     c->{
-                        if(c.getCusId().getCustomerId() == id && c.getEndDate().after(new Date())){
+                        if(c.getCusId().getCustomerId() == id && c.getEndDate().isAfter(LocalDate.now())){
                             throw new ResourceNotFoundException("Khach hang ki hop dong");
                         }
                     }
@@ -136,7 +136,7 @@ public class AdminController {
             return ResponseEntity.ok("Xoa thanh cong");
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
@@ -149,7 +149,7 @@ public class AdminController {
             return ResponseEntity.ok(new RoomRes(R.getId(),R.getLimit(),R.getHomeCategoryId().getHome_category_name(),R.getPrice(),R.getStatus()));
         }
         else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay phong");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong tim thay phong");
         }
     }
 
@@ -161,7 +161,7 @@ public class AdminController {
             return ResponseEntity.ok("Them thanh cong");
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
@@ -177,7 +177,7 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong the tim thay phong do");
             }
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
@@ -194,7 +194,7 @@ public class AdminController {
             );
             iContracService.getAllContract().stream().forEach(
                     c->{
-                        if(c.getRoom().getId() == id && c.getEndDate().after(new Date())){
+                        if(c.getRoom().getId() == id && c.getEndDate().isAfter(LocalDate.now())){
                             throw new ResourceNotFoundException("Hop dong chua het han");
                         }
                     }
@@ -204,7 +204,7 @@ public class AdminController {
             return ResponseEntity.ok("Xoa thanh cong");
         }
         catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
@@ -219,7 +219,7 @@ public class AdminController {
             return ResponseEntity.ok("Them loai phong thanh cong");
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Khong the them");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong the them");
         }
     }
 
@@ -237,7 +237,18 @@ public class AdminController {
             List<RoomRes> list = iRoomService.getAllRoomByStatus(status);
             return ResponseEntity.ok(list);
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    // 6. Lay theo phong trong
+    @GetMapping("/get/room/limit/{type}")
+    public ResponseEntity<?> getAllRoomByLimit( @PathVariable int type){
+        try{
+            log.info("{}", type);
+            return ResponseEntity.ok(iRoomService.getAllRoomByLimit(type));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
@@ -248,18 +259,48 @@ public class AdminController {
             Report r = iBillService.getReport(month, year);
             return ResponseEntity.ok(r);
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
     // lay yeu cau nguoi thue gui
-    @GetMapping("get/notice")
-    public ResponseEntity<?> getRequest(){
+    @GetMapping("get/notice/{status}")
+    public ResponseEntity<?> getRequest(@PathVariable boolean status){
         try {
-            return ResponseEntity.ok(iCommuService.getRequest(iCustomerService.getAdmin().getCustomerId()));
+            return ResponseEntity.ok(iCommuService.getRequest(iCustomerService.getAdmin().getCustomerId(), status));
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    // lay tat ca yeu cau
+    @GetMapping("get/notice/all")
+    public ResponseEntity<?> getAll(){
+        try{
+            return ResponseEntity.ok(iCommuService.getAll());
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    // update yeu cau
+    @PutMapping("update/notice/{id}")
+    public ResponseEntity<?> updateRequest(@PathVariable int id){
+        try{
+            iCommuService.updateRequest(id);
+            return ResponseEntity.ok("Update Success");
+        }catch (Exception ex)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    // lay phong ton tai va co nguoi thue roi
+    @GetMapping("get/room/bill")
+    public ResponseEntity<?> getRoomForBill(){
+        try{
+            return ResponseEntity.ok(iRoomService.getRoomForBill());
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 }

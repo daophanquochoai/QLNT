@@ -10,17 +10,20 @@ import com.CNPM.QLNT.services.Inter.*;
 import com.CNPM.QLNT.services.Impl.RoomService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final RoomService roomService;
     private final ICustomerService iCustomerService;
@@ -99,13 +102,13 @@ public class UserController {
     public ResponseEntity<?> addNotice(@PathVariable int id, @RequestBody String mess){
         try{
             Requests request = new Requests();
-            request.setCreatedDatatime(new Date());
+            request.setCreatedDatatime(LocalDateTime.now());
             request.setStatus(true);
             request.setMessage(mess);
             iCommuService.addMessage(request,  iCustomerService.getCustomer(id).get(),iCustomerService.getAdmin());
             return ResponseEntity.ok("Them thanh cong");
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Khong the them");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 

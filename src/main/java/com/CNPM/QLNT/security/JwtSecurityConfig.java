@@ -35,10 +35,13 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
+import java.io.FileOutputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 import java.util.UUID;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -83,10 +86,10 @@ public class JwtSecurityConfig{
 
     @Bean
     public AuthenticationManager authenticationManager(JdbcUserDetailsManager jdbcUserDetailsManager) {
-        var authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(jdbcUserDetailsManager);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authenticationProvider);
+            var authenticationProvider = new DaoAuthenticationProvider();
+            authenticationProvider.setUserDetailsService(jdbcUserDetailsManager);
+            authenticationProvider.setPasswordEncoder(passwordEncoder());
+            return new ProviderManager(authenticationProvider);
     }
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
@@ -130,7 +133,6 @@ public class JwtSecurityConfig{
                     "Unable to generate an RSA Key Pair", e);
         }
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         // Password encoder, để Spring Security sử dụng mã hóa mật khẩu người dùng

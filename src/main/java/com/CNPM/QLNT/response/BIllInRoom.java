@@ -3,8 +3,7 @@ package com.CNPM.QLNT.response;
 import lombok.*;
 
 import java.math.BigInteger;
-import java.util.Date;
-
+import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -12,8 +11,8 @@ import java.util.Date;
 @Setter
 public class BIllInRoom {
     private int numberBill;
-    private Date day_Begin;
-    private Date day_End;
+    private LocalDate day_Begin;
+    private LocalDate day_End;
     private int number_E_Begin;
     private int number_E_End;
     private int number_W_Begin;
@@ -22,4 +21,5 @@ public class BIllInRoom {
     private String ghi_Chu;
     private BigInteger thanh_Tien;
     private boolean dong_tien;
+    private int roomId;
 }

@@ -10,17 +10,19 @@ import com.CNPM.QLNT.services.Inter.IContracService;
 import com.CNPM.QLNT.services.Inter.ICustomerService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerService implements ICustomerService {
     private final CustomerRepository customerRepository;
     private final IRoomService iRoomService;
@@ -68,11 +70,13 @@ public class CustomerService implements ICustomerService {
     @Override
     public Customers getAdmin() {
         List<Customers> list = customerRepository.findAll();
-        Optional<Customers> adminOptional = list.stream()
-                .filter(c -> c.getUserAuthId().getAuthId().getRole().equals("ADMIN"))
-                .findFirst();
-
-        return adminOptional.orElse(null); // Trả về null nếu không tìm thấy admin
+        for( Customers c : list){
+            if("ADMIN".equals(c.getUserAuthId().getAuthId().getRole())){
+                log.info("{}",c);
+                return c;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -104,23 +108,26 @@ public class CustomerService implements ICustomerService {
     @Override
     public Boolean addCustomer(Info_user info) throws Exception {
         List<Info_user> listCus = getAllCustomer();
-        boolean check = getAllCustomer().stream().anyMatch(
-                c -> ( c.getCCCD().equals(info.getCCCD())|| c.getTaikhoan().equals(info.getTaikhoan()))
-        );
-        Customers admin = getAdmin();
-        if(info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan()))){
-            check = true;
-        }
-        if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
+       Customers c = new Customers();
+       if( !listCus.isEmpty()){
+           boolean check = getAllCustomer().stream().anyMatch(
+                   cus -> ( cus.getCCCD().equals(info.getCCCD())|| cus.getTaikhoan().equals(info.getTaikhoan()))
+           );
+           Customers admin = getAdmin();
+           if( admin != null ){
+               if(info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan()))){
+                   check = true;
+               }
+           }
+           if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
+       }
         List<Info_user> list = getCustomerByRoomId(info.getRoom());
-        Customers c = new Customers();
-        System.out.println(info.getRoom());
-        if( info.getRoom() != 0){
-            c.setRoom(iRoomService.getRoom(info.getRoom()).get());
+        if( info.getRoom() != 0 && !iRoomService.getAllRoomByStatus(true).isEmpty()){
             Room Room = iRoomService.getRoom(info.getRoom()).get();
             if( Room.getLimit() == list.size()){
                 return false;
             }
+            c.setRoom(iRoomService.getRoom(info.getRoom()).get());
         }
 
         c.setFirstName(info.getFirst_name());
@@ -206,7 +213,7 @@ public class CustomerService implements ICustomerService {
     public void deleteCustomer(int id) {
         List<Contracts> listCT = iContracService.getAllContract();
         listCT.stream().forEach( c ->{
-            if( c.getCusId().getCustomerId() == id && c.getEndDate().before(new Date()) ){
+            if( c.getCusId().getCustomerId() == id && c.getEndDate().isBefore(LocalDate.now()) ){
                 throw new ResourceNotFoundException("Con rang buoc boi bill");
             }
         });

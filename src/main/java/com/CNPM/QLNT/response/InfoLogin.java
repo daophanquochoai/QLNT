@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InfoLogin {
+    private String role;
     private int id;
     private String name;
 }
