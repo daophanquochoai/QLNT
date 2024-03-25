@@ -134,11 +134,10 @@ public class RoomService implements IRoomService {
     public List<RoomRes> getRoomForBill() {
         List<Room> list = roomRepository.getRoomByStatus(true);
         list = list.stream().filter( r->!r.getCustomers().isEmpty() &&
-                !r.getBill().stream().anyMatch( b->b.getBeginDate().getMonth() == LocalDate.now().getMonth()
+                !r.getBill().stream().anyMatch( b->b.getBeginDate().getMonth().getValue() == LocalDate.now().getMonth().getValue()-1
                                             && b.getBeginDate().getYear() == LocalDate.now().getYear()
                 ))
                         .collect(Collectors.toList());
-        log.info("{}", list);
         List<RoomRes> l = list.stream().map(
                 r ->
                 {

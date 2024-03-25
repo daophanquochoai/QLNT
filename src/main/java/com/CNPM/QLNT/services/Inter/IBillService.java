@@ -11,4 +11,5 @@ public interface IBillService {
     Report getReport( int month, int year);
     List<BIllInRoom> getAllBillByRoom(int room);
     List<BIllInRoom> getAllBillByStatus(int room,boolean status);
+    Long getDoanhThu(int year);
 }
