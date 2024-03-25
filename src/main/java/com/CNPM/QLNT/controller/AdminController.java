@@ -303,7 +303,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
-
+    // lay thong ke
     @GetMapping("/get/statistical")
     public ResponseEntity<?> getStatistical(){
         try{
@@ -319,4 +319,15 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+    // xoa notice
+    @DeleteMapping("remove/notice/{id}")
+    public ResponseEntity<?> deletNoticeById(@PathVariable int id){
+        try{
+            iCommuService.deleteCommunication(id);
+            return ResponseEntity.ok("Notice was deleted");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
 }

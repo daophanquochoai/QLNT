@@ -13,4 +13,5 @@ public interface ICommuService {
     List<Message> getRequest(int id, boolean status);
     void updateRequest(int id);
     List<Communication> getAll();
+    void deleteCommunication( int id );
 }
