@@ -24,6 +24,11 @@ public class CommuService implements ICommuService {
     private final RequestRepo requestRepo;
     @Override
     public void addMessage(Requests mess_id, Customers sender_id, Customers receiver_id) {
+        if( receiver_id != null){
+            if( sender_id.getCustomerId() == receiver_id.getCustomerId()){
+                throw new ResourceNotFoundException("I can't send myself");
+            }
+        }
         Communication com = new Communication();
         com.setReceiverID(receiver_id);
         com.setSenderId(sender_id);
@@ -59,5 +64,20 @@ public class CommuService implements ICommuService {
     @Override
     public List<Communication> getAll() {
         return communicationRepo.findAll();
+    }
+
+    @Override
+    public void deleteCommunication(int id){
+        try{
+            Communication c = communicationRepo.findById(id).get();
+            if( !c.getMessageID().getStatus() ){
+                requestRepo.deleteById(c.getMessageID().getRequestsId());
+                communicationRepo.deleteById(id);
+            }else {
+                throw new ResourceNotFoundException("It wasn't commited");
+            }
+        }catch (Exception ex){
+            throw new ResourceNotFoundException(ex.getMessage());
+        }
     }
 }
