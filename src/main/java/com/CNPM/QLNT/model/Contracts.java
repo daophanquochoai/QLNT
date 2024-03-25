@@ -23,7 +23,7 @@ public class Contracts {
     private Customers cusId;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false, unique = true)
+    @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false)
     private Customers ownId;
 
     @OneToOne(cascade = CascadeType.ALL)

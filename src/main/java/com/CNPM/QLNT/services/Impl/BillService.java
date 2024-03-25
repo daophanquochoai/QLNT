@@ -138,4 +138,23 @@ public class BillService implements IBillService {
         });
         return listBR;
     }
+
+    @Override
+    public Long getDoanhThu(int year) {
+        return billRepo.getBillByYear(year)
+                .stream()
+                .mapToLong(bill -> {
+                    long electricityCost = Optional.ofNullable(bill.getPriceQuotationId())
+                            .map(priceQuotation -> (long) priceQuotation.getElectricityPrice())
+                            .orElse(0L);
+                    long waterCost = Optional.ofNullable(bill.getPriceQuotationId())
+                            .map(priceQuotation -> (long) priceQuotation.getWaterPrice())
+                            .orElse(0L);
+                    long electricityTotal = electricityCost * (bill.getElectricNumberEnd() - bill.getElectricNumberBegin());
+                    long waterTotal = waterCost * (bill.getWaterNumberEnd() - bill.getWaterNumberBegin());
+                    long otherPrice = bill.getOtherPrice();
+                    return electricityTotal + waterTotal + otherPrice;
+                })
+                .sum();
+    }
 }

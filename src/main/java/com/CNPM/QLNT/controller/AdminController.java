@@ -5,6 +5,7 @@ import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.response.Info_user;
 import com.CNPM.QLNT.response.Report;
 import com.CNPM.QLNT.response.RoomRes;
+import com.CNPM.QLNT.response.Statistical;
 import com.CNPM.QLNT.services.Inter.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -245,7 +246,6 @@ public class AdminController {
     @GetMapping("/get/room/limit/{type}")
     public ResponseEntity<?> getAllRoomByLimit( @PathVariable int type){
         try{
-            log.info("{}", type);
             return ResponseEntity.ok(iRoomService.getAllRoomByLimit(type));
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -299,6 +299,22 @@ public class AdminController {
     public ResponseEntity<?> getRoomForBill(){
         try{
             return ResponseEntity.ok(iRoomService.getRoomForBill());
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/get/statistical")
+    public ResponseEntity<?> getStatistical(){
+        try{
+            Statistical sta = new Statistical();
+            sta.setDoanhThu(iBillService.getDoanhThu(LocalDate.now().getYear()));
+            sta.setPhongDaDong(iBillService.getReport(LocalDate.now().getMonth().getValue()-1, LocalDate.now().getYear()).getDaDong().size());
+            sta.setPhongChuaDong(iBillService.getReport(LocalDate.now().getMonth().getValue()-1, LocalDate.now().getYear()).getChuaDong().size());
+            sta.setDaThueDay(iRoomService.getAllRoomByLimit(3).size());
+            sta.setDaThueChuaDay(iRoomService.getAllRoomByLimit(2).size());
+            sta.setChuaThue(iRoomService.getAllRoomByLimit(1).size());
+            return ResponseEntity.ok(sta);
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

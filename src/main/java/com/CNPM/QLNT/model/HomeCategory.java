@@ -17,6 +17,6 @@ public class HomeCategory {
     @Column(name = "homeCategoryId", nullable = false)
     private int home_category_id;
 
-    @Column(name = "homeCategoryName", nullable = false, columnDefinition = "nvarchar(55)")
+    @Column(name = "homeCategoryName", nullable = false, unique = true, columnDefinition = "nvarchar(55)")
     private String home_category_name;
 }
