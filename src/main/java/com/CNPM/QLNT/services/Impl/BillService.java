@@ -8,6 +8,7 @@ import com.CNPM.QLNT.response.Report;
 import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.IBillService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BillService implements IBillService {
     private final BillRepo billRepo;
     @Override
@@ -28,16 +30,53 @@ public class BillService implements IBillService {
     @Override
     public Report getReport(int month, int year) {
         try{
-            List<Bill> list = getAllBill();
+            List<Bill> list = billRepo.getRepost(month, year);
             Report r = new Report();
-            list = list.stream().filter( b -> (b.getBeginDate().getMonth() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
-            List<RoomRes> listR = (List<RoomRes>) list.stream().map(c -> {
-                return new RoomRes(c.getRoomId().getId(), c.getRoomId().getLimit(), c.getRoomId().getHomeCategoryId().getHome_category_name(), c.getRoomId().getPrice(), c.getRoomId().getStatus());
-            });
-            r.setListRoom(listR);
-            Double total = list.stream().filter(b->b.getStatus()==Boolean.TRUE).mapToDouble(bill -> (bill.getWaterNumberEnd() - bill.getWaterNumberBegin()) * bill.getPriceQuotationId().getWaterPrice())
-                    .sum();
-            r.setMoney(total);
+            List<Bill> l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
+            List<BIllInRoom> listCD = (List<BIllInRoom>) l.stream().map(b -> {
+                BIllInRoom br = new BIllInRoom();
+                br.setNumber_E_Begin(b.getElectricNumberBegin());
+                br.setNumber_E_End(b.getElectricNumberEnd());
+                br.setNumberBill(b.getBillId());
+                br.setDay_Begin(b.getBeginDate());
+                br.setDay_End(b.getEndDate());
+                br.setNumber_W_Begin(b.getWaterNumberBegin());
+                br.setNumber_W_End(b.getWaterNumberEnd());
+                br.setOther_Price(b.getOtherPrice());
+                br.setGhi_Chu(b.getGhiChu());
+                br.setThanh_Tien(
+                        BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
+                                + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                );
+                br.setGhi_Chu(b.getGhiChu());
+                br.setDong_tien( b.getStatus());
+                br.setRoomId(b.getRoomId().getId());
+                return br;
+            }).collect(Collectors.toList());
+            r.setChuaDong(listCD);
+
+            l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.TRUE)).collect(Collectors.toList());
+            List<BIllInRoom> listDD = (List<BIllInRoom>) l.stream().map(b -> {
+                BIllInRoom br = new BIllInRoom();
+                br.setNumber_E_Begin(b.getElectricNumberBegin());
+                br.setNumber_E_End(b.getElectricNumberEnd());
+                br.setNumberBill(b.getBillId());
+                br.setDay_Begin(b.getBeginDate());
+                br.setDay_End(b.getEndDate());
+                br.setNumber_W_Begin(b.getWaterNumberBegin());
+                br.setNumber_W_End(b.getWaterNumberEnd());
+                br.setOther_Price(b.getOtherPrice());
+                br.setGhi_Chu(b.getGhiChu());
+                br.setThanh_Tien(
+                        BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
+                                + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                );
+                br.setGhi_Chu(b.getGhiChu());
+                br.setDong_tien( b.getStatus());
+                br.setRoomId(b.getRoomId().getId());
+                return br;
+            }).collect(Collectors.toList());
+            r.setDaDong(listDD);
             return r;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -61,11 +100,12 @@ public class BillService implements IBillService {
                 br.setOther_Price(b.getOtherPrice());
                 br.setGhi_Chu(b.getGhiChu());
                 br.setThanh_Tien(
-                        BigInteger.valueOf(b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
-                        + b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                        BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
+                        + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
                 );
                 br.setGhi_Chu(b.getGhiChu());
                 br.setDong_tien( b.getStatus());
+                br.setRoomId(b.getRoomId().getId());
                 listBR.add(br);
                 });
             return listBR;
@@ -88,11 +128,12 @@ public class BillService implements IBillService {
             br.setOther_Price(b.getOtherPrice());
             br.setGhi_Chu(b.getGhiChu());
             br.setThanh_Tien(
-                    BigInteger.valueOf(b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
-                            + b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                    BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
+                            + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
             );
             br.setGhi_Chu(b.getGhiChu());
             br.setDong_tien( b.getStatus());
+            br.setRoomId(b.getRoomId().getId());
             listBR.add(br);
         });
         return listBR;

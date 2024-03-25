@@ -1,6 +1,9 @@
 package com.CNPM.QLNT;
 
+import com.CNPM.QLNT.model.Customers;
 import com.CNPM.QLNT.services.Inter.ICustomerService;
+import com.CNPM.QLNT.services.Inter.IRoomService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,12 +14,15 @@ import java.util.Calendar;
 import java.util.Date;
 
 @SpringBootApplication
+@Slf4j
 public class QlntApplication implements CommandLineRunner {
-
+	@Autowired
+	private IRoomService iRoomService;
 	public static void main(String[] args) {
 		SpringApplication.run(QlntApplication.class, args);
 	}
 	@Override
 	public void run(String... args) throws Exception {
+		iRoomService.getRoomForBill();
 	}
 }

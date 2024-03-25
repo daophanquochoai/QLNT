@@ -17,7 +17,6 @@ import java.util.List;
 public class Room {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
     @ManyToOne( cascade = CascadeType.ALL)
@@ -36,5 +35,9 @@ public class Room {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId",  fetch = FetchType.EAGER)
     @JsonIgnore
     private List<com.CNPM.QLNT.model.Bill> Bill;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Customers> customers;
 
 }

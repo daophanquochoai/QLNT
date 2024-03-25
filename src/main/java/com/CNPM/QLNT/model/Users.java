@@ -21,8 +21,8 @@ public class Users {
     @Size( min = 2, max = 55, message = "Khong dung gioi han")
     private String username;
 
-    @Column(name = "password", length = 128, nullable = false, columnDefinition = "varchar(55)")
-    @Size( min = 2, max = 55, message = "Khong dung gioi han")
+    @Column(name = "password", length = 128, nullable = false, columnDefinition = "varchar(255)")
+    @Size( min = 7, max = 100, message = "Khong dung gioi han")
     private String password;
 
     @Column(name = "active", length = 1, nullable = false)

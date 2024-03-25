@@ -8,14 +8,18 @@ import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.IHomeCategory;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoomService implements IRoomService {
 
     private final RoomResitory roomRepository;
@@ -47,13 +51,14 @@ public class RoomService implements IRoomService {
     public void addRoom(RoomRes roomRes) {
         try{
             HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
-            Room Room = new Room();
-            Room.setLimit(roomRes.getLimit());
-            Room.setStatus(false);
-            Room.setPrice(roomRes.getPrice());
-            Room.setHomeCategoryId(homeCategory);
-            Room.setStatus(roomRes.getStatus());
-            roomRepository.save(Room);
+            Room room = new Room();
+            room.setId(roomRes.getRoom_id());
+            room.setLimit(roomRes.getLimit());
+            room.setPrice(roomRes.getPrice());
+            room.setHomeCategoryId(homeCategory);
+            room.setStatus(true);
+            log.info("{}",room);
+            roomRepository.save(room);
         }
         catch (Exception ex){
             throw new ResourceNotFoundException("Khong tim thay loai hoac du lieu phong sai");
@@ -88,6 +93,53 @@ public class RoomService implements IRoomService {
     public List<RoomRes> getAllRoomByStatus(boolean status) {
         List<Room> listRoom = roomRepository.getRoomByStatus(status);
         List<RoomRes> l = listRoom.stream().map(
+                r ->
+                {
+                    RoomRes rm = new RoomRes(r.getId(),
+                            r.getLimit(),
+                            r.getHomeCategoryId().getHome_category_name(),
+                            r.getPrice(),
+                            r.getStatus());
+                    return rm;
+                }
+        ).collect(Collectors.toList());
+        return l;
+    }
+
+    @Override
+    public List<RoomRes> getAllRoomByLimit(int type) {
+        List<Room> l = new ArrayList<>();
+        if(type == 1){
+            l = roomRepository.getRoomByTrong();
+        }else if( type == 2){
+            l = roomRepository.getRoomByThueTrong();
+        }else{
+            l = roomRepository.getRoomByDay();
+        }
+        List<RoomRes> list = l.stream().map(
+                r ->
+                {
+                    RoomRes rm = new RoomRes(r.getId(),
+                            r.getLimit(),
+                            r.getHomeCategoryId().getHome_category_name(),
+                            r.getPrice(),
+                            r.getStatus());
+                    return rm;
+                }
+        ).collect(Collectors.toList());
+        return list;
+    }
+
+    @Override
+    public List<RoomRes> getRoomForBill() {
+        List<Room> list = roomRepository.getRoomByStatus(true);
+        list = list.stream().filter( r->!r.getCustomers().isEmpty() &&
+                !r.getBill().stream().anyMatch( b->b.getBeginDate().getMonth() == LocalDate.now().getMonth()
+                                            && b.getBeginDate().getYear() == LocalDate.now().getYear()
+                ))
+                        .collect(Collectors.toList());
+        log.info("{}", list);
+        List<RoomRes> l = list.stream().map(
                 r ->
                 {
                     RoomRes rm = new RoomRes(r.getId(),

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "Bill")
@@ -20,16 +20,16 @@ public class Bill {
     @Column(name = "billId")
     private int billId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idRoom")
     @JsonIgnore
     private Room roomId;
 
-    @Column(name = "beginDate", nullable = false)
-    private Date beginDate;
+    @Column(name = "beginDate", nullable = false, columnDefinition = "DATE")
+    private LocalDate beginDate;
 
-    @Column(name = "endDate", nullable = false)
-    private Date endDate;
+    @Column(name = "endDate", nullable = false, columnDefinition = "DATE")
+    private LocalDate endDate;
 
     @Column(name = "electricNumberBegin", nullable = false)
     private int electricNumberBegin;
@@ -49,10 +49,28 @@ public class Bill {
     @Column(name = "status", nullable = false)
     private Boolean status;
 
-    @Column(name = "ghiChu")
+    @Column(name = "ghiChu", columnDefinition = "nvarchar(255)")
     private String ghiChu;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "donGiaId")
     private PriceQuotation priceQuotationId;
+
+    @Override
+    public String toString() {
+        return "Bill{" +
+                "billId=" + billId +
+//                ", roomId=" + roomId +
+                ", beginDate=" + beginDate +
+                ", endDate=" + endDate +
+                ", electricNumberBegin=" + electricNumberBegin +
+                ", electricNumberEnd=" + electricNumberEnd +
+                ", waterNumberBegin=" + waterNumberBegin +
+                ", waterNumberEnd=" + waterNumberEnd +
+                ", otherPrice=" + otherPrice +
+                ", status=" + status +
+                ", ghiChu='" + ghiChu + '\'' +
+                ", priceQuotationId=" + priceQuotationId +
+                '}';
+    }
 }

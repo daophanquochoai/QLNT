@@ -10,8 +10,8 @@ import com.CNPM.QLNT.services.Inter.IDonGiaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,15 +23,15 @@ public class DonGiaService implements IDonGiaService {
 
     @Override
     public List<PriceQuotation> getDonGia() {
-        return donGiaRepo.findAll();
+        return donGiaRepo.findAllByOrderByTimeChangeDesc();
     }
 
     @Override
     public void saveDonGia(PriceQuotation dg) {
-        dg.setTimeChange(Calendar.getInstance().getTime());
+        dg.setTimeChange(LocalDate.now());
         String mess = "Thay doi : Tien dien = "+ dg.getElectricityPrice() +" , Tien nuoc = "+ dg.getWaterPrice() +" , Thoi gian thay doi = "+ dg.getTimeChange();
         Requests request = new Requests();
-        request.setCreatedDatatime(new Date());
+        request.setCreatedDatatime(LocalDateTime.now());
         request.setStatus(true);
         request.setMessage(mess);
         Customers chutro = iCustomerService.getAdmin();

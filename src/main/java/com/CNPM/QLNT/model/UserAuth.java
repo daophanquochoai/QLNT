@@ -19,7 +19,7 @@ public class UserAuth {
     private int id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "usersId", nullable = false)
+    @JoinColumn(name = "usersId", nullable = false, unique = true)
     private Users usersId;
 
     @ManyToOne

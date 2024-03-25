@@ -3,10 +3,10 @@ package com.CNPM.QLNT.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "DonGia")
+@Table(name = "PriceQuotation")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -24,6 +24,6 @@ public class PriceQuotation {
     @Column(name = "waterPrice", nullable = false, columnDefinition = "money")
     private int waterPrice;
 
-    @Column(name = "timeChange", nullable = false)
-    private Date timeChange;
+    @Column(name = "timeChange", nullable = false, columnDefinition = "DATE")
+    private LocalDate timeChange;
 }

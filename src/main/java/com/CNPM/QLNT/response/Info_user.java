@@ -2,19 +2,17 @@ package com.CNPM.QLNT.response;
 
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Getter
-@Setter
 public class Info_user {
     private int id;
     private String first_name;
     private String last_name;
     private String CCCD;
-    private Date date_of_birth;
+    private LocalDate date_of_birth;
     private Boolean sex;
     private String info_address;
     private String phone_number;

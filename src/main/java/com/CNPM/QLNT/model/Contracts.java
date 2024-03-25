@@ -3,7 +3,7 @@ package com.CNPM.QLNT.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "Contracts")
@@ -23,21 +23,21 @@ public class Contracts {
     private Customers cusId;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false)
+    @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false, unique = true)
     private Customers ownId;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "roomId", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "roomId", referencedColumnName = "id", nullable = false, unique = true)
     private com.CNPM.QLNT.model.Room Room;
 
     @Column(name = "conDate", nullable = false, columnDefinition = "DATE")
-    private Date conDate;
+    private LocalDate conDate;
 
-    @Column(name = "beginDate", nullable = false)
-    private Date beginDate;
+    @Column(name = "beginDate", nullable = false, columnDefinition = "DATE")
+    private LocalDate beginDate;
 
-    @Column(name = "endDate" ,nullable = false)
-    private Date endDate;
+    @Column(name = "endDate" ,nullable = false, columnDefinition = "DATE")
+    private LocalDate endDate;
 
     @Column(name = "status", nullable = false, columnDefinition = "BIT DEFAULT 0")
     private Boolean status;

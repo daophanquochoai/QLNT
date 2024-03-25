@@ -18,7 +18,7 @@ public class Communication {
     private int communicationID;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "SenderID", referencedColumnName = "customerId")
+    @JoinColumn(name = "SenderID", referencedColumnName = "customerId", nullable = false)
     private Customers senderId;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -26,6 +26,6 @@ public class Communication {
     private Customers receiverID;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "MessageID", referencedColumnName = "requestsId", nullable = false)
+    @JoinColumn(name = "MessageID", referencedColumnName = "requestsId", nullable = false, unique = true)
     private Requests messageID;
 }

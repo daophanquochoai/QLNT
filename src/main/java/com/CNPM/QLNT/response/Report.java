@@ -10,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class Report {
-    private List<RoomRes> listRoom;
-    private Double money;
+    private List<BIllInRoom> chuaDong;
+    private List<BIllInRoom> daDong;
 }

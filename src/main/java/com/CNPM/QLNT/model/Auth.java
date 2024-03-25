@@ -17,6 +17,6 @@ public class Auth {
     @Column(name="id" , nullable = false)
     private int id;
 
-    @Column(name = "role", length = 30, nullable = false, unique = true)
+    @Column(name = "role", length = 30, nullable = false, unique = true, columnDefinition = "varchar(55)")
     private String role;
 }
