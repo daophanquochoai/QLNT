@@ -71,8 +71,9 @@ public class CommuService implements ICommuService {
         try{
             Communication c = communicationRepo.findById(id).get();
             if( !c.getMessageID().getStatus() ){
-                requestRepo.deleteById(c.getMessageID().getRequestsId());
                 communicationRepo.deleteById(id);
+                requestRepo.deleteById(c.getMessageID().getRequestsId());
+
             }else {
                 throw new ResourceNotFoundException("It wasn't commited");
             }
