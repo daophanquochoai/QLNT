@@ -40,7 +40,7 @@ public class AdminController {
     public ResponseEntity<List<RoomRes>> getAllRoom() throws SQLException {
         return ResponseEntity.ok(iRoomService.allRoom());
     }
-    // 1. lay thong tin customer
+    // 1. lay thong tin tat ca customer
     @GetMapping("/getAllCustomer")
     public ResponseEntity<List<Info_user>> getAllCustomer(){
         return ResponseEntity.ok(iCustomerService.getAllCustomer());
@@ -252,7 +252,7 @@ public class AdminController {
         }
     }
 
-    //12 . Xem bao cao phong chua dong va so tien nhan duọuocj trong thang
+    //12 . Xem bao cao phong chua dong va so tien nhan duoc trong thang
     @GetMapping("get/report/{month}/{year}")
     public ResponseEntity<?> getReport(@PathVariable int month, @PathVariable int year){
         try {
