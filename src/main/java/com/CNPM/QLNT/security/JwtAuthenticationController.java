@@ -1,34 +1,46 @@
 package com.CNPM.QLNT.security;
 
-import com.CNPM.QLNT.response.InfoLogin;
-import com.CNPM.QLNT.services.Inter.ICustomerService;
+import com.CNPM.QLNT.exception.ResourceNotFoundException;
+import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.Manager;
+import com.CNPM.QLNT.model.UserAuth;
+import com.CNPM.QLNT.repository.CustomerRepository;
+import com.CNPM.QLNT.repository.ManagerRepo;
+import com.CNPM.QLNT.repository.UserAuthRepo;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.interfaces.RSAKey;
 
 @RestController
 @Slf4j
 public class JwtAuthenticationController {
-    
-    private final JwtTokenService tokenService;
-    private ICustomerService iCustomerService;
+
+    private JwtTokenService tokenService;
+    private CustomerRepository customerRepository;
     private AuthenticationManager authenticationManager;
+    private UserAuthRepo userAuthRepo;
+    private ManagerRepo managerRepo;
+
+
 
     @Autowired
     public JwtAuthenticationController(JwtTokenService tokenService,
-                                       AuthenticationManager authenticationManager, ICustomerService iCustomerService) {
+                                       AuthenticationManager authenticationManager,
+                                       CustomerRepository customerRepository,
+                                       UserAuthRepo userAuthRepo,
+                                       ManagerRepo managerRepo) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
-        this.iCustomerService = iCustomerService;
-
+        this.customerRepository = customerRepository;
+        this.userAuthRepo = userAuthRepo;
+        this.managerRepo = managerRepo;
     }
 
     @PostMapping("/authenticate")
@@ -42,8 +54,17 @@ public class JwtAuthenticationController {
                 authenticationManager.authenticate(authenticationToken);
 
         var token = tokenService.generateToken(authentication);
-        InfoLogin info = iCustomerService.getLogin(jwtTokenRequest.username());
-        return ResponseEntity.ok(new JwtTokenResponse(token, info));
+        Optional<UserAuth> ua = userAuthRepo.findByUsername(jwtTokenRequest.username());
+        if( ua.isEmpty()) throw new ResourceNotFoundException("Lỗi lấy thông tin người dùng");
+        UserAuth u = ua.get();
+        if( u.getRole().equals("ADMIN") || u.getRole().equals("MANAGER")){
+            Manager m = managerRepo.getInfoManager(u.getId());
+            return ResponseEntity.ok(new JwtTokenResponse(token,m));
+        }
+        else{
+            Customers c = customerRepository.getInfoCustomerr(u.getId());
+            return ResponseEntity.ok(new JwtTokenResponse(token, c));
+        }
     }
 }
 

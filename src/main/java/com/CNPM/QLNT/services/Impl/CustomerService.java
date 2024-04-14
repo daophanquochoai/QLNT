@@ -3,7 +3,8 @@ package com.CNPM.QLNT.services.Impl;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.repository.CustomerRepository;
-import com.CNPM.QLNT.repository.authRepo;
+import com.CNPM.QLNT.repository.HistoryCustomerRepo;
+import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.InfoLogin;
 import com.CNPM.QLNT.response.Info_user;
 import com.CNPM.QLNT.services.Inter.IContracService;
@@ -11,11 +12,16 @@ import com.CNPM.QLNT.services.Inter.ICustomerService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.id.Configurable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,22 +33,20 @@ public class CustomerService implements ICustomerService {
     private final CustomerRepository customerRepository;
     private final IRoomService iRoomService;
     private final IContracService iContracService;
-    @Autowired
-    private authRepo auth_repo;
+    private final HistoryCustomerRepo historyCustomerRepo;
+    private final RoomRepo roomRepo;
+//    private final SessionFactory sessionFactory = new Configuration().configure("hibernate.cfg.xml").
+//            buildSessionFactory();
+//    Session session = sessionFactory.openSession();
     @Override
     public List<Info_user> getAllCustomer() {
+
         List<Customers> list = customerRepository.findAll();
         List<Info_user> l = list.stream()
-                .filter(c-> c.getUserAuthId().getAuthId().getRole().equals("USER"))
+                .filter(c-> c.getUserAuthId().getRole().equals("USER"))
                 .map(
                 c ->
                 {
-                    int room;
-                    if( c.getRoom() == null){
-                        room = 0;
-                    }else {
-                        room = c.getRoom().getId();
-                    }
                     Info_user user = new Info_user(c.getCustomerId(),
                     c.getFirstName(),
                     c.getLastName(),
@@ -52,9 +56,9 @@ public class CustomerService implements ICustomerService {
                     c.getInfoAddress(),
                     c.getPhoneNumber(),
                     c.getEmail(),
-                    room,
-                     c.getUserAuthId().getUsersId().getUsername(),
-                    c.getUserAuthId().getUsersId().getPassword()
+                    c.getHistoryCustomer()== null ? null : c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomers().getCustomerId() == c.getCustomerId())).findFirst().get().getRoomOld().getId(),
+                     c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
+                    c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
                     );
                     return user;
                 }
@@ -68,20 +72,8 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public Customers getAdmin() {
-        List<Customers> list = customerRepository.findAll();
-        for( Customers c : list){
-            if("ADMIN".equals(c.getUserAuthId().getAuthId().getRole())){
-                log.info("{}",c);
-                return c;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<Info_user> getCustomerByRoomId(int room_id) {
-        List<Customers> list = customerRepository.getCustomerByRoomId(room_id);
+    public List<Info_user> getCustomerByRoomId(Integer room_id) {
+        List<Customers> list = historyCustomerRepo.getCustmersByRoom(room_id);
         List<Info_user> l = list.stream().map(
                 c->
                 {
@@ -95,9 +87,9 @@ public class CustomerService implements ICustomerService {
                             c.getInfoAddress(),
                             c.getPhoneNumber(),
                             c.getEmail(),
-                            c.getRoom().getId(),
-                            c.getUserAuthId().getUsersId().getUsername(),
-                            c.getUserAuthId().getUsersId().getPassword()
+                            room_id,
+                            c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
+                            c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
                     );
                     return user;
                 }
@@ -113,12 +105,6 @@ public class CustomerService implements ICustomerService {
            boolean check = getAllCustomer().stream().anyMatch(
                    cus -> ( cus.getCCCD().equals(info.getCCCD())|| cus.getTaikhoan().equals(info.getTaikhoan()))
            );
-           Customers admin = getAdmin();
-           if( admin != null ){
-               if(info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan()))){
-                   check = true;
-               }
-           }
            if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
        }
         List<Info_user> list = getCustomerByRoomId(info.getRoom());
@@ -127,7 +113,10 @@ public class CustomerService implements ICustomerService {
             if( Room.getLimit() == list.size()){
                 return false;
             }
-            c.setRoom(iRoomService.getRoom(info.getRoom()).get());
+            HistoryCustomer h = new HistoryCustomer();
+            h.setBeginDate(LocalDateTime.now());
+            h.setRoomOld(iRoomService.getRoom(info.getRoom()).get());
+            c.getHistoryCustomer().add(h);
         }
 
         c.setFirstName(info.getFirst_name());
@@ -148,15 +137,9 @@ public class CustomerService implements ICustomerService {
         if(info.getEmail() != null){
             c.setEmail(info.getEmail());
         }
-
-        Users u = new Users();
-        u.setUsername(info.getTaikhoan());
-        u.setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
-        u.setActive(true);
-        Auth a =  auth_repo.getAuth();
         UserAuth ua = new UserAuth();
-        ua.setUsersId(u);
-        ua.setAuthId(a);
+        ua.setUsername(info.getTaikhoan());
+        ua.setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
         c.setUserAuthId(ua);
         customerRepository.save(c);
         return true;
@@ -168,10 +151,6 @@ public class CustomerService implements ICustomerService {
         boolean check = getAllCustomer().stream().anyMatch(
                 c -> (c.getId() != id && ( c.getCCCD().equals(info.getCCCD())|| c.getTaikhoan().equals(info.getTaikhoan())))
         );
-        Customers admin = getAdmin();
-        if(Customer.getCustomerId() != admin.getCustomerId() && (info.getCCCD().equals(admin.getCCCD()) || (admin.getUserAuthId().getUsersId().getUsername().equals(info.getTaikhoan())))){
-            check = true;
-        }
         if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
 
         if( info.getFirst_name() !=  null){
@@ -199,26 +178,47 @@ public class CustomerService implements ICustomerService {
             Customer.setSex(info.getSex());
         }
         if( info.getTaikhoan() !=  null){
-            Customer.getUserAuthId().getUsersId().setUsername(info.getTaikhoan());
+            Customer.getUserAuthId().setUsername(info.getTaikhoan());
         }
         if( info.getMatkhau() !=  null) {
-            Customer.getUserAuthId().getUsersId().setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
+            Customer.getUserAuthId().setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
         }
-        if( info.getRoom() != 0 )
-            Customer.setRoom(iRoomService.getRoom(info.getRoom()).get());
+        if( info.getRoom() != 0 ) {
+            Optional<HistoryCustomer> h = Customer.getHistoryCustomer().stream().filter(t-> t.getEndDate() == null).findFirst();
+            if( h.isPresent()){
+                h.get().setEndDate(LocalDateTime.now());
+                if( roomRepo.findById(info.getRoom()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay phong");
+                h.get().setRoomNew(   roomRepo.findById(info.getRoom()).get());
+            }else{
+                throw new RuntimeException("Lỗi lịch sử phòng");
+            }
+        }
+
         customerRepository.save(Customer);
     }
 
     @Override
     public void deleteCustomer(int id) {
-        List<Contracts> listCT = iContracService.getAllContract();
-        listCT.stream().forEach( c ->{
-            if( c.getCusId().getCustomerId() == id && c.getEndDate().isBefore(LocalDate.now()) ){
-                throw new ResourceNotFoundException("Con rang buoc boi bill");
-            }
-        });
-        Customers Customer = getCustomer(id).get();
-        customerRepository.delete(Customer);
+        try{
+            List<Contracts> listCT = iContracService.getAllContract();
+            listCT.stream().forEach( c ->{
+                if( c.getCusId().getCustomerId() == id && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus()) ){
+                    System.out.println( c.getEndDate().isBefore(LocalDate.now()) );
+                    throw new ResourceNotFoundException("Con rang buoc boi Hop Dong");
+                }
+            });
+            Customers Customer = getCustomer(id).get();
+//            session.beginTransaction();
+            customerRepository.delete(Customer);
+//            session.getTransaction().commit();
+        }
+        catch (Exception ex){
+//            session.getTransaction().rollback();
+            throw new ResourceNotFoundException(ex.getMessage());
+        }
+        finally {
+//            session.close();
+        }
     }
 
     @Override
@@ -227,3 +227,9 @@ public class CustomerService implements ICustomerService {
     }
 
 }
+
+
+
+
+
+

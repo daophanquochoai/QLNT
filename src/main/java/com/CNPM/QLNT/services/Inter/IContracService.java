@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IContracService {
     List<Contracts> getAllContract();
-    Contracts getContractById(int id);
+    Contracts getContractById(Integer id);
 }

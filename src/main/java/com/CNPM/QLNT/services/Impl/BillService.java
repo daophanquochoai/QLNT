@@ -2,11 +2,17 @@ package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Bill;
+import com.CNPM.QLNT.model.ElectricPrice;
+import com.CNPM.QLNT.model.WaterPrice;
 import com.CNPM.QLNT.repository.BillRepo;
+import com.CNPM.QLNT.repository.ElectricPriceRepo;
+import com.CNPM.QLNT.repository.WaterPriceRepo;
 import com.CNPM.QLNT.response.BIllInRoom;
+import com.CNPM.QLNT.response.PriceQuotation;
 import com.CNPM.QLNT.response.Report;
 import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.IBillService;
+import com.CNPM.QLNT.services.Inter.IDonGiaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +28,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BillService implements IBillService {
     private final BillRepo billRepo;
+//    private final ElectricPriceRepo electricPriceRepo;
+//    private final WaterPriceRepo waterPriceRepo;
+    private final IDonGiaService iDonGiaService;
     @Override
     public List<Bill> getAllBill() {
         return billRepo.findAll();
@@ -35,20 +44,17 @@ public class BillService implements IBillService {
             List<Bill> l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
             List<BIllInRoom> listCD = (List<BIllInRoom>) l.stream().map(b -> {
                 BIllInRoom br = new BIllInRoom();
-                br.setNumber_E_Begin(b.getElectricNumberBegin());
-                br.setNumber_E_End(b.getElectricNumberEnd());
+                br.setElectricNumberBegin(b.getElectricNumberBegin());
+                br.setElectricNumberEnd(b.getElectricNumberEnd());
                 br.setNumberBill(b.getBillId());
-                br.setDay_Begin(b.getBeginDate());
-                br.setDay_End(b.getEndDate());
-                br.setNumber_W_Begin(b.getWaterNumberBegin());
-                br.setNumber_W_End(b.getWaterNumberEnd());
-                br.setOther_Price(b.getOtherPrice());
-                br.setGhi_Chu(b.getGhiChu());
-                br.setThanh_Tien(
-                        BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
-                                + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                br.setBeginDate(b.getBeginDate());
+                br.setEndDate(b.getEndDate());
+                br.setWaterNumberBegin(b.getWaterNumberBegin());
+                br.setWaterNumberEnd(b.getWaterNumberEnd());
+                br.setGhiChu(b.getGhiChu());
+                br.setTotal(
+                    b.getTotal()
                 );
-                br.setGhi_Chu(b.getGhiChu());
                 br.setDong_tien( b.getStatus());
                 br.setRoomId(b.getRoomId().getId());
                 return br;
@@ -58,20 +64,17 @@ public class BillService implements IBillService {
             l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.TRUE)).collect(Collectors.toList());
             List<BIllInRoom> listDD = (List<BIllInRoom>) l.stream().map(b -> {
                 BIllInRoom br = new BIllInRoom();
-                br.setNumber_E_Begin(b.getElectricNumberBegin());
-                br.setNumber_E_End(b.getElectricNumberEnd());
+                br.setElectricNumberBegin(b.getElectricNumberBegin());
+                br.setElectricNumberEnd(b.getElectricNumberEnd());
                 br.setNumberBill(b.getBillId());
-                br.setDay_Begin(b.getBeginDate());
-                br.setDay_End(b.getEndDate());
-                br.setNumber_W_Begin(b.getWaterNumberBegin());
-                br.setNumber_W_End(b.getWaterNumberEnd());
-                br.setOther_Price(b.getOtherPrice());
-                br.setGhi_Chu(b.getGhiChu());
-                br.setThanh_Tien(
-                        BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
-                                + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                br.setBeginDate(b.getBeginDate());
+                br.setEndDate(b.getEndDate());
+                br.setWaterNumberBegin(b.getWaterNumberBegin());
+                br.setWaterNumberEnd(b.getWaterNumberEnd());
+                br.setGhiChu(b.getGhiChu());
+                br.setTotal(
+                        b.getTotal()
                 );
-                br.setGhi_Chu(b.getGhiChu());
                 br.setDong_tien( b.getStatus());
                 br.setRoomId(b.getRoomId().getId());
                 return br;
@@ -90,20 +93,17 @@ public class BillService implements IBillService {
             List<BIllInRoom> listBR = new ArrayList<>();
             listB.get().stream().forEach(b-> {
                 BIllInRoom br = new BIllInRoom();
-                br.setNumber_E_Begin(b.getElectricNumberBegin());
-                br.setNumber_E_End(b.getElectricNumberEnd());
+                br.setElectricNumberBegin(b.getElectricNumberBegin());
+                br.setElectricNumberEnd(b.getElectricNumberEnd());
                 br.setNumberBill(b.getBillId());
-                br.setDay_Begin(b.getBeginDate());
-                br.setDay_End(b.getEndDate());
-                br.setNumber_W_Begin(b.getWaterNumberBegin());
-                br.setNumber_W_End(b.getWaterNumberEnd());
-                br.setOther_Price(b.getOtherPrice());
-                br.setGhi_Chu(b.getGhiChu());
-                br.setThanh_Tien(
-                        BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
-                        + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+                br.setBeginDate(b.getBeginDate());
+                br.setEndDate(b.getEndDate());
+                br.setWaterNumberBegin(b.getWaterNumberBegin());
+                br.setWaterNumberEnd(b.getWaterNumberEnd());
+                br.setGhiChu(b.getGhiChu());
+                br.setTotal(
+                        b.getTotal()
                 );
-                br.setGhi_Chu(b.getGhiChu());
                 br.setDong_tien( b.getStatus());
                 br.setRoomId(b.getRoomId().getId());
                 listBR.add(br);
@@ -118,20 +118,17 @@ public class BillService implements IBillService {
         List<BIllInRoom> listBR = new ArrayList<>();
         listB.get().stream().forEach(b-> {
             BIllInRoom br = new BIllInRoom();
-            br.setNumber_E_Begin(b.getElectricNumberBegin());
-            br.setNumber_E_End(b.getElectricNumberEnd());
+            br.setElectricNumberBegin(b.getElectricNumberBegin());
+            br.setElectricNumberEnd(b.getElectricNumberEnd());
             br.setNumberBill(b.getBillId());
-            br.setDay_Begin(b.getBeginDate());
-            br.setDay_End(b.getEndDate());
-            br.setNumber_W_Begin(b.getWaterNumberBegin());
-            br.setNumber_W_End(b.getWaterNumberEnd());
-            br.setOther_Price(b.getOtherPrice());
-            br.setGhi_Chu(b.getGhiChu());
-            br.setThanh_Tien(
-                    BigInteger.valueOf((long) b.getPriceQuotationId().getElectricityPrice() *(b.getElectricNumberEnd()-b.getElectricNumberBegin())
-                            + (long) b.getPriceQuotationId().getWaterPrice() * (b.getWaterNumberEnd()-b.getWaterNumberBegin()) + b.getOtherPrice())
+            br.setBeginDate(b.getBeginDate());
+            br.setEndDate(b.getEndDate());
+            br.setWaterNumberBegin(b.getWaterNumberBegin());
+            br.setWaterNumberEnd(b.getWaterNumberEnd());
+            br.setGhiChu(b.getGhiChu());
+            br.setTotal(
+                    b.getTotal()
             );
-            br.setGhi_Chu(b.getGhiChu());
             br.setDong_tien( b.getStatus());
             br.setRoomId(b.getRoomId().getId());
             listBR.add(br);
@@ -144,17 +141,52 @@ public class BillService implements IBillService {
         return billRepo.getBillByYear(year)
                 .stream()
                 .mapToLong(bill -> {
-                    long electricityCost = Optional.ofNullable(bill.getPriceQuotationId())
-                            .map(priceQuotation -> (long) priceQuotation.getElectricityPrice())
-                            .orElse(0L);
-                    long waterCost = Optional.ofNullable(bill.getPriceQuotationId())
-                            .map(priceQuotation -> (long) priceQuotation.getWaterPrice())
-                            .orElse(0L);
-                    long electricityTotal = electricityCost * (bill.getElectricNumberEnd() - bill.getElectricNumberBegin());
-                    long waterTotal = waterCost * (bill.getWaterNumberEnd() - bill.getWaterNumberBegin());
-                    long otherPrice = bill.getOtherPrice();
-                    return electricityTotal + waterTotal + otherPrice;
+                    return bill.getTotal();
                 })
                 .sum();
+    }
+
+    @Override
+    public void billCalculator(BIllInRoom bill) {
+        try{
+            Bill b = new Bill();
+            if( bill.getBeginDate() == null ){
+                throw new ResourceNotFoundException("beginDate");
+            }else{
+                b.setBeginDate(bill.getBeginDate());
+            }
+            if( bill.getEndDate() == null){
+                throw new ResourceNotFoundException("endDate");
+            }else{
+                if( bill.getEndDate().isAfter(bill.getBeginDate())){
+                    b.setEndDate(bill.getEndDate());
+                }else{
+                    throw new ResourceNotFoundException("endDate");
+                }
+            }
+            if( bill.getElectricNumberBegin() >= 0){
+                b.setElectricNumberBegin(bill.getElectricNumberBegin());
+            }
+            if( bill.getElectricNumberEnd() > bill.getElectricNumberBegin()){
+                b.setElectricNumberEnd(bill.getElectricNumberEnd());
+            }else {
+                throw new ResourceNotFoundException("electricNumberEnd");
+            }
+            if( bill.getWaterNumberBegin() >= 0){
+                b.setWaterNumberBegin(bill.getWaterNumberBegin());
+            }
+            if( bill.getElectricNumberEnd() > bill.getWaterNumberBegin()){
+                b.setWaterNumberEnd(bill.getWaterNumberEnd());
+            }else {
+                throw new ResourceNotFoundException("electricNumberEnd");
+            }
+            b.setGhiChu(bill.getGhiChu());
+            Integer numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
+            Integer numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
+            PriceQuotation price = iDonGiaService.getDonGiaNow();
+
+        }catch (Exception ex){
+
+        }
     }
 }

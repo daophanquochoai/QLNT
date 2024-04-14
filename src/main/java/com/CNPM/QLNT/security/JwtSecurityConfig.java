@@ -74,14 +74,10 @@ public class JwtSecurityConfig{
     public JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource) {
         JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
         jdbcUserDetailsManager.setUsersByUsernameQuery(
-                "SELECT username, password, active FROM users WHERE username = ?"
+                "SELECT user_name, password, active FROM user_auth WHERE user_name = ?"
         );
         jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
-                "SELECT u.username, a.role " +
-                        "FROM users u " +
-                        "JOIN user_auth ua ON u.id = ua.users_id " +
-                        "JOIN auth a ON ua.auth_id = a.id " +
-                        "WHERE u.username = ?"
+                "SELECT user_name, role FROM user_auth WHERE user_name = ?"
         );
         return jdbcUserDetailsManager;
     }

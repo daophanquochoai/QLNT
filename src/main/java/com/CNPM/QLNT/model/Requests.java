@@ -3,7 +3,6 @@ package com.CNPM.QLNT.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -28,4 +27,9 @@ public class Requests {
 
     @Column(name = "message", nullable = false, columnDefinition = "nvarchar(255)")
     private String message;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "customer")
+    private Customers customer;
+    @Column( name = "sendOrRei")
+    private Boolean senOrRei;
 }

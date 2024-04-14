@@ -2,6 +2,7 @@ package com.CNPM.QLNT.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import java.time.LocalDate;
 
@@ -18,15 +19,13 @@ public class Contracts {
     @Column(name = "contractsId")
     private int contractsId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne( fetch = FetchType.EAGER)
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
     private Customers cusId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "onwer_id", referencedColumnName = "customerId", nullable = false)
-    private Customers ownId;
-
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @JoinColumn(name = "roomId", referencedColumnName = "id", nullable = false, unique = true)
     private com.CNPM.QLNT.model.Room Room;
 

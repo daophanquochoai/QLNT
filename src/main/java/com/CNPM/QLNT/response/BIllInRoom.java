@@ -11,15 +11,14 @@ import java.time.LocalDate;
 @Setter
 public class BIllInRoom {
     private int numberBill;
-    private LocalDate day_Begin;
-    private LocalDate day_End;
-    private int number_E_Begin;
-    private int number_E_End;
-    private int number_W_Begin;
-    private int number_W_End;
-    private int other_Price;
-    private String ghi_Chu;
-    private BigInteger thanh_Tien;
+    private LocalDate beginDate;
+    private LocalDate endDate;
+    private int electricNumberBegin;
+    private int electricNumberEnd;
+    private int waterNumberBegin;
+    private int waterNumberEnd;
+    private String ghiChu;
+    private Long total;
     private boolean dong_tien;
     private int roomId;
 }

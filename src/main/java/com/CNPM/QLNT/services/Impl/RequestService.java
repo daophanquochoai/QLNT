@@ -1,10 +1,14 @@
 package com.CNPM.QLNT.services.Impl;
 
+import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Requests;
 import com.CNPM.QLNT.repository.RequestRepo;
 import com.CNPM.QLNT.services.Inter.IRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,5 +18,36 @@ public class RequestService implements IRequestService {
     @Override
     public void addRequest_DonGia(Requests re) {
             requestRepo.save(re);
+    }
+
+    @Override
+    public List<Requests> getAllRequestOfCustomerByStatus(boolean status) {
+        return requestRepo.getRequestOfCustomerByStatus(status);
+    }
+
+    @Override
+    public List<Requests> getAllRequestOfCustomer() {
+        return requestRepo.getAllRequestOfCustomer();
+    }
+
+    @Override
+    public void updateRequest(int id) {
+        Optional<Requests> r = requestRepo.findById(id);
+        if( r.isEmpty()) throw new ResourceNotFoundException("Khong Tim Thay Yeu Cau");
+        r.get().setStatus(true);
+        requestRepo.save(r.get());
+    }
+
+    @Override
+    public void deleteCommunication(int id) {
+        Optional<Requests> r = requestRepo.findById(id);
+        if( r.isEmpty()) throw new ResourceNotFoundException("Khong Tim Thay Yeu Cau");
+        if( r.get().getStatus() == false) throw new ResourceNotFoundException("Vui long dap ung yeu cay truoc");
+        requestRepo.delete(r.get());
+    }
+
+    @Override
+    public List<Requests> getNoticeBySender(Integer id) {
+        return requestRepo.getAllRequestOfAdmin(id);
     }
 }

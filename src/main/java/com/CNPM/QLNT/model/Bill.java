@@ -43,18 +43,14 @@ public class Bill {
     @Column(name = "waterNumberEnd", nullable = false)
     private int waterNumberEnd;
 
-    @Column(name = "otherPrice", nullable = false)
-    private int otherPrice;
-
     @Column(name = "status", nullable = false)
     private Boolean status;
 
     @Column(name = "ghiChu", columnDefinition = "nvarchar(255)")
     private String ghiChu;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "donGiaId")
-    private PriceQuotation priceQuotationId;
+    @Column(name = "total", columnDefinition = "MONEY")
+    private Long total;
 
     @Override
     public String toString() {
@@ -67,10 +63,9 @@ public class Bill {
                 ", electricNumberEnd=" + electricNumberEnd +
                 ", waterNumberBegin=" + waterNumberBegin +
                 ", waterNumberEnd=" + waterNumberEnd +
-                ", otherPrice=" + otherPrice +
                 ", status=" + status +
                 ", ghiChu='" + ghiChu + '\'' +
-                ", priceQuotationId=" + priceQuotationId +
+                ", total=" + total +
                 '}';
     }
 }

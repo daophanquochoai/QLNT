@@ -1,6 +1,6 @@
 package com.CNPM.QLNT.services.Impl;
 
-import com.CNPM.QLNT.repository.homeCategoryRepo;
+import com.CNPM.QLNT.repository.HomeCategoryRepo;
 import com.CNPM.QLNT.services.Inter.IHomeCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class HomeCategory implements IHomeCategory {
-    private final homeCategoryRepo homeCaRepo;
+    private final HomeCategoryRepo homeCaRepo;
     @Override
     public void addHomeCate(com.CNPM.QLNT.model.HomeCategory homeCate) {
         List<com.CNPM.QLNT.model.HomeCategory> homeCategory = homeCaRepo.findAll();

@@ -10,8 +10,7 @@ import java.util.Optional;
 public interface ICustomerService {
     List<Info_user> getAllCustomer();
     Optional<Customers> getCustomer(int cus_id);
-    Customers getAdmin();
-    List<Info_user> getCustomerByRoomId(int room_id);
+    List<Info_user> getCustomerByRoomId(Integer room_id);
     Boolean addCustomer(Info_user info) throws Exception;
     void updateCustomer(int id, Info_user info);
     void deleteCustomer(int id);

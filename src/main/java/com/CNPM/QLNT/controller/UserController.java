@@ -1,10 +1,8 @@
 package com.CNPM.QLNT.controller;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Customers;
-import com.CNPM.QLNT.model.PriceQuotation;
-import com.CNPM.QLNT.model.Requests;
-import com.CNPM.QLNT.model.Room;
+import com.CNPM.QLNT.model.*;
+import com.CNPM.QLNT.response.InfoContract;
 import com.CNPM.QLNT.response.Info_user;
 import com.CNPM.QLNT.services.Inter.*;
 import com.CNPM.QLNT.services.Impl.RoomService;
@@ -15,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +26,7 @@ public class UserController {
     private final ICustomerService iCustomerService;
     private final IDonGiaService iDonGiaService;
     private final IBillService iBillService;
-    private final ICommuService  iCommuService;
+    private final IRequestService  iRequestService;
     private final IContracService iContracService;
 
     // 3. xem thong tin phong
@@ -43,28 +40,44 @@ public class UserController {
     }
     // 1/2. xem thong tin cua minh va ng khac
     @GetMapping("/customer/{cus_id}")
-    public Optional<Info_user> getCustomerById(@PathVariable int cus_id){
+    public Optional<?> getCustomerById(@PathVariable Integer cus_id){
         Optional<Customers> theCustomer = iCustomerService.getCustomer(cus_id);
         if(theCustomer.isEmpty() ){
             throw new ResourceNotFoundException("Not Found Customer");
         }
         Customers Customer = theCustomer.get();
-        Info_user user = new Info_user(Customer.getCustomerId(),Customer.getFirstName(), Customer.getFirstName(), Customer.getCCCD(), Customer.getDate_of_birth(), Customer.getSex(), Customer.getInfoAddress(), Customer.getPhoneNumber(), Customer.getEmail(), Customer.getRoom().getId(), Customer.getUserAuthId().getUsersId().getUsername(), Customer.getUserAuthId().getUsersId().getPassword());
+        Info_user user = new Info_user(
+                Customer.getCustomerId(),
+                Customer.getFirstName(),
+                Customer.getFirstName(),
+                Customer.getCCCD(),
+                Customer.getDate_of_birth(),
+                Customer.getSex(),
+                Customer.getInfoAddress(),
+                Customer.getPhoneNumber(),
+                Customer.getEmail(),
+                Customer.getHistoryCustomer().size() == 0 ? -1 : Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId(),
+                Customer.getUserAuthId() == null ? "Chưa có tài khoản" : Customer.getUserAuthId().getUsername(),
+                Customer.getUserAuthId() == null ? "Chưa có tài khoản" : Customer.getUserAuthId().getPassword());
         return Optional.of(user);
     }
 
     // 4. xem gia dien, nuoc
-    @GetMapping("/dongia/getAll")
-    public List<PriceQuotation> getAll(){
-        return iDonGiaService.getDonGia();
+    @GetMapping("/gianuoc/all")
+    public ResponseEntity<List<?>> getAllWaterPrice(){
+        return ResponseEntity.ok(iDonGiaService.getAllWaterPrice());
+    }
+    @GetMapping("/giadien/all")
+    public ResponseEntity<List<?>> getAllElecPrice(){
+        return ResponseEntity.ok(iDonGiaService.getAllElectricProce());
     }
     // 1. lay thong tin chu tro
-    @GetMapping("/getAdmin")
-    public Info_user getAdmin(){
-        Customers c = iCustomerService.getAdmin();
-        Info_user admin = new Info_user(c.getCustomerId(),c.getFirstName(), c.getLastName(),c.getCCCD(),c.getDate_of_birth(),c.getSex(),c.getInfoAddress(), c.getPhoneNumber(),c.getEmail(),0,null,null);
-        return admin;
-    }
+//    @GetMapping("/getAdmin")
+//    public Info_user getAdmin(){
+//        Customers c = iCustomerService.getAdmin();
+//        Info_user admin = new Info_user(c.getCustomerId(),c.getFirstName(), c.getLastName(),c.getCCCD(),c.getDate_of_birth(),c.getSex(),c.getInfoAddress(), c.getPhoneNumber(),c.getEmail(),0,null,null);
+//        return admin;
+//    }
     // 5. Xem hoa don cua phong minh
     @GetMapping("get/bill/{room}")
     public ResponseEntity<?>  getAllBillByRoom(@PathVariable int room){
@@ -81,31 +94,32 @@ public class UserController {
         try {
             return ResponseEntity.ok(iBillService.getAllBillByStatus(room,status));
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
     //7 . Nhan thong bao tu chu tro
     @GetMapping("get/notice/{id}")
-    public ResponseEntity<?> getNoticce(@PathVariable int id){
+    public ResponseEntity<?> getNoticce(@PathVariable Integer id){
         try {
-            return ResponseEntity.ok(iCommuService.getNoticeBySender(id));
+            return ResponseEntity.ok(iRequestService.getNoticeBySender(id));
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
     // 8. Gui yeu cau den chu tro
     @PostMapping("add/notice/{id}")
-    @Transactional
+//    @Transactional
     public ResponseEntity<?> addNotice(@PathVariable int id, @RequestBody String mess){
         try{
             Requests request = new Requests();
             request.setCreatedDatatime(LocalDateTime.now());
-            request.setStatus(true);
+            request.setStatus(false);
             request.setMessage(mess);
-            iCommuService.addMessage(request,  iCustomerService.getCustomer(id).get(),iCustomerService.getAdmin());
+            request.setSenOrRei(true);
+            iRequestService.addRequest_DonGia(request);
             return ResponseEntity.ok("Them thanh cong");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -114,9 +128,24 @@ public class UserController {
 
     //9. Xem hopv dong cua  minh
     @GetMapping("get/contract/{id}")
-    public ResponseEntity<?> getContract(@PathVariable int id){
+    public ResponseEntity<?> getContract(@PathVariable Integer id){
         try{
-            return ResponseEntity.ok(iContracService.getContractById(id));
+            Contracts c = iContracService.getContractById(id);
+            InfoContract ic = new InfoContract();
+            ic.setCCCD(c.getCusId().getCCCD());
+            ic.setEmail(c.getCusId().getEmail());
+            ic.setBeginDate(c.getBeginDate());
+            ic.setConDate(c.getConDate());
+            ic.setEndDate(c.getEndDate());
+            ic.setSex(c.getCusId().getSex());
+            ic.setFirstName(c.getCusId().getFirstName());
+            ic.setStatus(c.getStatus());
+            ic.setInfoAddress(c.getCusId().getInfoAddress());
+            ic.setLastName(c.getCusId().getLastName());
+            ic.setNumberRoom(c.getRoom().getId());
+            ic.setPhoneNumber(c.getCusId().getPhoneNumber());
+            ic.setDate_of_birth(c.getCusId().getDate_of_birth());
+            return ResponseEntity.ok(ic);
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

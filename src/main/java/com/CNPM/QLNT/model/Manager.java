@@ -1,6 +1,5 @@
 package com.CNPM.QLNT.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -9,21 +8,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "Customer")
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
 @Getter
-public class Customers {
-
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Manager {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "customerId", nullable = false)
-    private int customerId;
+    @Column(name = "managerId")
+    private int managerId;
 
     @Column(name = "firstName", nullable = false, columnDefinition = "nvarchar(55)")
     private String firstName;
@@ -52,12 +47,5 @@ public class Customers {
 
     @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "userAuthId")
-    private UserAuth userAuthId = null;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customers", fetch = FetchType.EAGER)
-    @Column(name = "historyCustomer")
-    @JsonIgnore
-    private List<HistoryCustomer> historyCustomer = new ArrayList<>();
-
-
+    private UserAuth userAuthId;
 }

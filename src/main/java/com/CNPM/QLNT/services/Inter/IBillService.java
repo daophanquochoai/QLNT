@@ -12,4 +12,5 @@ public interface IBillService {
     List<BIllInRoom> getAllBillByRoom(int room);
     List<BIllInRoom> getAllBillByStatus(int room,boolean status);
     Long getDoanhThu(int year);
+    void billCalculator( BIllInRoom bill);
 }

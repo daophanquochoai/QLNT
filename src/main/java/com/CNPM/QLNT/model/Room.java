@@ -21,6 +21,7 @@ public class Room {
     private int id;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(name = "homeCategoryId", referencedColumnName = "homeCategoryId", nullable = false)
+    @JsonIgnore
     private HomeCategory homeCategoryId;
 
     @Column(name = "limit", nullable = false)
@@ -36,8 +37,8 @@ public class Room {
     @JsonIgnore
     private List<com.CNPM.QLNT.model.Bill> Bill;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId", fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<Customers> customers;
+    private List<RoomService> roomServices;
 
 }

@@ -2,10 +2,7 @@ package com.CNPM.QLNT.controller;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
-import com.CNPM.QLNT.response.Info_user;
-import com.CNPM.QLNT.response.Report;
-import com.CNPM.QLNT.response.RoomRes;
-import com.CNPM.QLNT.response.Statistical;
+import com.CNPM.QLNT.response.*;
 import com.CNPM.QLNT.services.Inter.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +27,9 @@ public class AdminController {
     private final IRoomService iRoomService;
     private final IHomeCategory iHomeCategory;
     private final IBillService iBillService;
-    private final ICommuService iCommuService;
+    private final IRequestService iRequestService;
+    private final IManagerService iManagerService;
+    private final IHistoryCustomerService iHistoryCustomerService;
 
     // lay tat ca phong
     @GetMapping("/getAllRoom")
@@ -54,14 +50,19 @@ public class AdminController {
            if(theCustomer.isEmpty() ){
                throw new ResourceNotFoundException("Khong tim  thay");
            }
-           Customers Customers = theCustomer.get();
-           int room;
-           if(Customers.getRoom() == null) {
-               room = 0;
-           }else {
-               room = Customers.getRoom().getId();
-           }
-           Info_user user = new Info_user(Customers.getCustomerId(), Customers.getFirstName(), Customers.getLastName(), Customers.getCCCD(), Customers.getDate_of_birth(), Customers.getSex(), Customers.getInfoAddress(), Customers.getPhoneNumber(), Customers.getEmail(), room, Customers.getUserAuthId().getUsersId().getUsername(), Customers.getUserAuthId().getUsersId().getPassword());
+           Info_user user = new Info_user(
+                   theCustomer.get().getCustomerId(),
+                   theCustomer.get().getFirstName(),
+                   theCustomer.get().getLastName(),
+                   theCustomer.get().getCCCD(),
+                   theCustomer.get().getDate_of_birth(),
+                   theCustomer.get().getSex(),
+                   theCustomer.get().getInfoAddress(),
+                   theCustomer.get().getPhoneNumber(),
+                   theCustomer.get().getEmail(),
+                   theCustomer.get().getHistoryCustomer() == null ? null : theCustomer.get().getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId(),
+                   theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getUsername(),
+                   theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getPassword());
            return ResponseEntity.of(Optional.of(user));
        }
        catch (Exception ex){
@@ -69,20 +70,34 @@ public class AdminController {
        }
     }
     // 9. thay doi don gia
-    @PostMapping("/dongia/add")
+    @PostMapping("/dongia/giadien/add")
     @Transactional
-    public ResponseEntity<?> saveDonGia(@RequestBody PriceQuotation dg){
+    public ResponseEntity<?> saveDonGia(@RequestBody ElectricPrice e){
         try{
-            iDonGiaService.saveDonGia(dg);
+            iDonGiaService.saveDElecPrice(e);
+            return ResponseEntity.ok("Chinh sua thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
+        }
+    }
+    @PostMapping("/dongia/gianuoc/add")
+    @Transactional
+    public ResponseEntity<?> saveDonGia(@RequestBody WaterPrice w){
+        try{
+                    iDonGiaService.saveWaterPrice(w);
             return ResponseEntity.ok("Chinh sua thanh cong");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
         }
     }
     // 13. lay don gia
-    @GetMapping("/dongia/all")
-    public ResponseEntity<List<?>> getAllDonGia(){
-        return ResponseEntity.ok(iDonGiaService.getDonGia());
+    @GetMapping("/dongia/gianuoc/all")
+    public ResponseEntity<List<?>> getAllWaterPrice(){
+        return ResponseEntity.ok(iDonGiaService.getAllWaterPrice());
+    }
+    @GetMapping("/dongia/giadien/all")
+    public ResponseEntity<List<?>> getAllElecPrice(){
+        return ResponseEntity.ok(iDonGiaService.getAllElectricProce());
     }
 
 
@@ -123,16 +138,11 @@ public class AdminController {
     @DeleteMapping("/remove/customer/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable int id){
         try {
-            if(iCustomerService.getCustomer(id).get().getRoom() != null ){
+            if(iCustomerService.getCustomer(id).get().getHistoryCustomer() == null ?
+                    true :
+                    iCustomerService.getCustomer(id).get().getHistoryCustomer().stream().filter(t->t.getEndDate() == null).findFirst().isPresent()){
                 throw new ResourceNotFoundException("Khach hang da thue tro");
             }
-            iContracService.getAllContract().stream().forEach(
-                    c->{
-                        if(c.getCusId().getCustomerId() == id && c.getEndDate().isAfter(LocalDate.now())){
-                            throw new ResourceNotFoundException("Khach hang ki hop dong");
-                        }
-                    }
-            );
             iCustomerService.deleteCustomer(id);
             return ResponseEntity.ok("Xoa thanh cong");
         }
@@ -267,7 +277,7 @@ public class AdminController {
     @GetMapping("get/notice/{status}")
     public ResponseEntity<?> getRequest(@PathVariable boolean status){
         try {
-            return ResponseEntity.ok(iCommuService.getRequest(iCustomerService.getAdmin().getCustomerId(), status));
+            return ResponseEntity.ok(iRequestService.getAllRequestOfCustomerByStatus(status));
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -277,7 +287,7 @@ public class AdminController {
     @GetMapping("get/notice/all")
     public ResponseEntity<?> getAll(){
         try{
-            return ResponseEntity.ok(iCommuService.getAll());
+            return ResponseEntity.ok(iRequestService.getAllRequestOfCustomer());
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -286,7 +296,7 @@ public class AdminController {
     @PutMapping("update/notice/{id}")
     public ResponseEntity<?> updateRequest(@PathVariable int id){
         try{
-            iCommuService.updateRequest(id);
+            iRequestService.updateRequest(id);
             return ResponseEntity.ok("Update Success");
         }catch (Exception ex)
         {
@@ -321,13 +331,73 @@ public class AdminController {
     }
     // xoa notice
     @DeleteMapping("remove/notice/{id}")
+    @Transactional
     public ResponseEntity<?> deletNoticeById(@PathVariable int id){
         try{
-            iCommuService.deleteCommunication(id);
+            iRequestService.deleteCommunication(id);
             return ResponseEntity.ok("Notice was deleted");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+    // xem nhan vien
+    @GetMapping("/get/manager/all")
+    public ResponseEntity<List<?>> getAllManager(){
+        try {
+            return ResponseEntity.ok(iManagerService.getAllManager());
+        }catch (Exception ex){
+            throw new ResourceNotFoundException("Dữ liệu không tìm thấy!!");
+        }
+    }
+    // xem 1 nhan vien
+    @GetMapping("get/manager/{id}")
+    public ResponseEntity<Manager> getManagerById( @PathVariable("id") Integer id){
+        Optional<Manager> m  = iManagerService.getManagerById(id);
+        if( m.isEmpty() ) throw new ResourceNotFoundException("Không tìm thấy Manager");
+        return ResponseEntity.ok(m.get());
+    }
+    // thay đổi manager
+    @PutMapping("update/manager/{id}")
+    @Transactional
+    public ResponseEntity<?> updateManagerById(
+            @PathVariable("id") Integer id,
+            @RequestBody InfoOfManager info
+    ){
+        try{
+            iManagerService.updateManager(id, info);
+            return ResponseEntity.ok("Cập nhật thành công");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    // xoa nhan vien theo ID
+    @DeleteMapping("delete/manager/id")
+    @Transactional
+    public ResponseEntity<?> deleteManagerId(
+            @PathVariable("id") Integer id
+    ){
+        try {
+            iManagerService.deleteManagerById(id);
+            return ResponseEntity.ok("Xóa thành công");
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    // lay lich su chuyen di
+    @GetMapping("get/history/all")
+    public ResponseEntity<?> getAllHistory(){
+        try {
+            return ResponseEntity.ok(iHistoryCustomerService.getAllHistoryCustomer());
+        }
+        catch (Exception ex){
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
 
+    // tinh hoa don
+    @PostMapping("add/bill")
+    public ResponseEntity<?> billCalculation( @RequestBody BIllInRoom bIllInRoom){
+
+    }
 }

@@ -2,7 +2,6 @@ package com.CNPM.QLNT.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
 @Entity
 @Table(name = "UserAuth")
@@ -17,15 +16,12 @@ public class UserAuth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
+    @Column(name = "userName", nullable = false, unique = true)
+    private String username;
+    @Column(name = "password", nullable = false)
+    private String password;
+    @Column(name = "role")
+    private String role;
+    private Boolean active;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "usersId", nullable = false, unique = true)
-    private Users usersId;
-
-    @ManyToOne
-    @Cascade({org.hibernate.annotations.CascadeType.DETACH,
-    org.hibernate.annotations.CascadeType.MERGE,
-    org.hibernate.annotations.CascadeType.REFRESH})
-    @JoinColumn(name = "authId", nullable = false)
-    private Auth authId;
 }

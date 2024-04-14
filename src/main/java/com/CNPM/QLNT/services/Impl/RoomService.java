@@ -3,7 +3,8 @@ package com.CNPM.QLNT.services.Impl;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.HomeCategory;
 import com.CNPM.QLNT.model.Room;
-import com.CNPM.QLNT.repository.RoomResitory;
+import com.CNPM.QLNT.repository.HistoryCustomerRepo;
+import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.IHomeCategory;
 import com.CNPM.QLNT.services.Inter.IRoomService;
@@ -21,9 +22,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RoomService implements IRoomService {
-
-    private final RoomResitory roomRepository;
+    private final RoomRepo roomRepository;
     private final IHomeCategory iHomeCategory;
+    private final HistoryCustomerRepo historyCustomerRepo;
 
     @Override
     public List<RoomRes> allRoom() {
@@ -68,13 +69,21 @@ public class RoomService implements IRoomService {
     @Override
     public void updateRoom(int id, RoomRes roomRes) {
         try{
+            if( getRoom(id).isEmpty() || id == 0) throw new ResourceNotFoundException("Phong khong ton tai");
             Room R = getRoom(id).get();
-            HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
-            R.setLimit(roomRes.getLimit());
-            R.setStatus(false);
-            R.setPrice(roomRes.getPrice());
-            R.setHomeCategoryId(homeCategory);
-            R.setStatus(roomRes.getStatus());
+            if( roomRes.getHome_category_name() != null) {
+                HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
+                R.setHomeCategoryId(homeCategory);
+            }
+            if( roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
+                R.setLimit(roomRes.getLimit());
+            }
+            if( roomRes.getStatus() != null) {
+                R.setStatus(roomRes.getStatus());
+            }
+            if( roomRes.getPrice() != null) {
+                R.setPrice(roomRes.getPrice());
+            }
             roomRepository.save(R);
         }
         catch (Exception ex){
@@ -109,21 +118,22 @@ public class RoomService implements IRoomService {
     @Override
     public List<RoomRes> getAllRoomByLimit(int type) {
         List<Room> l = new ArrayList<>();
+        List<Room> r = roomRepository.findAll();
         if(type == 1){
-            l = roomRepository.getRoomByTrong();
+            l = r.stream().filter( temp -> historyCustomerRepo.getCustmersByRoom(temp.getId()).size() == 0).collect(Collectors.toList());
         }else if( type == 2){
-            l = roomRepository.getRoomByThueTrong();
+            l = r.stream().filter( temp -> (historyCustomerRepo.getCustmersByRoom(temp.getId()).size() < temp.getLimit() && historyCustomerRepo.getCustmersByRoom(temp.getId()).size() > 0) ).collect(Collectors.toList());
         }else{
-            l = roomRepository.getRoomByDay();
+            l = r.stream().filter( temp -> historyCustomerRepo.getCustmersByRoom(temp.getId()).size() == temp.getLimit()).collect(Collectors.toList());
         }
         List<RoomRes> list = l.stream().map(
-                r ->
+                temp ->
                 {
-                    RoomRes rm = new RoomRes(r.getId(),
-                            r.getLimit(),
-                            r.getHomeCategoryId().getHome_category_name(),
-                            r.getPrice(),
-                            r.getStatus());
+                    RoomRes rm = new RoomRes(temp.getId(),
+                            temp.getLimit(),
+                            temp.getHomeCategoryId().getHome_category_name(),
+                            temp.getPrice(),
+                            temp.getStatus());
                     return rm;
                 }
         ).collect(Collectors.toList());
@@ -133,7 +143,7 @@ public class RoomService implements IRoomService {
     @Override
     public List<RoomRes> getRoomForBill() {
         List<Room> list = roomRepository.getRoomByStatus(true);
-        list = list.stream().filter( r->!r.getCustomers().isEmpty() &&
+        list = list.stream().filter( r-> historyCustomerRepo.getCustmersByRoom(r.getId()).size() != 0 &&
                 !r.getBill().stream().anyMatch( b->b.getBeginDate().getMonth().getValue() == LocalDate.now().getMonth().getValue()-1
                                             && b.getBeginDate().getYear() == LocalDate.now().getYear()
                 ))
