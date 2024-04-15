@@ -28,6 +28,7 @@ public class UserController {
     private final IBillService iBillService;
     private final IRequestService  iRequestService;
     private final IContracService iContracService;
+    private final IHistoryCustomerService iHistoryCustomerService;
 
     // 3. xem thong tin phong
     @GetMapping("/room/{room_id}")
@@ -132,22 +133,25 @@ public class UserController {
         try{
             Contracts c = iContracService.getContractById(id);
             InfoContract ic = new InfoContract();
-            ic.setCCCD(c.getCusId().getCCCD());
-            ic.setEmail(c.getCusId().getEmail());
             ic.setBeginDate(c.getBeginDate());
             ic.setConDate(c.getConDate());
             ic.setEndDate(c.getEndDate());
-            ic.setSex(c.getCusId().getSex());
-            ic.setFirstName(c.getCusId().getFirstName());
             ic.setStatus(c.getStatus());
-            ic.setInfoAddress(c.getCusId().getInfoAddress());
-            ic.setLastName(c.getCusId().getLastName());
-            ic.setNumberRoom(c.getRoom().getId());
-            ic.setPhoneNumber(c.getCusId().getPhoneNumber());
-            ic.setDate_of_birth(c.getCusId().getDate_of_birth());
+            ic.setRoomId(c.getRoom().getId());
+            ic.setCustomerId(c.getCusId().getCustomerId());
             return ResponseEntity.ok(ic);
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    // xem thong nguoi cua tat cả nguoi chung phong
+    @GetMapping("get/customer/room/{roomId}")
+    public ResponseEntity<?> getAllCustomerByRoomId(@PathVariable Integer roomId){
+        try {
+            return ResponseEntity.ok(iHistoryCustomerService.getAllCustomerByRoom(roomId));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi");
         }
     }
 

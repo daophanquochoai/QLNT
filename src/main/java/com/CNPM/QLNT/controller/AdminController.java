@@ -459,4 +459,24 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+
+    //////// xem họp đồng
+    @GetMapping("get/contract")
+    public ResponseEntity<?> getAllContract(){
+        try{
+            return ResponseEntity.ok(iContracService.getAllContract());
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+//    @PostMapping("add/contract/{customerId}/{roomId}")
+//    public ResponseEntity<?> saveContract(@PathVariable Integer customerId,
+//                                          @PathVariable Integer roomId,
+//                                          @RequestBody InfoContract infoContract){
+//        try{
+//
+//        }catch (Exception ex){
+//
+//        }
+//    }
 }

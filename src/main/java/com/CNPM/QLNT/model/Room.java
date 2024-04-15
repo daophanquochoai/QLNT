@@ -21,7 +21,6 @@ public class Room {
     private int id;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(name = "homeCategoryId", referencedColumnName = "homeCategoryId", nullable = false)
-    @JsonIgnore
     private HomeCategory homeCategoryId;
 
     @Column(name = "limit", nullable = false)
