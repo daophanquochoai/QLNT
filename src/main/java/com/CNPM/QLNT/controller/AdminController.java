@@ -30,6 +30,8 @@ public class AdminController {
     private final IRequestService iRequestService;
     private final IManagerService iManagerService;
     private final IHistoryCustomerService iHistoryCustomerService;
+    private final IRoomService_Service iRoomServiceService;
+    private final IService_Service iServiceService;
 
     // lay tat ca phong
     @GetMapping("/getAllRoom")
@@ -395,9 +397,66 @@ public class AdminController {
         }
     }
 
-    // tinh hoa don
+//     tinh hoa don
     @PostMapping("add/bill")
+    @Transactional
     public ResponseEntity<?> billCalculation( @RequestBody BIllInRoom bIllInRoom){
+        try{
+            iBillService.billCalculator(bIllInRoom);
+            return ResponseEntity.ok("Them hoa don thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
 
+    // lay dich vu tai thoi diem
+    @GetMapping("get/service/{roomId}/{date}")
+    public ResponseEntity<?> getServiceByRoomIdAndDate(@PathVariable Integer roomId,
+                                                             @PathVariable LocalDate date){
+        try{
+            return ResponseEntity.ok(iRoomServiceService.getServiceByRoomIdAndDate(roomId,date));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    @GetMapping("get/service/all")
+    public ResponseEntity<?> getAllService(){
+        try{
+            return ResponseEntity.ok(iServiceService.getAllService());
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    @PostMapping("add/service")
+    @Transactional
+    public ResponseEntity<?> saveService( @RequestBody Services services){
+        try{
+            iServiceService.saveService(services);
+            return ResponseEntity.ok("Them service thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    @PutMapping("update/service/{id}")
+    @Transactional
+    public ResponseEntity<?> updateService( @PathVariable Integer id, @RequestBody Services services){
+        try{
+            iServiceService.updateService(id, services);
+            return ResponseEntity.ok("Cap nhat service thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("add/roomservice/{id}")
+    @Transactional
+    public ResponseEntity<?> saveRoomService(@PathVariable Integer id,
+                                             @RequestBody InfoRoomService infoRoomService){
+        try{
+            iRoomServiceService.saveRoomService(id,infoRoomService);
+            return ResponseEntity.ok("Them service thanh cong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
     }
 }

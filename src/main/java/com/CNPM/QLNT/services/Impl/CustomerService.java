@@ -12,11 +12,8 @@ import com.CNPM.QLNT.services.Inter.ICustomerService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.id.Configurable;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +32,8 @@ public class CustomerService implements ICustomerService {
     private final IContracService iContracService;
     private final HistoryCustomerRepo historyCustomerRepo;
     private final RoomRepo roomRepo;
-//    private final SessionFactory sessionFactory = new Configuration().configure("hibernate.cfg.xml").
-//            buildSessionFactory();
-//    Session session = sessionFactory.openSession();
+    private final String Email_Regex = "^\\\\w+([-+.']\\\\w+)*@\\\\w+([-.]\\\\w+)*\\\\.\\\\w+([-.]\\\\w+)*$";
+    private final Pattern pattern = Pattern.compile(Email_Regex);
     @Override
     public List<Info_user> getAllCustomer() {
 
@@ -121,8 +117,12 @@ public class CustomerService implements ICustomerService {
 
         c.setFirstName(info.getFirst_name());
         c.setLastName(info.getLast_name());
+        if( info.getCCCD() == null || info.getCCCD().length() != 12){
+            throw new ResourceNotFoundException("CCCD");
+        }
         c.setCCCD(info.getCCCD());
         if(info.getDate_of_birth() != null){
+            if( info.getDate_of_birth().isAfter(LocalDate.now()) ) throw new ResourceNotFoundException("dateOfBirth");
             c.setDate_of_birth(info.getDate_of_birth());
         }
         if(info.getSex() != null){
@@ -132,9 +132,12 @@ public class CustomerService implements ICustomerService {
             c.setInfoAddress(info.getInfo_address());
         }
         if(info.getPhone_number() != null){
+            if( info.getPhone_number().length() != 10 || info.getPhone_number().charAt(0) != 0)  throw new ResourceNotFoundException("phoneNumber");
             c.setPhoneNumber(info.getPhone_number());
         }
         if(info.getEmail() != null){
+            Matcher matcher = pattern.matcher(info.getEmail());
+            if( !matcher.matches()) throw new ResourceNotFoundException("email");
             c.setEmail(info.getEmail());
         }
         UserAuth ua = new UserAuth();

@@ -20,7 +20,7 @@ public class RoomService {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "roomServiceId")
     private int roomServiceId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "roomId")
     private Room roomId;
     @OneToOne(fetch = FetchType.EAGER)

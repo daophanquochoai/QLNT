@@ -1,5 +1,6 @@
 package com.CNPM.QLNT.services.Impl;
 
+import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.ElectricPrice;
 import com.CNPM.QLNT.model.WaterPrice;
 import com.CNPM.QLNT.repository.ElectricPriceRepo;
@@ -39,11 +40,13 @@ public class DonGiaService implements IDonGiaService {
 
     @Override
     public void saveDElecPrice(ElectricPrice e) {
+        if( e.getPrice() < 0 ) throw new ResourceNotFoundException("Gia dien lon 0");
         electricPriceRepo.save(e);
     }
 
     @Override
     public void saveWaterPrice(WaterPrice w) {
+        if( w.getPrice() < 0 ) throw new ResourceNotFoundException("Gia nuoc lon 0");
         waterPriceRepo.save(w);
     }
 }

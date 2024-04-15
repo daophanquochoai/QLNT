@@ -6,13 +6,12 @@ import com.CNPM.QLNT.model.ElectricPrice;
 import com.CNPM.QLNT.model.WaterPrice;
 import com.CNPM.QLNT.repository.BillRepo;
 import com.CNPM.QLNT.repository.ElectricPriceRepo;
+import com.CNPM.QLNT.repository.RoomServiceRepo;
 import com.CNPM.QLNT.repository.WaterPriceRepo;
-import com.CNPM.QLNT.response.BIllInRoom;
-import com.CNPM.QLNT.response.PriceQuotation;
-import com.CNPM.QLNT.response.Report;
-import com.CNPM.QLNT.response.RoomRes;
+import com.CNPM.QLNT.response.*;
 import com.CNPM.QLNT.services.Inter.IBillService;
 import com.CNPM.QLNT.services.Inter.IDonGiaService;
+import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BillService implements IBillService {
     private final BillRepo billRepo;
-//    private final ElectricPriceRepo electricPriceRepo;
-//    private final WaterPriceRepo waterPriceRepo;
     private final IDonGiaService iDonGiaService;
+    private final RoomServiceRepo roomServiceRepo;
+
     @Override
     public List<Bill> getAllBill() {
         return billRepo.findAll();
@@ -184,7 +183,12 @@ public class BillService implements IBillService {
             Integer numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
             Integer numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
             PriceQuotation price = iDonGiaService.getDonGiaNow();
-
+            List<InfoService> infoService = roomServiceRepo.getAllServiceByRoomId(bill.getRoomId(),bill.getBeginDate());
+            Long total = 0L;
+            total += numberWater * price.getWaterPrice() + numberElec* price.getElectricPrice();
+            total += infoService.stream().mapToLong( s -> s.getQuantity()*s.getPrice()).sum();
+            b.setTotal(total);
+            billRepo.save(b);
         }catch (Exception ex){
 
         }

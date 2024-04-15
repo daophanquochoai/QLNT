@@ -17,5 +17,6 @@ public class Services {
     private int serviceId;
     @Column(name = "serviceName", unique = true)
     private String serviceName;
-    private int price;
+    @Column(columnDefinition = "MONEY")
+    private Long price;
 }
