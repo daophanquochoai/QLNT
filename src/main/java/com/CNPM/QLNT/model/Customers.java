@@ -44,7 +44,6 @@ public class Customers {
     private String infoAddress;
 
     @Column(name = "phoneNumber", unique = true, nullable = false, columnDefinition = "varchar(10)")
-    @Size(min = 10, message = "SDT lon hon 10 so")
     private String phoneNumber;
 
     @Column(name = "email")
@@ -55,8 +54,8 @@ public class Customers {
     private UserAuth userAuthId = null;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customers", fetch = FetchType.EAGER)
-    @Column(name = "historyCustomer")
     @JsonIgnore
+    @Column(name = "historyCustomer")
     private List<HistoryCustomer> historyCustomer = new ArrayList<>();
 
 

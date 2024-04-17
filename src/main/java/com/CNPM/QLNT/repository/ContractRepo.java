@@ -11,5 +11,6 @@ public interface ContractRepo extends JpaRepository<Contracts, Integer> {
     @Query("select c from Contracts c where c.cusId.customerId = :id")
     Contracts getContractById(Integer id);
 
-//    Optional<Contracts> getContractsByCusIdAndStatus(Integer CusId, Boolean status);
+    @Query("select c from Contracts c where c.cusId.customerId = :CusId and c.status = :status")
+    Optional<Contracts> getContractsByCusIdAndStatus(Integer CusId, Boolean status);
 }

@@ -2,10 +2,8 @@ package com.CNPM.QLNT.security;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Customers;
-import com.CNPM.QLNT.model.Manager;
 import com.CNPM.QLNT.model.UserAuth;
 import com.CNPM.QLNT.repository.CustomerRepository;
-import com.CNPM.QLNT.repository.ManagerRepo;
 import com.CNPM.QLNT.repository.UserAuthRepo;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +24,6 @@ public class JwtAuthenticationController {
     private CustomerRepository customerRepository;
     private AuthenticationManager authenticationManager;
     private UserAuthRepo userAuthRepo;
-    private ManagerRepo managerRepo;
 
 
 
@@ -34,13 +31,11 @@ public class JwtAuthenticationController {
     public JwtAuthenticationController(JwtTokenService tokenService,
                                        AuthenticationManager authenticationManager,
                                        CustomerRepository customerRepository,
-                                       UserAuthRepo userAuthRepo,
-                                       ManagerRepo managerRepo) {
+                                       UserAuthRepo userAuthRepo) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
         this.customerRepository = customerRepository;
         this.userAuthRepo = userAuthRepo;
-        this.managerRepo = managerRepo;
     }
 
     @PostMapping("/authenticate")
@@ -57,9 +52,8 @@ public class JwtAuthenticationController {
         Optional<UserAuth> ua = userAuthRepo.findByUsername(jwtTokenRequest.username());
         if( ua.isEmpty()) throw new ResourceNotFoundException("Lỗi lấy thông tin người dùng");
         UserAuth u = ua.get();
-        if( u.getRole().equals("ADMIN") || u.getRole().equals("MANAGER")){
-            Manager m = managerRepo.getInfoManager(u.getId());
-            return ResponseEntity.ok(new JwtTokenResponse(token,m));
+        if( u.getRole().equals("ADMIN") ){
+            return ResponseEntity.ok(new JwtTokenResponse(token,"ADMIN"));
         }
         else{
             Customers c = customerRepository.getInfoCustomerr(u.getId());

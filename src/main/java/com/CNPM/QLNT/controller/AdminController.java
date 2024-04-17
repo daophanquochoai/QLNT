@@ -28,7 +28,6 @@ public class AdminController {
     private final IHomeCategory iHomeCategory;
     private final IBillService iBillService;
     private final IRequestService iRequestService;
-    private final IManagerService iManagerService;
     private final IHistoryCustomerService iHistoryCustomerService;
     private final IRoomService_Service iRoomServiceService;
     private final IService_Service iServiceService;
@@ -115,6 +114,7 @@ public class AdminController {
     }
     // 3.them ng thue
     @PostMapping("/add/customer")
+    @Transactional
     public ResponseEntity<?> addCustomer(@RequestBody Info_user info){
         try{
             Boolean check = iCustomerService.addCustomer(info);
@@ -126,6 +126,7 @@ public class AdminController {
     }
     // 3.Sua nguoi thua
     @PutMapping("/update/customer/{id}")
+    @Transactional
     public ResponseEntity<?> updateCustomer(@PathVariable int id,
                                             @RequestBody Info_user info){
         try {
@@ -342,50 +343,6 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
-    // xem nhan vien
-    @GetMapping("/get/manager/all")
-    public ResponseEntity<List<?>> getAllManager(){
-        try {
-            return ResponseEntity.ok(iManagerService.getAllManager());
-        }catch (Exception ex){
-            throw new ResourceNotFoundException("Dữ liệu không tìm thấy!!");
-        }
-    }
-    // xem 1 nhan vien
-    @GetMapping("get/manager/{id}")
-    public ResponseEntity<Manager> getManagerById( @PathVariable("id") Integer id){
-        Optional<Manager> m  = iManagerService.getManagerById(id);
-        if( m.isEmpty() ) throw new ResourceNotFoundException("Không tìm thấy Manager");
-        return ResponseEntity.ok(m.get());
-    }
-    // thay đổi manager
-    @PutMapping("update/manager/{id}")
-    @Transactional
-    public ResponseEntity<?> updateManagerById(
-            @PathVariable("id") Integer id,
-            @RequestBody InfoOfManager info
-    ){
-        try{
-            iManagerService.updateManager(id, info);
-            return ResponseEntity.ok("Cập nhật thành công");
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-    // xoa nhan vien theo ID
-    @DeleteMapping("delete/manager/id")
-    @Transactional
-    public ResponseEntity<?> deleteManagerId(
-            @PathVariable("id") Integer id
-    ){
-        try {
-            iManagerService.deleteManagerById(id);
-            return ResponseEntity.ok("Xóa thành công");
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
     // lay lich su chuyen di
     @GetMapping("get/history/all")
     public ResponseEntity<?> getAllHistory(){
@@ -469,14 +426,15 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
-//    @PostMapping("add/contract/{customerId}/{roomId}")
-//    public ResponseEntity<?> saveContract(@PathVariable Integer customerId,
-//                                          @PathVariable Integer roomId,
-//                                          @RequestBody InfoContract infoContract){
-//        try{
-//
-//        }catch (Exception ex){
-//
-//        }
-//    }
+    @PostMapping("add/contract/{customerId}/{roomId}")
+    public ResponseEntity<?> saveContract(@PathVariable Integer customerId,
+                                          @PathVariable Integer roomId,
+                                          @RequestBody InfoContract infoContract){
+        try{
+            iContracService.saveContract(customerId,roomId,infoContract);
+            return ResponseEntity.ok("Luu thanh cong hop dong");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
 }

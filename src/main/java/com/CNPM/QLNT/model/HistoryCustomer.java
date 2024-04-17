@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Setter
@@ -29,7 +29,7 @@ public class HistoryCustomer {
     @JoinColumn(name = "roomNew", nullable = true)
     private Room roomNew;
     @Column(columnDefinition = "DATETIME", nullable = false)
-    private LocalDateTime beginDate;
+    private LocalDate beginDate;
     @Column(columnDefinition = "DATETIME", nullable = true)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 }

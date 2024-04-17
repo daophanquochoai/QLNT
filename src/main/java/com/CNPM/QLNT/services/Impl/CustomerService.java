@@ -32,7 +32,8 @@ public class CustomerService implements ICustomerService {
     private final IContracService iContracService;
     private final HistoryCustomerRepo historyCustomerRepo;
     private final RoomRepo roomRepo;
-    private final String Email_Regex = "^\\\\w+([-+.']\\\\w+)*@\\\\w+([-.]\\\\w+)*\\\\.\\\\w+([-.]\\\\w+)*$";
+    private final String Email_Regex = "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
+
     private final Pattern pattern = Pattern.compile(Email_Regex);
     @Override
     public List<Info_user> getAllCustomer() {
@@ -43,6 +44,11 @@ public class CustomerService implements ICustomerService {
                 .map(
                 c ->
                 {
+                    Integer roomId = -1;
+                    if( c.getHistoryCustomer() != null ){
+                        Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomers().getCustomerId() == c.getCustomerId())).findFirst();
+                        if( h.isPresent()) roomId = h.get().getRoomOld().getId();
+                    }
                     Info_user user = new Info_user(c.getCustomerId(),
                     c.getFirstName(),
                     c.getLastName(),
@@ -52,7 +58,7 @@ public class CustomerService implements ICustomerService {
                     c.getInfoAddress(),
                     c.getPhoneNumber(),
                     c.getEmail(),
-                    c.getHistoryCustomer()== null ? null : c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomers().getCustomerId() == c.getCustomerId())).findFirst().get().getRoomOld().getId(),
+                    roomId,
                      c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
                     c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
                     );
@@ -109,10 +115,6 @@ public class CustomerService implements ICustomerService {
             if( Room.getLimit() == list.size()){
                 return false;
             }
-            HistoryCustomer h = new HistoryCustomer();
-            h.setBeginDate(LocalDateTime.now());
-            h.setRoomOld(iRoomService.getRoom(info.getRoom()).get());
-            c.getHistoryCustomer().add(h);
         }
 
         c.setFirstName(info.getFirst_name());
@@ -132,7 +134,7 @@ public class CustomerService implements ICustomerService {
             c.setInfoAddress(info.getInfo_address());
         }
         if(info.getPhone_number() != null){
-            if( info.getPhone_number().length() != 10 || info.getPhone_number().charAt(0) != 0)  throw new ResourceNotFoundException("phoneNumber");
+            if( info.getPhone_number().length() != 10 || info.getPhone_number().charAt(0) != '0')  throw new ResourceNotFoundException("phoneNumber");
             c.setPhoneNumber(info.getPhone_number());
         }
         if(info.getEmail() != null){
@@ -140,17 +142,36 @@ public class CustomerService implements ICustomerService {
             if( !matcher.matches()) throw new ResourceNotFoundException("email");
             c.setEmail(info.getEmail());
         }
+        HistoryCustomer historyCustomer = new HistoryCustomer();
+        if( info.getRoom() != 0 ){
+            if( roomRepo.findById(info.getRoom()).isEmpty()) throw new ResourceNotFoundException("room");
+            else{
+                Room r = roomRepo.findById(info.getRoom()).get();
+                if( r.getLimit() < historyCustomerRepo.getCustmersByRoom(r.getId()).size() ) throw new ResourceNotFoundException("room day");
+                historyCustomer.setRoomOld(r);
+                historyCustomer.setBeginDate(LocalDate.now());
+            }
+        }
+
         UserAuth ua = new UserAuth();
         ua.setUsername(info.getTaikhoan());
         ua.setPassword(new BCryptPasswordEncoder().encode(info.getMatkhau()));
+        ua.setActive(true);
+        ua.setRole("USER");
         c.setUserAuthId(ua);
-        customerRepository.save(c);
+        Customers customers = customerRepository.save(c);
+        if( info.getRoom() != 0 ){
+            historyCustomer.setCustomers(customers);
+            historyCustomerRepo.save(historyCustomer);
+        }
         return true;
     }
 
     @Override
     public void updateCustomer(int id, Info_user info) {
-        Customers Customer = getCustomer(id).get();
+        Optional<Customers> C = getCustomer(id);
+        if( C.isEmpty()) throw new ResourceNotFoundException("Khong tim thay customer");
+        Customers Customer = C.get();
         boolean check = getAllCustomer().stream().anyMatch(
                 c -> (c.getId() != id && ( c.getCCCD().equals(info.getCCCD())|| c.getTaikhoan().equals(info.getTaikhoan())))
         );
@@ -188,15 +209,22 @@ public class CustomerService implements ICustomerService {
         }
         if( info.getRoom() != 0 ) {
             Optional<HistoryCustomer> h = Customer.getHistoryCustomer().stream().filter(t-> t.getEndDate() == null).findFirst();
+            if( roomRepo.findById(info.getRoom()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay phong");
             if( h.isPresent()){
-                h.get().setEndDate(LocalDateTime.now());
-                if( roomRepo.findById(info.getRoom()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay phong");
+                h.get().setEndDate(LocalDate.now());
                 h.get().setRoomNew(   roomRepo.findById(info.getRoom()).get());
-            }else{
-                throw new RuntimeException("Lỗi lịch sử phòng");
+            }
+            HistoryCustomer historyCustomer = new HistoryCustomer();
+            historyCustomer.setBeginDate(LocalDate.now());
+            historyCustomer.setRoomOld(roomRepo.findById(info.getRoom()).get());
+            historyCustomer.setCustomers(Customer);
+            historyCustomerRepo.save(historyCustomer);
+        }else{
+            Optional<HistoryCustomer> h = Customer.getHistoryCustomer().stream().filter(t-> t.getEndDate() == null).findFirst();
+            if( h.isPresent()){
+                h.get().setEndDate(LocalDate.now());
             }
         }
-
         customerRepository.save(Customer);
     }
 
@@ -211,16 +239,10 @@ public class CustomerService implements ICustomerService {
                 }
             });
             Customers Customer = getCustomer(id).get();
-//            session.beginTransaction();
             customerRepository.delete(Customer);
-//            session.getTransaction().commit();
         }
         catch (Exception ex){
-//            session.getTransaction().rollback();
             throw new ResourceNotFoundException(ex.getMessage());
-        }
-        finally {
-//            session.close();
         }
     }
 

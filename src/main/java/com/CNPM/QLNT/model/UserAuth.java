@@ -20,8 +20,9 @@ public class UserAuth {
     private String username;
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private String role;
+    @Column(nullable = false)
     private Boolean active;
 
 }

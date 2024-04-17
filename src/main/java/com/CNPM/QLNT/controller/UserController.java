@@ -9,6 +9,7 @@ import com.CNPM.QLNT.services.Impl.RoomService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.expression.spel.ast.NullLiteral;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,12 +42,16 @@ public class UserController {
     }
     // 1/2. xem thong tin cua minh va ng khac
     @GetMapping("/customer/{cus_id}")
-    public Optional<?> getCustomerById(@PathVariable Integer cus_id){
-        Optional<Customers> theCustomer = iCustomerService.getCustomer(cus_id);
-        if(theCustomer.isEmpty() ){
-            throw new ResourceNotFoundException("Not Found Customer");
-        }
-        Customers Customer = theCustomer.get();
+    public ResponseEntity<?> getCustomerById(@PathVariable Integer cus_id){
+       try{
+           Optional<Customers> theCustomer = iCustomerService.getCustomer(cus_id);
+           if(theCustomer.isEmpty() ){
+               throw new ResourceNotFoundException("Not Found Customer");
+           }
+           Customers Customer = theCustomer.get();
+//           System.out.println("===========================");
+//           log.info("{}",Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId());
+//           System.out.println("===========================");
         Info_user user = new Info_user(
                 Customer.getCustomerId(),
                 Customer.getFirstName(),
@@ -57,10 +62,13 @@ public class UserController {
                 Customer.getInfoAddress(),
                 Customer.getPhoneNumber(),
                 Customer.getEmail(),
-                Customer.getHistoryCustomer().size() == 0 ? -1 : Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId(),
+                Customer.getHistoryCustomer().isEmpty() ? -1 : Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId(),
                 Customer.getUserAuthId() == null ? "Chưa có tài khoản" : Customer.getUserAuthId().getUsername(),
                 Customer.getUserAuthId() == null ? "Chưa có tài khoản" : Customer.getUserAuthId().getPassword());
-        return Optional.of(user);
+           return ResponseEntity.ok(user);
+       }catch (Exception ex){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+       }
     }
 
     // 4. xem gia dien, nuoc
@@ -72,13 +80,7 @@ public class UserController {
     public ResponseEntity<List<?>> getAllElecPrice(){
         return ResponseEntity.ok(iDonGiaService.getAllElectricProce());
     }
-    // 1. lay thong tin chu tro
-//    @GetMapping("/getAdmin")
-//    public Info_user getAdmin(){
-//        Customers c = iCustomerService.getAdmin();
-//        Info_user admin = new Info_user(c.getCustomerId(),c.getFirstName(), c.getLastName(),c.getCCCD(),c.getDate_of_birth(),c.getSex(),c.getInfoAddress(), c.getPhoneNumber(),c.getEmail(),0,null,null);
-//        return admin;
-//    }
+
     // 5. Xem hoa don cua phong minh
     @GetMapping("get/bill/{room}")
     public ResponseEntity<?>  getAllBillByRoom(@PathVariable int room){
