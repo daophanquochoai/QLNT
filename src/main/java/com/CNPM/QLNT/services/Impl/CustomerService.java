@@ -46,13 +46,13 @@ public class CustomerService implements ICustomerService {
                 {
                     Integer roomId = -1;
                     if( c.getHistoryCustomer() != null ){
-                        Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomers().getCustomerId() == c.getCustomerId())).findFirst();
-                        if( h.isPresent()) roomId = h.get().getRoomOld().getId();
+                        Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomerId().getCustomerId() == c.getCustomerId())).findFirst();
+                        if( h.isPresent()) roomId = h.get().getRoomOld().getRoomId();
                     }
                     Info_user user = new Info_user(c.getCustomerId(),
                     c.getFirstName(),
                     c.getLastName(),
-                    c.getCCCD(),
+                    c.getIdentifier(),
                     c.getDate_of_birth(),
                     c.getSex(),
                     c.getInfoAddress(),
@@ -83,7 +83,7 @@ public class CustomerService implements ICustomerService {
                             c.getCustomerId(),
                             c.getFirstName(),
                             c.getLastName(),
-                            c.getCCCD(),
+                            c.getIdentifier(),
                             c.getDate_of_birth(),
                             c.getSex(),
                             c.getInfoAddress(),
@@ -107,7 +107,7 @@ public class CustomerService implements ICustomerService {
            boolean check = getAllCustomer().stream().anyMatch(
                    cus -> ( cus.getCCCD().equals(info.getCCCD())|| cus.getTaikhoan().equals(info.getTaikhoan()))
            );
-           if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
+           if( check) throw new ResourceNotFoundException("Bi trung Identify hoac Tai khoan");
        }
         List<Info_user> list = getCustomerByRoomId(info.getRoom());
         if( info.getRoom() != 0 && !iRoomService.getAllRoomByStatus(true).isEmpty()){
@@ -120,9 +120,9 @@ public class CustomerService implements ICustomerService {
         c.setFirstName(info.getFirst_name());
         c.setLastName(info.getLast_name());
         if( info.getCCCD() == null || info.getCCCD().length() != 12){
-            throw new ResourceNotFoundException("CCCD");
+            throw new ResourceNotFoundException("Identify");
         }
-        c.setCCCD(info.getCCCD());
+        c.setIdentifier(info.getCCCD());
         if(info.getDate_of_birth() != null){
             if( info.getDate_of_birth().isAfter(LocalDate.now()) ) throw new ResourceNotFoundException("dateOfBirth");
             c.setDate_of_birth(info.getDate_of_birth());
@@ -147,7 +147,7 @@ public class CustomerService implements ICustomerService {
             if( roomRepo.findById(info.getRoom()).isEmpty()) throw new ResourceNotFoundException("room");
             else{
                 Room r = roomRepo.findById(info.getRoom()).get();
-                if( r.getLimit() < historyCustomerRepo.getCustmersByRoom(r.getId()).size() ) throw new ResourceNotFoundException("room day");
+                if( r.getLimit() < historyCustomerRepo.getCustmersByRoom(r.getRoomId()).size() ) throw new ResourceNotFoundException("room day");
                 historyCustomer.setRoomOld(r);
                 historyCustomer.setBeginDate(LocalDate.now());
             }
@@ -161,7 +161,7 @@ public class CustomerService implements ICustomerService {
         c.setUserAuthId(ua);
         Customers customers = customerRepository.save(c);
         if( info.getRoom() != 0 ){
-            historyCustomer.setCustomers(customers);
+            historyCustomer.setCustomerId(customers);
             historyCustomerRepo.save(historyCustomer);
         }
         return true;
@@ -177,6 +177,10 @@ public class CustomerService implements ICustomerService {
         );
         if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
 
+        if( info.getCCCD() == null || info.getCCCD().length() != 12){
+            throw new ResourceNotFoundException("Identify");
+        }
+
         if( info.getFirst_name() !=  null){
             Customer.setFirstName(info.getFirst_name());
         }
@@ -184,22 +188,26 @@ public class CustomerService implements ICustomerService {
             Customer.setLastName(info.getLast_name());
         }
         if( info.getCCCD() !=  null){
-            Customer.setCCCD(info.getCCCD());
+            Customer.setIdentifier(info.getCCCD());
         }
         if( info.getInfo_address() !=  null){
             Customer.setInfoAddress(info.getInfo_address());
         }
         if( info.getDate_of_birth() !=  null){
+            if( info.getDate_of_birth().isAfter(LocalDate.now()) ) throw new ResourceNotFoundException("dateOfBirth");
             Customer.setDate_of_birth(info.getDate_of_birth());
         }
         if( info.getSex() !=  null){
             Customer.setSex(info.getSex());
         }
         if( info.getPhone_number() !=  null){
+            if( info.getPhone_number().length() != 10 || info.getPhone_number().charAt(0) != '0')  throw new ResourceNotFoundException("phoneNumber");
             Customer.setPhoneNumber(info.getPhone_number());
         }
         if( info.getEmail() !=  null){
-            Customer.setSex(info.getSex());
+            Matcher matcher = pattern.matcher(info.getEmail());
+            if( !matcher.matches()) throw new ResourceNotFoundException("email");
+            Customer.setEmail(info.getEmail());
         }
         if( info.getTaikhoan() !=  null){
             Customer.getUserAuthId().setUsername(info.getTaikhoan());
@@ -217,7 +225,7 @@ public class CustomerService implements ICustomerService {
             HistoryCustomer historyCustomer = new HistoryCustomer();
             historyCustomer.setBeginDate(LocalDate.now());
             historyCustomer.setRoomOld(roomRepo.findById(info.getRoom()).get());
-            historyCustomer.setCustomers(Customer);
+            historyCustomer.setCustomerId(Customer);
             historyCustomerRepo.save(historyCustomer);
         }else{
             Optional<HistoryCustomer> h = Customer.getHistoryCustomer().stream().filter(t-> t.getEndDate() == null).findFirst();

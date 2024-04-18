@@ -17,7 +17,7 @@ public class HomeCategory implements IHomeCategory {
 
         // Kiểm tra xem homeCate đã tồn tại trong danh sách chưa
         boolean isDuplicate = homeCategory.stream()
-                .anyMatch(h -> h.getHome_category_name().equals(homeCate.getHome_category_name()));
+                .anyMatch(h -> h.getRoomTypeName().equals(homeCate.getRoomTypeName()));
 
         if (!isDuplicate) {
             homeCaRepo.save(homeCate);
@@ -35,6 +35,6 @@ public class HomeCategory implements IHomeCategory {
 
     @Override
     public com.CNPM.QLNT.model.HomeCategory getHomeCategory(String home_name) {
-        return homeCaRepo.findAll().stream().filter(h->h.getHome_category_name().equals(home_name)).findFirst().get();
+        return homeCaRepo.findAll().stream().filter(h->h.getRoomTypeName().equals(home_name)).findFirst().get();
     }
 }

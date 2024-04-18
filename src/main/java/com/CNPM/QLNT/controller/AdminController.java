@@ -23,7 +23,7 @@ import java.util.Optional;
 public class AdminController {
     private final ICustomerService iCustomerService;
     private final IContracService iContracService;
-    private final IDonGiaService iDonGiaService;
+    private final IPriceService iPriceService;
     private final IRoomService iRoomService;
     private final IHomeCategory iHomeCategory;
     private final IBillService iBillService;
@@ -55,13 +55,13 @@ public class AdminController {
                    theCustomer.get().getCustomerId(),
                    theCustomer.get().getFirstName(),
                    theCustomer.get().getLastName(),
-                   theCustomer.get().getCCCD(),
+                   theCustomer.get().getIdentifier(),
                    theCustomer.get().getDate_of_birth(),
                    theCustomer.get().getSex(),
                    theCustomer.get().getInfoAddress(),
                    theCustomer.get().getPhoneNumber(),
                    theCustomer.get().getEmail(),
-                   theCustomer.get().getHistoryCustomer() == null ? null : theCustomer.get().getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId(),
+                   theCustomer.get().getHistoryCustomer() == null ? null : theCustomer.get().getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getRoomId(),
                    theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getUsername(),
                    theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getPassword());
            return ResponseEntity.of(Optional.of(user));
@@ -75,7 +75,7 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> saveDonGia(@RequestBody ElectricPrice e){
         try{
-            iDonGiaService.saveDElecPrice(e);
+            iPriceService.saveElecPrice(e);
             return ResponseEntity.ok("Chinh sua thanh cong");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
@@ -85,7 +85,7 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> saveDonGia(@RequestBody WaterPrice w){
         try{
-                    iDonGiaService.saveWaterPrice(w);
+                    iPriceService.saveWaterPrice(w);
             return ResponseEntity.ok("Chinh sua thanh cong");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
@@ -94,11 +94,11 @@ public class AdminController {
     // 13. lay don gia
     @GetMapping("/dongia/gianuoc/all")
     public ResponseEntity<List<?>> getAllWaterPrice(){
-        return ResponseEntity.ok(iDonGiaService.getAllWaterPrice());
+        return ResponseEntity.ok(iPriceService.getAllWaterPrice());
     }
     @GetMapping("/dongia/giadien/all")
     public ResponseEntity<List<?>> getAllElecPrice(){
-        return ResponseEntity.ok(iDonGiaService.getAllElectricProce());
+        return ResponseEntity.ok(iPriceService.getAllElectricPrice());
     }
 
 
@@ -160,7 +160,7 @@ public class AdminController {
         Optional<Room> Room = iRoomService.getRoom(idRoom);
         if(Room.isPresent()){
             com.CNPM.QLNT.model.Room R = Room.get();
-            return ResponseEntity.ok(new RoomRes(R.getId(),R.getLimit(),R.getHomeCategoryId().getHome_category_name(),R.getPrice(),R.getStatus()));
+            return ResponseEntity.ok(new RoomRes(R.getRoomId(),R.getLimit(),R.getHomeCategoryId().getRoomTypeName(),R.getPrice(),R.getStatus()));
         }
         else{
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong tim thay phong");
@@ -208,7 +208,7 @@ public class AdminController {
             );
             iContracService.getAllContract().stream().forEach(
                     c->{
-                        if(c.getRoom().getId() == id && c.getEndDate().isAfter(LocalDate.now())){
+                        if(c.getRoomId().getRoomId() == id && c.getEndDate().isAfter(LocalDate.now())){
                             throw new ResourceNotFoundException("Hop dong chua het han");
                         }
                     }

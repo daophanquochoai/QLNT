@@ -10,7 +10,7 @@ import com.CNPM.QLNT.repository.RoomServiceRepo;
 import com.CNPM.QLNT.repository.WaterPriceRepo;
 import com.CNPM.QLNT.response.*;
 import com.CNPM.QLNT.services.Inter.IBillService;
-import com.CNPM.QLNT.services.Inter.IDonGiaService;
+import com.CNPM.QLNT.services.Inter.IPriceService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BillService implements IBillService {
     private final BillRepo billRepo;
-    private final IDonGiaService iDonGiaService;
+    private final IPriceService iPriceService;
     private final RoomServiceRepo roomServiceRepo;
 
     @Override
@@ -50,12 +50,12 @@ public class BillService implements IBillService {
                 br.setEndDate(b.getEndDate());
                 br.setWaterNumberBegin(b.getWaterNumberBegin());
                 br.setWaterNumberEnd(b.getWaterNumberEnd());
-                br.setGhiChu(b.getGhiChu());
+                br.setGhiChu(b.getNote());
                 br.setTotal(
                     b.getTotal()
                 );
                 br.setDong_tien( b.getStatus());
-                br.setRoomId(b.getRoomId().getId());
+                br.setRoomId(b.getRoomId().getRoomId());
                 return br;
             }).collect(Collectors.toList());
             r.setChuaDong(listCD);
@@ -70,12 +70,12 @@ public class BillService implements IBillService {
                 br.setEndDate(b.getEndDate());
                 br.setWaterNumberBegin(b.getWaterNumberBegin());
                 br.setWaterNumberEnd(b.getWaterNumberEnd());
-                br.setGhiChu(b.getGhiChu());
+                br.setGhiChu(b.getNote());
                 br.setTotal(
                         b.getTotal()
                 );
                 br.setDong_tien( b.getStatus());
-                br.setRoomId(b.getRoomId().getId());
+                br.setRoomId(b.getRoomId().getRoomId());
                 return br;
             }).collect(Collectors.toList());
             r.setDaDong(listDD);
@@ -99,12 +99,12 @@ public class BillService implements IBillService {
                 br.setEndDate(b.getEndDate());
                 br.setWaterNumberBegin(b.getWaterNumberBegin());
                 br.setWaterNumberEnd(b.getWaterNumberEnd());
-                br.setGhiChu(b.getGhiChu());
+                br.setGhiChu(b.getNote());
                 br.setTotal(
                         b.getTotal()
                 );
                 br.setDong_tien( b.getStatus());
-                br.setRoomId(b.getRoomId().getId());
+                br.setRoomId(b.getRoomId().getRoomId());
                 listBR.add(br);
                 });
             return listBR;
@@ -124,12 +124,12 @@ public class BillService implements IBillService {
             br.setEndDate(b.getEndDate());
             br.setWaterNumberBegin(b.getWaterNumberBegin());
             br.setWaterNumberEnd(b.getWaterNumberEnd());
-            br.setGhiChu(b.getGhiChu());
+            br.setGhiChu(b.getNote());
             br.setTotal(
                     b.getTotal()
             );
             br.setDong_tien( b.getStatus());
-            br.setRoomId(b.getRoomId().getId());
+            br.setRoomId(b.getRoomId().getRoomId());
             listBR.add(br);
         });
         return listBR;
@@ -179,10 +179,10 @@ public class BillService implements IBillService {
             }else {
                 throw new ResourceNotFoundException("electricNumberEnd");
             }
-            b.setGhiChu(bill.getGhiChu());
+            b.setNote(bill.getGhiChu());
             Integer numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
             Integer numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
-            PriceQuotation price = iDonGiaService.getDonGiaNow();
+            PriceQuotation price = iPriceService.getPriceNow();
             List<InfoService> infoService = roomServiceRepo.getAllServiceByRoomId(bill.getRoomId(),bill.getBeginDate());
             Long total = 0L;
             total += numberWater * price.getWaterPrice() + numberElec* price.getElectricPrice();

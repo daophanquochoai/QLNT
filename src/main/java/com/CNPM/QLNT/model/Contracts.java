@@ -26,11 +26,11 @@ public class Contracts {
 
     @OneToOne
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
-    @JoinColumn(name = "roomId", referencedColumnName = "id", nullable = false, unique = true)
-    private com.CNPM.QLNT.model.Room Room;
+    @JoinColumn(name = "roomId", referencedColumnName = "roomId", nullable = false, unique = true)
+    private com.CNPM.QLNT.model.Room roomId;
 
-    @Column(name = "conDate", nullable = false, columnDefinition = "DATE")
-    private LocalDate conDate;
+    @Column(name = "createdDate", nullable = false, columnDefinition = "DATE")
+    private LocalDate createdDate;
 
     @Column(name = "beginDate", nullable = false, columnDefinition = "DATE")
     private LocalDate beginDate;

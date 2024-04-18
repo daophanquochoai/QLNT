@@ -19,9 +19,9 @@ public class HistoryCustomer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
     @ManyToOne
-    @JoinColumn(name = "customers")
+    @JoinColumn(name = "customerId")
     @JsonIgnore
-    private Customers customers;
+    private Customers customerId;
     @ManyToOne
     @JoinColumn(name = "roomOld", nullable = false)
     private Room roomOld;

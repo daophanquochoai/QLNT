@@ -14,9 +14,9 @@ public class HomeCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "homeCategoryId", nullable = false)
-    private int home_category_id;
+    @Column(name = "roomTypeId", nullable = false)
+    private int roomTypeId;
 
-    @Column(name = "homeCategoryName", nullable = false, unique = true, columnDefinition = "nvarchar(55)")
-    private String home_category_name;
+    @Column(name = "roomTypeName", nullable = false, unique = true, columnDefinition = "nvarchar(55)")
+    private String roomTypeName;
 }
