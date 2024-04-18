@@ -7,10 +7,10 @@ import com.CNPM.QLNT.response.PriceQuotation;
 
 import java.util.List;
 
-public interface IDonGiaService {
-    List<ElectricPrice> getAllElectricProce();
+public interface IPriceService {
+    List<ElectricPrice> getAllElectricPrice();
     List<WaterPrice> getAllWaterPrice();
-    void saveDElecPrice(ElectricPrice e);
+    void saveElecPrice(ElectricPrice e);
     void saveWaterPrice(WaterPrice w);
-    PriceQuotation getDonGiaNow();
+    PriceQuotation getPriceNow();
 }

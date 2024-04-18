@@ -32,9 +32,9 @@ public class RoomService implements IRoomService {
         List<RoomRes> l = list.stream().map(
                 r ->
                 {
-                    RoomRes rm = new RoomRes(r.getId(),
+                    RoomRes rm = new RoomRes(r.getRoomId(),
                             r.getLimit(),
-                            r.getHomeCategoryId().getHome_category_name(),
+                            r.getHomeCategoryId().getRoomTypeName(),
                             r.getPrice(),
                             r.getStatus());
                     return rm;
@@ -53,7 +53,7 @@ public class RoomService implements IRoomService {
         try{
             HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
             Room room = new Room();
-            room.setId(roomRes.getRoom_id());
+            room.setRoomId(roomRes.getRoom_id());
             room.setLimit(roomRes.getLimit());
             room.setPrice(roomRes.getPrice());
             room.setHomeCategoryId(homeCategory);
@@ -104,9 +104,9 @@ public class RoomService implements IRoomService {
         List<RoomRes> l = listRoom.stream().map(
                 r ->
                 {
-                    RoomRes rm = new RoomRes(r.getId(),
+                    RoomRes rm = new RoomRes(r.getRoomId(),
                             r.getLimit(),
-                            r.getHomeCategoryId().getHome_category_name(),
+                            r.getHomeCategoryId().getRoomTypeName(),
                             r.getPrice(),
                             r.getStatus());
                     return rm;
@@ -120,18 +120,18 @@ public class RoomService implements IRoomService {
         List<Room> l = new ArrayList<>();
         List<Room> r = roomRepository.findAll();
         if(type == 1){
-            l = r.stream().filter( temp -> historyCustomerRepo.getCustmersByRoom(temp.getId()).size() == 0).collect(Collectors.toList());
+            l = r.stream().filter( temp -> historyCustomerRepo.getCustmersByRoom(temp.getRoomId()).size() == 0).collect(Collectors.toList());
         }else if( type == 2){
-            l = r.stream().filter( temp -> (historyCustomerRepo.getCustmersByRoom(temp.getId()).size() < temp.getLimit() && historyCustomerRepo.getCustmersByRoom(temp.getId()).size() > 0) ).collect(Collectors.toList());
+            l = r.stream().filter( temp -> (historyCustomerRepo.getCustmersByRoom(temp.getRoomId()).size() < temp.getLimit() && historyCustomerRepo.getCustmersByRoom(temp.getRoomId()).size() > 0) ).collect(Collectors.toList());
         }else{
-            l = r.stream().filter( temp -> historyCustomerRepo.getCustmersByRoom(temp.getId()).size() == temp.getLimit()).collect(Collectors.toList());
+            l = r.stream().filter( temp -> historyCustomerRepo.getCustmersByRoom(temp.getRoomId()).size() == temp.getLimit()).collect(Collectors.toList());
         }
         List<RoomRes> list = l.stream().map(
                 temp ->
                 {
-                    RoomRes rm = new RoomRes(temp.getId(),
+                    RoomRes rm = new RoomRes(temp.getRoomId(),
                             temp.getLimit(),
-                            temp.getHomeCategoryId().getHome_category_name(),
+                            temp.getHomeCategoryId().getRoomTypeName(),
                             temp.getPrice(),
                             temp.getStatus());
                     return rm;
@@ -143,7 +143,7 @@ public class RoomService implements IRoomService {
     @Override
     public List<RoomRes> getRoomForBill() {
         List<Room> list = roomRepository.getRoomByStatus(true);
-        list = list.stream().filter( r-> historyCustomerRepo.getCustmersByRoom(r.getId()).size() != 0 &&
+        list = list.stream().filter( r-> historyCustomerRepo.getCustmersByRoom(r.getRoomId()).size() != 0 &&
                 !r.getBill().stream().anyMatch( b->b.getBeginDate().getMonth().getValue() == LocalDate.now().getMonth().getValue()-1
                                             && b.getBeginDate().getYear() == LocalDate.now().getYear()
                 ))
@@ -151,9 +151,9 @@ public class RoomService implements IRoomService {
         List<RoomRes> l = list.stream().map(
                 r ->
                 {
-                    RoomRes rm = new RoomRes(r.getId(),
+                    RoomRes rm = new RoomRes(r.getRoomId(),
                             r.getLimit(),
-                            r.getHomeCategoryId().getHome_category_name(),
+                            r.getHomeCategoryId().getRoomTypeName(),
                             r.getPrice(),
                             r.getStatus());
                     return rm;

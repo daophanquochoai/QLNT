@@ -21,7 +21,7 @@ public class Bill {
     private int billId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idRoom")
+    @JoinColumn(name = "roomId")
     @JsonIgnore
     private Room roomId;
 
@@ -46,8 +46,8 @@ public class Bill {
     @Column(name = "status", nullable = false)
     private Boolean status;
 
-    @Column(name = "ghiChu", columnDefinition = "nvarchar(255)")
-    private String ghiChu;
+    @Column(name = "note", columnDefinition = "nvarchar(255)")
+    private String note;
 
     @Column(name = "total", columnDefinition = "MONEY")
     private Long total;
@@ -64,7 +64,7 @@ public class Bill {
                 ", waterNumberBegin=" + waterNumberBegin +
                 ", waterNumberEnd=" + waterNumberEnd +
                 ", status=" + status +
-                ", ghiChu='" + ghiChu + '\'' +
+                ", ghiChu='" + note + '\'' +
                 ", total=" + total +
                 '}';
     }

@@ -15,5 +15,5 @@ public interface CustomerRepository extends JpaRepository<Customers, Integer> {
     InfoLogin getLogin(String name);
     @Query("select c from Customers c where c.userAuthId.id = :id")
     Customers getInfoCustomerr(Integer id);
-    Optional<Customers> findByCCCD(String CCCD);
+    Optional<Customers> findByIdentifier(String Identifier);
 }

@@ -32,7 +32,7 @@ public class Customers {
     private String lastName;
 
     @Column(name = "cccd", nullable = false, unique = true, columnDefinition = "varchar(12)")
-    private String CCCD;
+    private String identifier;
 
     @Column(name = "dateOfBirth", nullable = false, columnDefinition = "DATE")
     private LocalDate date_of_birth;
@@ -53,7 +53,7 @@ public class Customers {
     @JoinColumn(name = "userAuthId")
     private UserAuth userAuthId = null;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customers", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId", fetch = FetchType.EAGER)
     @JsonIgnore
     @Column(name = "historyCustomer")
     private List<HistoryCustomer> historyCustomer = new ArrayList<>();

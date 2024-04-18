@@ -17,10 +17,10 @@ import java.util.List;
 public class Room {
 
     @Id
-    @Column(name = "id")
-    private int id;
+    @Column(name = "roomId")
+    private int roomId;
     @ManyToOne( cascade = CascadeType.ALL)
-    @JoinColumn(name = "homeCategoryId", referencedColumnName = "homeCategoryId", nullable = false)
+    @JoinColumn(name = "roomTypeId", referencedColumnName = "roomTypeId", nullable = false)
     private HomeCategory homeCategoryId;
 
     @Column(name = "limit", nullable = false)

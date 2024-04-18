@@ -25,7 +25,7 @@ import java.util.Optional;
 public class UserController {
     private final RoomService roomService;
     private final ICustomerService iCustomerService;
-    private final IDonGiaService iDonGiaService;
+    private final IPriceService iPriceService;
     private final IBillService iBillService;
     private final IRequestService  iRequestService;
     private final IContracService iContracService;
@@ -56,13 +56,13 @@ public class UserController {
                 Customer.getCustomerId(),
                 Customer.getFirstName(),
                 Customer.getFirstName(),
-                Customer.getCCCD(),
+                Customer.getIdentifier(),
                 Customer.getDate_of_birth(),
                 Customer.getSex(),
                 Customer.getInfoAddress(),
                 Customer.getPhoneNumber(),
                 Customer.getEmail(),
-                Customer.getHistoryCustomer().isEmpty() ? -1 : Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId(),
+                Customer.getHistoryCustomer().isEmpty() ? -1 : Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getRoomId(),
                 Customer.getUserAuthId() == null ? "Chưa có tài khoản" : Customer.getUserAuthId().getUsername(),
                 Customer.getUserAuthId() == null ? "Chưa có tài khoản" : Customer.getUserAuthId().getPassword());
            return ResponseEntity.ok(user);
@@ -74,11 +74,11 @@ public class UserController {
     // 4. xem gia dien, nuoc
     @GetMapping("/gianuoc/all")
     public ResponseEntity<List<?>> getAllWaterPrice(){
-        return ResponseEntity.ok(iDonGiaService.getAllWaterPrice());
+        return ResponseEntity.ok(iPriceService.getAllWaterPrice());
     }
     @GetMapping("/giadien/all")
     public ResponseEntity<List<?>> getAllElecPrice(){
-        return ResponseEntity.ok(iDonGiaService.getAllElectricProce());
+        return ResponseEntity.ok(iPriceService.getAllElectricPrice());
     }
 
     // 5. Xem hoa don cua phong minh
@@ -117,11 +117,14 @@ public class UserController {
 //    @Transactional
     public ResponseEntity<?> addNotice(@PathVariable int id, @RequestBody String mess){
         try{
+            Optional<Customers> customers = iCustomerService.getCustomer(id);
+            if( customers.isEmpty()) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Not found Customer");
             Requests request = new Requests();
+            request.setCustomerId(customers.get());
             request.setCreatedDatatime(LocalDateTime.now());
             request.setStatus(false);
             request.setMessage(mess);
-            request.setSenOrRei(true);
+            request.setIsSend(true);
             iRequestService.addRequest_DonGia(request);
             return ResponseEntity.ok("Them thanh cong");
         }catch (Exception ex){
@@ -136,10 +139,10 @@ public class UserController {
             Contracts c = iContracService.getContractById(id);
             InfoContract ic = new InfoContract();
             ic.setBeginDate(c.getBeginDate());
-            ic.setConDate(c.getConDate());
+            ic.setConDate(c.getCreatedDate());
             ic.setEndDate(c.getEndDate());
             ic.setStatus(c.getStatus());
-            ic.setRoomId(c.getRoom().getId());
+            ic.setRoomId(c.getRoomId().getRoomId());
             ic.setCustomerId(c.getCusId().getCustomerId());
             return ResponseEntity.ok(ic);
         }catch (Exception ex){

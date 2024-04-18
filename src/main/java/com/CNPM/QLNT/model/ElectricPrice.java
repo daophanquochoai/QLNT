@@ -17,8 +17,8 @@ public class ElectricPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
-    @Column(name = "dataChanged", columnDefinition = "DATETIME")
-    private LocalDateTime dataChanged;
+    @Column(name = "changedDate", columnDefinition = "DATETIME")
+    private LocalDateTime changedDate;
     @Column(name = "price", columnDefinition = "money")
     private int price;
 }

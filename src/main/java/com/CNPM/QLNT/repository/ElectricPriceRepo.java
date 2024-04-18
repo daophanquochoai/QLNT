@@ -6,5 +6,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ElectricPriceRepo extends JpaRepository<ElectricPrice, Integer> {
-    List<ElectricPrice> findAllByOrderByDataChangedDesc();
+    List<ElectricPrice> findAllByOrderByChangedDateDesc();
 }
