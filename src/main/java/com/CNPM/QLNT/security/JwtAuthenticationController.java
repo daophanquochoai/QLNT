@@ -1,7 +1,7 @@
 package com.CNPM.QLNT.security;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.Customer;
 import com.CNPM.QLNT.model.UserAuth;
 import com.CNPM.QLNT.repository.CustomerRepository;
 import com.CNPM.QLNT.repository.UserAuthRepo;
@@ -56,7 +56,7 @@ public class JwtAuthenticationController {
             return ResponseEntity.ok(new JwtTokenResponse(token,"ADMIN"));
         }
         else{
-            Customers c = customerRepository.getInfoCustomerr(u.getId());
+            Customer c = customerRepository.getInfoCustomerr(u.getId());
             return ResponseEntity.ok(new JwtTokenResponse(token, c));
         }
     }

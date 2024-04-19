@@ -1,7 +1,7 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.Customer;
 import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.response.History;
 import com.CNPM.QLNT.services.Inter.IHistoryCustomerService;
@@ -20,26 +20,26 @@ public class HistoryCustomerService implements IHistoryCustomerService {
         List<History> list = historyCustomerRepo.findAll().stream().map( h ->{
             History history = new History();
             if( h.getBeginDate() != null){
-                history.setStayDay(h.getBeginDate());
+                history.setBeginDate(h.getBeginDate());
             }else{
                 throw new ResourceNotFoundException("StayDay");
             }
             if(h.getEndDate() == null){
-                history.setMoveDay(null);
+                history.setEndDate(null);
                 if( h.getRoomNew() != null){
                     throw new ResourceNotFoundException("MoveDay");
                 }else{
-                    history.setNewRoom(null);
+                    history.setRoomNew(null);
                 }
             }else {
                 if( h.getEndDate().isAfter(h.getBeginDate())){
-                    history.setMoveDay(h.getEndDate());
+                    history.setEndDate(h.getEndDate());
                 }else{
                     throw new ResourceNotFoundException("MoveDay");
                 }
             }
             if( h.getRoomOld() != null){
-                history.setOldRoom(h.getRoomOld());
+                history.setRoomOld(h.getRoomOld());
             }else throw new ResourceNotFoundException("OldRoom");
             return history;
         }).collect(Collectors.toList());
@@ -47,7 +47,7 @@ public class HistoryCustomerService implements IHistoryCustomerService {
     }
 
     @Override
-    public List<Customers> getAllCustomerByRoom(Integer roomId) {
+    public List<Customer> getAllCustomerByRoom(Integer roomId) {
         return historyCustomerRepo.getCustmersByRoom(roomId);
     }
 }

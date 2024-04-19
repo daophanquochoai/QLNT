@@ -1,8 +1,8 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Contracts;
-import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.Contract;
+import com.CNPM.QLNT.model.Customer;
 import com.CNPM.QLNT.model.HistoryCustomer;
 import com.CNPM.QLNT.model.Room;
 import com.CNPM.QLNT.repository.ContractRepo;
@@ -29,25 +29,25 @@ public class ContractService implements IContracService {
     private final HistoryCustomerRepo historyCustomerRepo;
 
     @Override
-    public List<Contracts> getAllContract() {
+    public List<Contract> getAllContract() {
         return contractRepo.findAll();
     }
 
     @Override
-    public Contracts getContractById(Integer id) {
+    public Contract getContractById(Integer id) {
         log.info("{}",contractRepo.getContractById(id));
-        Optional<Contracts> c = Optional.ofNullable(contractRepo.getContractById(id));
+        Optional<Contract> c = Optional.ofNullable(contractRepo.getContractById(id));
         if( c.isEmpty()) throw new ResourceNotFoundException("Khong tim thay hop dong");
         return c.get();
     }
 
     @Override
     public void saveContract(Integer customerId, Integer roomId, InfoContract infoContract) {
-        Optional<Customers> customer = customerRepo.findById(customerId);
+        Optional<Customer> customer = customerRepo.findById(customerId);
         if( customer.isEmpty()) throw new ResourceNotFoundException("Khong tim thay khach hang");
         Optional<Room> room = roomRepo.findById(roomId);
         if( room.isEmpty() ) throw new ResourceNotFoundException("Khong tim thay phong");
-        Contracts contract = new Contracts();
+        Contract contract = new Contract();
         if( infoContract.getBeginDate() == null ) throw new ResourceNotFoundException("beginDate");
         if( infoContract.getConDate() == null ) throw new ResourceNotFoundException("conDate");
         if( infoContract.getEndDate() == null ) throw new ResourceNotFoundException("endDate");

@@ -21,7 +21,7 @@ public class Room {
     private int roomId;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(name = "roomTypeId", referencedColumnName = "roomTypeId", nullable = false)
-    private HomeCategory homeCategoryId;
+    private RoomType roomTypeId;
 
     @Column(name = "limit", nullable = false)
     private int limit;
@@ -34,10 +34,10 @@ public class Room {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId",  fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<com.CNPM.QLNT.model.Bill> Bill;
+    private List<com.CNPM.QLNT.model.Bill> bill;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roomId", fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<RoomService> roomServices;
+    private List<RoomService> roomService;
 
 }

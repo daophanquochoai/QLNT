@@ -7,20 +7,20 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "Requests")
+@Table(name = "Request")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Data
-public class Requests {
+public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "requestsId", nullable = false)
-    private int requestsId;
+    @Column(name = "requestId", nullable = false)
+    private int requestId;
 
-    @Column(name = "createdDatatime", nullable = false, columnDefinition = "DATE")
-    private LocalDateTime createdDatatime;
+    @Column(name = "createdDate", nullable = false, columnDefinition = "DATETIME")
+    private LocalDateTime createdDate;
 
     @Column(name="status", nullable = false)
     private Boolean status;
@@ -29,7 +29,7 @@ public class Requests {
     private String message;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customerId ")
-    private Customers customerId;
+    private Customer customerId;
     @Column( name = "isSend")
     private Boolean isSend;
 }

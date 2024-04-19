@@ -2,7 +2,6 @@ package com.CNPM.QLNT.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Setter
 @Getter
-public class Customers {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +30,11 @@ public class Customers {
     @Column(name = "lastName", nullable = false, columnDefinition = "nvarchar(55)")
     private String lastName;
 
-    @Column(name = "cccd", nullable = false, unique = true, columnDefinition = "varchar(12)")
+    @Column(name = "identifier", nullable = false, unique = true, columnDefinition = "varchar(12)")
     private String identifier;
 
     @Column(name = "dateOfBirth", nullable = false, columnDefinition = "DATE")
-    private LocalDate date_of_birth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "sex", nullable = false)
     private Boolean sex;

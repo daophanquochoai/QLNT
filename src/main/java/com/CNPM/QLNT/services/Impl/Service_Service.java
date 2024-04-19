@@ -1,42 +1,42 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Services;
+import com.CNPM.QLNT.model.Service;
 import com.CNPM.QLNT.repository.ServiceRepo;
 import com.CNPM.QLNT.services.Inter.IService_Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 import java.util.List;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class Service_Service implements IService_Service {
     private final ServiceRepo serviceRepo;
 
     @Override
-    public void saveService(Services services) {
-        if( services.getPrice() < 0){
+    public void saveService(Service service) {
+        if( service.getPrice() < 0){
             throw new ResourceNotFoundException("price lon hon 0");
         }
-        serviceRepo.save(services);
+        serviceRepo.save(service);
     }
 
     @Override
-    public void updateService(Integer id,Services services) {
-        Optional<Services> s = serviceRepo.findById(id);
+    public void updateService(Integer id, Service service) {
+        Optional<Service> s = serviceRepo.findById(id);
         if( s.isEmpty()) throw new ResourceNotFoundException("Khong tim thay service");
-        Services ser = s.get();
-        if( services.getPrice() >= 0){
-            ser.setPrice(services.getPrice());
+        Service ser = s.get();
+        if( service.getPrice() >= 0){
+            ser.setPrice(service.getPrice());
         }
-        ser.setServiceName(services.getServiceName());
+        ser.setServiceName(service.getServiceName());
         serviceRepo.save(ser);
     }
 
     @Override
-    public List<Services> getAllService() {
+    public List<Service> getAllService() {
         return serviceRepo.findAll();
     }
 }

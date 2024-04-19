@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class RoomRes {
-    private int room_id;
+    private int roomId;
     private int limit;
-    private String home_category_name;
+    private String roomTypeName;
     private BigDecimal price;
     private Boolean status;
 }

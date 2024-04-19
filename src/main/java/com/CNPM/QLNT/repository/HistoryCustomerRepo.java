@@ -1,6 +1,6 @@
 package com.CNPM.QLNT.repository;
 
-import com.CNPM.QLNT.model.Customers;
+import com.CNPM.QLNT.model.Customer;
 import com.CNPM.QLNT.model.HistoryCustomer;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +13,5 @@ public interface HistoryCustomerRepo extends JpaRepository<HistoryCustomer, Inte
     Optional<HistoryCustomer> getHistoryCustomerByCustomerId(Integer CustomerId);
     // lay khạch hang 1 phong
     @Query("select h.customerId from HistoryCustomer h where h.roomOld.roomId = :roomId and h.endDate is null and h.roomNew is null")
-    public List<Customers> getCustmersByRoom(Integer roomId);
+    public List<Customer> getCustmersByRoom(Integer roomId);
 }

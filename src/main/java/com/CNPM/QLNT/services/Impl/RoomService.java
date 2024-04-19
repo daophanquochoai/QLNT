@@ -1,12 +1,12 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.HomeCategory;
+import com.CNPM.QLNT.model.RoomType;
 import com.CNPM.QLNT.model.Room;
 import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.RoomRes;
-import com.CNPM.QLNT.services.Inter.IHomeCategory;
+import com.CNPM.QLNT.services.Inter.IRoomType;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RoomService implements IRoomService {
     private final RoomRepo roomRepository;
-    private final IHomeCategory iHomeCategory;
+    private final IRoomType iRoomType;
     private final HistoryCustomerRepo historyCustomerRepo;
 
     @Override
@@ -34,7 +34,7 @@ public class RoomService implements IRoomService {
                 {
                     RoomRes rm = new RoomRes(r.getRoomId(),
                             r.getLimit(),
-                            r.getHomeCategoryId().getRoomTypeName(),
+                            r.getRoomTypeId().getRoomTypeName(),
                             r.getPrice(),
                             r.getStatus());
                     return rm;
@@ -51,12 +51,12 @@ public class RoomService implements IRoomService {
     @Override
     public void addRoom(RoomRes roomRes) {
         try{
-            HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
+            RoomType roomType = iRoomType.getRoomType(roomRes.getRoomTypeName());
             Room room = new Room();
-            room.setRoomId(roomRes.getRoom_id());
+            room.setRoomId(roomRes.getRoomId());
             room.setLimit(roomRes.getLimit());
             room.setPrice(roomRes.getPrice());
-            room.setHomeCategoryId(homeCategory);
+            room.setRoomTypeId(roomType);
             room.setStatus(true);
             log.info("{}",room);
             roomRepository.save(room);
@@ -71,9 +71,9 @@ public class RoomService implements IRoomService {
         try{
             if( getRoom(id).isEmpty() || id == 0) throw new ResourceNotFoundException("Phong khong ton tai");
             Room R = getRoom(id).get();
-            if( roomRes.getHome_category_name() != null) {
-                HomeCategory homeCategory = iHomeCategory.getHomeCategory(roomRes.getHome_category_name());
-                R.setHomeCategoryId(homeCategory);
+            if( roomRes.getRoomTypeName() != null) {
+                RoomType roomType = iRoomType.getRoomType(roomRes.getRoomTypeName());
+                R.setRoomTypeId(roomType);
             }
             if( roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
                 R.setLimit(roomRes.getLimit());
@@ -94,7 +94,7 @@ public class RoomService implements IRoomService {
     @Override
     public void deleteRoom(int id) throws Exception {
         Room Room = getRoom(id).get();
-        Room.setHomeCategoryId(null);
+        Room.setRoomTypeId(null);
         roomRepository.delete(Room);
     }
 
@@ -106,7 +106,7 @@ public class RoomService implements IRoomService {
                 {
                     RoomRes rm = new RoomRes(r.getRoomId(),
                             r.getLimit(),
-                            r.getHomeCategoryId().getRoomTypeName(),
+                            r.getRoomTypeId().getRoomTypeName(),
                             r.getPrice(),
                             r.getStatus());
                     return rm;
@@ -131,7 +131,7 @@ public class RoomService implements IRoomService {
                 {
                     RoomRes rm = new RoomRes(temp.getRoomId(),
                             temp.getLimit(),
-                            temp.getHomeCategoryId().getRoomTypeName(),
+                            temp.getRoomTypeId().getRoomTypeName(),
                             temp.getPrice(),
                             temp.getStatus());
                     return rm;
@@ -153,7 +153,7 @@ public class RoomService implements IRoomService {
                 {
                     RoomRes rm = new RoomRes(r.getRoomId(),
                             r.getLimit(),
-                            r.getHomeCategoryId().getRoomTypeName(),
+                            r.getRoomTypeId().getRoomTypeName(),
                             r.getPrice(),
                             r.getStatus());
                     return rm;

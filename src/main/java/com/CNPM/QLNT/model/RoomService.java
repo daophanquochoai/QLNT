@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Getter
@@ -25,7 +24,7 @@ public class RoomService {
     private Room roomId;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "serviceId")
-    private Services serviceId;
+    private Service serviceId;
     private int quantity;
     private LocalDate beginDate;
     private LocalDate endDate;

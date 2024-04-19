@@ -3,7 +3,7 @@ package com.CNPM.QLNT.services.Impl;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Room;
 import com.CNPM.QLNT.model.RoomService;
-import com.CNPM.QLNT.model.Services;
+import com.CNPM.QLNT.model.Service;
 import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.repository.RoomServiceRepo;
 import com.CNPM.QLNT.repository.ServiceRepo;
@@ -11,11 +11,11 @@ import com.CNPM.QLNT.response.InfoRoomService;
 import com.CNPM.QLNT.response.InfoService;
 import com.CNPM.QLNT.services.Inter.IRoomService_Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 import java.time.LocalDate;
 import java.util.List;
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class RoomService_Service implements IRoomService_Service {
     private final RoomServiceRepo roomServiceRepo;
@@ -39,11 +39,11 @@ public class RoomService_Service implements IRoomService_Service {
         }
         if( infoRoomService.getQuantity() < 0 ) throw new ResourceNotFoundException("Quantity lon hon 0");
         roomService.setQuantity(infoRoomService.getQuantity());
-        if( serviceRepo.findById(infoRoomService.getServices()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay service");
+        if( serviceRepo.findById(infoRoomService.getServiceId()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay service");
         if( roomRepo.findById(infoRoomService.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay room");
         Room room = roomRepo.findById(infoRoomService.getRoomId()).get();
-        Services services = serviceRepo.findById(infoRoomService.getServices()).get();
-        roomService.setServiceId(services);
+        Service service = serviceRepo.findById(infoRoomService.getServiceId()).get();
+        roomService.setServiceId(service);
         roomService.setRoomId(room);
         roomServiceRepo.save(roomService);
     }

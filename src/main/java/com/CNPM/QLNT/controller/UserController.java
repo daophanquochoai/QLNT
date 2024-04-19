@@ -3,13 +3,11 @@ package com.CNPM.QLNT.controller;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.response.InfoContract;
-import com.CNPM.QLNT.response.Info_user;
+import com.CNPM.QLNT.response.InfoUser;
 import com.CNPM.QLNT.services.Inter.*;
 import com.CNPM.QLNT.services.Impl.RoomService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.spel.ast.NullLiteral;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,20 +42,20 @@ public class UserController {
     @GetMapping("/customer/{cus_id}")
     public ResponseEntity<?> getCustomerById(@PathVariable Integer cus_id){
        try{
-           Optional<Customers> theCustomer = iCustomerService.getCustomer(cus_id);
+           Optional<Customer> theCustomer = iCustomerService.getCustomer(cus_id);
            if(theCustomer.isEmpty() ){
                throw new ResourceNotFoundException("Not Found Customer");
            }
-           Customers Customer = theCustomer.get();
+           Customer Customer = theCustomer.get();
 //           System.out.println("===========================");
 //           log.info("{}",Customer.getHistoryCustomer().stream().filter(t->t.getEndDate()==null).findFirst().get().getRoomOld().getId());
 //           System.out.println("===========================");
-        Info_user user = new Info_user(
+        InfoUser user = new InfoUser(
                 Customer.getCustomerId(),
                 Customer.getFirstName(),
                 Customer.getFirstName(),
                 Customer.getIdentifier(),
-                Customer.getDate_of_birth(),
+                Customer.getDateOfBirth(),
                 Customer.getSex(),
                 Customer.getInfoAddress(),
                 Customer.getPhoneNumber(),
@@ -117,11 +115,11 @@ public class UserController {
 //    @Transactional
     public ResponseEntity<?> addNotice(@PathVariable int id, @RequestBody String mess){
         try{
-            Optional<Customers> customers = iCustomerService.getCustomer(id);
+            Optional<Customer> customers = iCustomerService.getCustomer(id);
             if( customers.isEmpty()) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Not found Customer");
-            Requests request = new Requests();
+            Request request = new Request();
             request.setCustomerId(customers.get());
-            request.setCreatedDatatime(LocalDateTime.now());
+            request.setCreatedDate(LocalDateTime.now());
             request.setStatus(false);
             request.setMessage(mess);
             request.setIsSend(true);
@@ -132,11 +130,11 @@ public class UserController {
         }
     }
 
-    //9. Xem hopv dong cua  minh
+    //9. Xem hop dong cua minh
     @GetMapping("get/contract/{id}")
     public ResponseEntity<?> getContract(@PathVariable Integer id){
         try{
-            Contracts c = iContracService.getContractById(id);
+            Contract c = iContracService.getContractById(id);
             InfoContract ic = new InfoContract();
             ic.setBeginDate(c.getBeginDate());
             ic.setConDate(c.getCreatedDate());

@@ -7,22 +7,22 @@ import org.hibernate.annotations.Cascade;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Contracts")
+@Table(name = "Contract")
 @Getter
 @Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Contracts {
+public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contractsId")
-    private int contractsId;
+    @Column(name = "contractId")
+    private int contractId;
 
     @OneToOne( fetch = FetchType.EAGER)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
-    private Customers cusId;
+    private Customer cusId;
 
     @OneToOne
     @Cascade({org.hibernate.annotations.CascadeType.ALL})

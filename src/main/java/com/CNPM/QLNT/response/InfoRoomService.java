@@ -13,6 +13,6 @@ public class InfoRoomService {
     private LocalDate beginDate;
     private LocalDate endDate;
     private Integer roomId;
-    private Integer services;
+    private Integer serviceId;
     private Integer quantity;
 }

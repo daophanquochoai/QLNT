@@ -21,7 +21,7 @@ public class HistoryCustomer {
     @ManyToOne
     @JoinColumn(name = "customerId")
     @JsonIgnore
-    private Customers customerId;
+    private Customer customerId;
     @ManyToOne
     @JoinColumn(name = "roomOld", nullable = false)
     private Room roomOld;

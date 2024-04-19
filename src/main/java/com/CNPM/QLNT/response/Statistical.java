@@ -7,10 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Statistical {
-    private Long doanhThu;
-    private int phongChuaDong;
-    private int phongDaDong;
-    private int daThueDay;
-    private int daThueChuaDay;
-    private int chuaThue;
+    private Long revenue;
+    private int numberOfUnpaidRoom;
+    private int numberOfPaidRoom;
+    private int numberOfFullRoom;
+    private int numberOfAvailableRoom;
+    private int numberOfEmptyRoom;
 }
