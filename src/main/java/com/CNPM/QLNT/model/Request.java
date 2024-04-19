@@ -28,8 +28,8 @@ public class Request {
     @Column(name = "message", nullable = false, columnDefinition = "nvarchar(255)")
     private String message;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "customerId ")
-    private Customer customerId;
+    @JoinColumn(name = "customerId")
+    private Customer customer;
     @Column( name = "isSend")
     private Boolean isSend;
 }

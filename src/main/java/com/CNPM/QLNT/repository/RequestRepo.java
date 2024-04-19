@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface RequestRepo extends JpaRepository<Request, Integer> {
-    @Query("select r from Request r where r.isSend = false and r.status = :status")
+    @Query("select r from Request r where r.isSend = true and r.status = :status")
     List<Request> getRequestOfCustomerByStatus(boolean status);
-    @Query("select r from Request r where r.isSend = false")
+    @Query("select r from Request r where r.isSend = true")
     List<Request> getAllRequestOfCustomer();
-    @Query("select r from Request r where r.isSend = true and (r.customerId is null or r.customerId.customerId = :cus)")
+    @Query("select r from Request r where r.isSend = false and (r.customer is null or r.customer.customerId = :cus)")
     List<Request> getAllRequestOfAdmin(Integer cus);
 }

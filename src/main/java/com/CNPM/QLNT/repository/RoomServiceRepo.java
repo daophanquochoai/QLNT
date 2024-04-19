@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface RoomServiceRepo extends JpaRepository<RoomService, Integer> {
-    @Query("select new com.CNPM.QLNT.response.InfoService(r.serviceId.serviceName, r.serviceId.price, r.quantity) from RoomService r where r.roomId.id = :roomId and r.beginDate < :date and ( r.endDate > :date or r.endDate is null )")
+    @Query("select new com.CNPM.QLNT.response.InfoService(r.service.serviceName, r.service.price, r.quantity) " +
+            "from RoomService r where r.room.roomId = :roomId and r.beginDate < :date " +
+            "and ( r.endDate > :date or r.endDate is null )")
     List<InfoService> getAllServiceByRoomId(Integer roomId, LocalDate date);
 }

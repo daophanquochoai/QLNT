@@ -52,7 +52,7 @@ public class Customer {
     @JoinColumn(name = "userAuthId")
     private UserAuth userAuthId = null;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer", fetch = FetchType.EAGER)
     @JsonIgnore
     @Column(name = "historyCustomer")
     private List<HistoryCustomer> historyCustomer = new ArrayList<>();

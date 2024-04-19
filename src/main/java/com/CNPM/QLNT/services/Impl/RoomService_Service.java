@@ -43,8 +43,8 @@ public class RoomService_Service implements IRoomService_Service {
         if( roomRepo.findById(infoRoomService.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay room");
         Room room = roomRepo.findById(infoRoomService.getRoomId()).get();
         Service service = serviceRepo.findById(infoRoomService.getServiceId()).get();
-        roomService.setServiceId(service);
-        roomService.setRoomId(room);
+        roomService.setService(service);
+        roomService.setRoom(room);
         roomServiceRepo.save(roomService);
     }
 

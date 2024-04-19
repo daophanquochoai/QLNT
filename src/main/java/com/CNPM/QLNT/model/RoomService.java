@@ -21,10 +21,10 @@ public class RoomService {
     private int roomServiceId;
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "roomId")
-    private Room roomId;
+    private Room room;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "serviceId")
-    private Service serviceId;
+    private Service service;
     private int quantity;
     private LocalDate beginDate;
     private LocalDate endDate;

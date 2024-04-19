@@ -56,7 +56,7 @@ public class JwtAuthenticationController {
             return ResponseEntity.ok(new JwtTokenResponse(token,"ADMIN"));
         }
         else{
-            Customer c = customerRepository.getInfoCustomerr(u.getId());
+            Customer c = customerRepository.getInfoCustomer(u.getId());
             return ResponseEntity.ok(new JwtTokenResponse(token, c));
         }
     }

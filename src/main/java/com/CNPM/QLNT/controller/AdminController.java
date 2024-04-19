@@ -164,7 +164,7 @@ public class AdminController {
         Optional<Room> Room = iRoomService.getRoom(roomId);
         if (Room.isPresent()) {
             com.CNPM.QLNT.model.Room R = Room.get();
-            return ResponseEntity.ok(new RoomRes(R.getRoomId(), R.getLimit(), R.getRoomTypeId().getRoomTypeName(), R.getPrice(), R.getStatus()));
+            return ResponseEntity.ok(new RoomRes(R.getRoomId(), R.getLimit(), R.getRoomType().getRoomTypeName(), R.getPrice(), R.getStatus()));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong tim thay phong");
         }
@@ -210,7 +210,7 @@ public class AdminController {
             );
             iContracService.getAllContract().stream().forEach(
                     c -> {
-                        if (c.getRoomId().getRoomId() == roomId && c.getEndDate().isAfter(LocalDate.now())) {
+                        if (c.getRoom().getRoomId() == roomId && c.getEndDate().isAfter(LocalDate.now())) {
                             throw new ResourceNotFoundException("Hop dong chua het han");
                         }
                     }

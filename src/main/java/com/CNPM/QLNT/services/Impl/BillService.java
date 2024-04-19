@@ -49,7 +49,7 @@ public class BillService implements IBillService {
                     b.getTotal()
                 );
                 br.setPaid( b.getStatus());
-                br.setRoomId(b.getRoomId().getRoomId());
+                br.setRoomId(b.getRoom().getRoomId());
                 return br;
             }).collect(Collectors.toList());
             r.setUnpaidRoomList(unpaidList);
@@ -69,7 +69,7 @@ public class BillService implements IBillService {
                         b.getTotal()
                 );
                 br.setPaid( b.getStatus());
-                br.setRoomId(b.getRoomId().getRoomId());
+                br.setRoomId(b.getRoom().getRoomId());
                 return br;
             }).collect(Collectors.toList());
             r.setPaidRoomList(paidList);
@@ -98,7 +98,7 @@ public class BillService implements IBillService {
                         b.getTotal()
                 );
                 br.setPaid( b.getStatus());
-                br.setRoomId(b.getRoomId().getRoomId());
+                br.setRoomId(b.getRoom().getRoomId());
                 listBR.add(br);
                 });
             return listBR;
@@ -122,8 +122,8 @@ public class BillService implements IBillService {
             br.setTotal(
                     b.getTotal()
             );
-            br.setPaid( b.getStatus());
-            br.setRoomId(b.getRoomId().getRoomId());
+            br.setPaid(b.getStatus());
+            br.setRoomId(b.getRoom().getRoomId());
             listBR.add(br);
         });
         return listBR;

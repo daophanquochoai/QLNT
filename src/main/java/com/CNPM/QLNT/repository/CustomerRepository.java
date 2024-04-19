@@ -12,6 +12,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     @Query("select new com.CNPM.QLNT.response.InfoLogin(c.userAuthId.role, c.customerId, concat(c.firstName,' ',c.lastName) ) from Customer c where c.userAuthId.username = :name")
     InfoLogin getLogin(String name);
     @Query("select c from Customer c where c.userAuthId.id = :id")
-    Customer getInfoCustomerr(Integer id);
+    Customer getInfoCustomer(Integer id);
     Optional<Customer> findByIdentifier(String Identifier);
 }

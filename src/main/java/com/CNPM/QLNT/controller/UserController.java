@@ -118,7 +118,7 @@ public class UserController {
             Optional<Customer> customers = iCustomerService.getCustomer(id);
             if( customers.isEmpty()) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Not found Customer");
             Request request = new Request();
-            request.setCustomerId(customers.get());
+            request.setCustomer(customers.get());
             request.setCreatedDate(LocalDateTime.now());
             request.setStatus(false);
             request.setMessage(mess);
@@ -140,8 +140,8 @@ public class UserController {
             ic.setConDate(c.getCreatedDate());
             ic.setEndDate(c.getEndDate());
             ic.setStatus(c.getStatus());
-            ic.setRoomId(c.getRoomId().getRoomId());
-            ic.setCustomerId(c.getCusId().getCustomerId());
+            ic.setRoomId(c.getRoom().getRoomId());
+            ic.setCustomerId(c.getCustomer().getCustomerId());
             return ResponseEntity.ok(ic);
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

@@ -45,7 +45,7 @@ public class CustomerService implements ICustomerService {
                 {
                     Integer roomId = -1;
                     if( c.getHistoryCustomer() != null ){
-                        Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomerId().getCustomerId() == c.getCustomerId())).findFirst();
+                        Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter( t-> (t.getEndDate() == null && t.getCustomer().getCustomerId() == c.getCustomerId())).findFirst();
                         if( h.isPresent()) roomId = h.get().getRoomOld().getRoomId();
                     }
                     InfoUser user = new InfoUser(c.getCustomerId(),
@@ -74,7 +74,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public List<InfoUser> getCustomerByRoomId(Integer room_id) {
-        List<Customer> list = historyCustomerRepo.getCustmersByRoom(room_id);
+        List<Customer> list = historyCustomerRepo.getCustomersByRoom(room_id);
         List<InfoUser> l = list.stream().map(
                 c->
                 {
@@ -146,7 +146,7 @@ public class CustomerService implements ICustomerService {
             if( roomRepo.findById(info.getRoomId()).isEmpty()) throw new ResourceNotFoundException("room");
             else{
                 Room r = roomRepo.findById(info.getRoomId()).get();
-                if( r.getLimit() < historyCustomerRepo.getCustmersByRoom(r.getRoomId()).size() ) throw new ResourceNotFoundException("room day");
+                if( r.getLimit() < historyCustomerRepo.getCustomersByRoom(r.getRoomId()).size() ) throw new ResourceNotFoundException("room day");
                 historyCustomer.setRoomOld(r);
                 historyCustomer.setBeginDate(LocalDate.now());
             }
@@ -160,7 +160,7 @@ public class CustomerService implements ICustomerService {
         c.setUserAuthId(ua);
         Customer customer = customerRepository.save(c);
         if( info.getRoomId() != 0 ){
-            historyCustomer.setCustomerId(customer);
+            historyCustomer.setCustomer(customer);
             historyCustomerRepo.save(historyCustomer);
         }
         return true;
@@ -224,7 +224,7 @@ public class CustomerService implements ICustomerService {
             HistoryCustomer historyCustomer = new HistoryCustomer();
             historyCustomer.setBeginDate(LocalDate.now());
             historyCustomer.setRoomOld(roomRepo.findById(info.getRoomId()).get());
-            historyCustomer.setCustomerId(Customer);
+            historyCustomer.setCustomer(Customer);
             historyCustomerRepo.save(historyCustomer);
         }else{
             Optional<HistoryCustomer> h = Customer.getHistoryCustomer().stream().filter(t-> t.getEndDate() == null).findFirst();
@@ -240,7 +240,7 @@ public class CustomerService implements ICustomerService {
         try{
             List<Contract> listCT = iContracService.getAllContract();
             listCT.stream().forEach( c ->{
-                if( c.getCusId().getCustomerId() == id && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus()) ){
+                if( c.getCustomer().getCustomerId() == id && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus()) ){
                     System.out.println( c.getEndDate().isBefore(LocalDate.now()) );
                     throw new ResourceNotFoundException("Con rang buoc boi Hop Dong");
                 }

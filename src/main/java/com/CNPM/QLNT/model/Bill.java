@@ -23,7 +23,7 @@ public class Bill {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "roomId")
     @JsonIgnore
-    private Room roomId;
+    private Room room;
 
     @Column(name = "beginDate", nullable = false, columnDefinition = "DATE")
     private LocalDate beginDate;

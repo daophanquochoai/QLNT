@@ -22,12 +22,12 @@ public class Contract {
     @OneToOne( fetch = FetchType.EAGER)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
-    private Customer cusId;
+    private Customer customer;
 
     @OneToOne
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @JoinColumn(name = "roomId", referencedColumnName = "roomId", nullable = false, unique = true)
-    private com.CNPM.QLNT.model.Room roomId;
+    private Room room;
 
     @Column(name = "createdDate", nullable = false, columnDefinition = "DATE")
     private LocalDate createdDate;

@@ -54,7 +54,7 @@ public class ContractService implements IContracService {
         if( infoContract.getBeginDate().isAfter(infoContract.getConDate())) throw new ResourceNotFoundException("beginDate");
         if( infoContract.getConDate().isAfter(infoContract.getEndDate())) throw new ResourceNotFoundException("conDate");
         if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("cusId");
-        if( room.get().getLimit() < historyCustomerRepo.getCustmersByRoom(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Room");
+        if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoom(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Room");
         Optional<HistoryCustomer> h = historyCustomerRepo.getHistoryCustomerByCustomerId(customerId);
         if( h.isPresent() ){
             // neu dang o chuyen qua phong moi va ghi lai
@@ -65,15 +65,15 @@ public class ContractService implements IContracService {
         // tao ban ghi phong moi
         HistoryCustomer h1 = new HistoryCustomer();
         h1.setBeginDate(LocalDate.now());
-        h1.setCustomerId(customer.get());
+        h1.setCustomer(customer.get());
         h1.setRoomOld(room.get());
 
         // tao hop dong
-        contract.setCusId(customer.get());
+        contract.setCustomer(customer.get());
         contract.setEndDate(infoContract.getEndDate());
         contract.setCreatedDate(infoContract.getConDate());
         contract.setBeginDate(infoContract.getBeginDate());
-        contract.setRoomId(room.get());
+        contract.setRoom(room.get());
         contract.setStatus(true);
 
         historyCustomerRepo.save(h1);
