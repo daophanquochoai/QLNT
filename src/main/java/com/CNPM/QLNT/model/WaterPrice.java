@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class WaterPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int waterPriceId;
     @Column(name = "changedDate", columnDefinition = "DATETIME")
     private LocalDateTime changedDate;
     @Column(name = "price", columnDefinition = "money")

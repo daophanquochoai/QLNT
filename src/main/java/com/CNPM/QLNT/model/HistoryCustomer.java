@@ -17,7 +17,7 @@ import java.time.LocalDate;
 public class HistoryCustomer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private int historyCustomerId;
     @ManyToOne
     @JoinColumn(name = "customerId")
     @JsonIgnore

@@ -1,14 +1,18 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
+import com.CNPM.QLNT.model.HistoryCustomer;
 import com.CNPM.QLNT.model.Request;
 import com.CNPM.QLNT.repository.RequestRepo;
+import com.CNPM.QLNT.response.History;
+import com.CNPM.QLNT.response.RequestInfo;
 import com.CNPM.QLNT.services.Inter.IRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +25,29 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public List<Request> getAllRequestOfCustomerByStatus(boolean status) {
-        return requestRepo.getRequestOfCustomerByStatus(status);
+    public List<RequestInfo> getAllRequestOfCustomerByStatus(boolean status) {
+        List<Request> listRequest = requestRepo.getRequestOfCustomerByStatus(status);
+        List<RequestInfo> listRequestInfo = listRequest.stream().map(r ->{
+            Integer roomId = -1;
+            if( r.getCustomer().getHistoryCustomer() != null ){
+                Optional<HistoryCustomer> h = r.getCustomer().getHistoryCustomer().stream().filter(t->
+                        (t.getEndDate() == null && t.getCustomer().getCustomerId() == r.getCustomer().getCustomerId())).findFirst();
+                if( h.isPresent()) roomId = h.get().getRoomOld().getRoomId();
+            }
+            RequestInfo requestInfo = new RequestInfo(
+                    r.getRequestId(),
+                    r.getCreatedDate(),
+                    r.getStatus(),
+                    r.getMessage(),
+                    r.getIsSend(),
+                    r.getCustomer().getFirstName(),
+                    r.getCustomer().getLastName(),
+                    roomId
+            );
+            return requestInfo;
+
+        }).collect(Collectors.toList());
+        return listRequestInfo;
     }
 
     @Override
