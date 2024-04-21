@@ -7,5 +7,5 @@ import java.util.List;
 public interface IRoomType {
     void addRoomType(RoomType homeCate);
     List<RoomType> getAllRoomType();
-    RoomType getRoomType(String home_name);
+    RoomType getRoomTypeByRoomTypeId(int roomTypeId);
 }

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public class InfoContract {
     private Integer customerId;
     private Integer roomId;
-    private LocalDate conDate;
+    private LocalDate createdDate;
     private LocalDate beginDate;
     private LocalDate endDate;
     private Boolean status;

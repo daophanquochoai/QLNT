@@ -137,7 +137,7 @@ public class UserController {
             Contract c = iContracService.getContractById(id);
             InfoContract ic = new InfoContract();
             ic.setBeginDate(c.getBeginDate());
-            ic.setConDate(c.getCreatedDate());
+            ic.setCreatedDate(c.getCreatedDate());
             ic.setEndDate(c.getEndDate());
             ic.setStatus(c.getStatus());
             ic.setRoomId(c.getRoom().getRoomId());

@@ -14,5 +14,6 @@ public interface IRoomService {
     void deleteRoom(int id) throws Exception;
     List<RoomRes> getAllRoomByStatus(boolean status);
     List<RoomRes> getAllRoomByLimit(int type);
+    List<Room> getAllRoomWithoutContract();
     List<RoomRes> getRoomForBill();
 }

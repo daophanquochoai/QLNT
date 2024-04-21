@@ -163,8 +163,8 @@ public class AdminController {
     public ResponseEntity<?> getRoom(@PathVariable int roomId) {
         Optional<Room> Room = iRoomService.getRoom(roomId);
         if (Room.isPresent()) {
-            com.CNPM.QLNT.model.Room R = Room.get();
-            return ResponseEntity.ok(new RoomRes(R.getRoomId(), R.getLimit(), R.getRoomType().getRoomTypeName(), R.getPrice(), R.getStatus()));
+            Room r = Room.get();
+            return ResponseEntity.ok(new RoomRes(r.getRoomId(), r.getLimit(), r.getRoomType().getRoomTypeId(), r.getPrice(), r.getStatus()));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong tim thay phong");
         }
@@ -260,6 +260,14 @@ public class AdminController {
     public ResponseEntity<?> getAllRoomByLimit(@PathVariable int type) {
         try {
             return ResponseEntity.ok(iRoomService.getAllRoomByLimit(type));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+    @GetMapping("/getAllRoomWithContract")
+    public ResponseEntity<?> getAllRoomWithContract() {
+        try {
+            return ResponseEntity.ok(iRoomService.getAllRoomWithoutContract());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -423,7 +431,7 @@ public class AdminController {
     }
 
     //////// xem hop dong
-    @GetMapping("get/contract")
+    @GetMapping("getAllContract")
     public ResponseEntity<?> getAllContract() {
         try {
             return ResponseEntity.ok(iContracService.getAllContract());

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 public class InfoUser {
-    private int id;
+    private int customerId;
     private String firstName;
     private String lastName;
     private String identifier;

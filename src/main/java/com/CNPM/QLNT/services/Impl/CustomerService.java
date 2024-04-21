@@ -172,7 +172,7 @@ public class CustomerService implements ICustomerService {
         if( C.isEmpty()) throw new ResourceNotFoundException("Khong tim thay customer");
         Customer Customer = C.get();
         boolean check = getAllCustomer().stream().anyMatch(
-                c -> (c.getId() != id && ( c.getIdentifier().equals(info.getIdentifier())|| c.getUsername().equals(info.getUsername())))
+                c -> (c.getCustomerId() != id && ( c.getIdentifier().equals(info.getIdentifier())|| c.getUsername().equals(info.getUsername())))
         );
         if( check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
 

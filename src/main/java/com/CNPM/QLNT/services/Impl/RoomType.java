@@ -27,14 +27,13 @@ public class RoomType implements IRoomType {
         }
     }
 
-
     @Override
     public List<com.CNPM.QLNT.model.RoomType> getAllRoomType() {
         return roomTypeRepo.findAll();
     }
-
     @Override
-    public com.CNPM.QLNT.model.RoomType getRoomType(String roomTypeName) {
-        return roomTypeRepo.findAll().stream().filter(h->h.getRoomTypeName().equals(roomTypeName)).findFirst().get();
+    public com.CNPM.QLNT.model.RoomType getRoomTypeByRoomTypeId(int roomTypeId) {
+        return roomTypeRepo.getRoomTypeByRoomTypeId(roomTypeId);
     }
+
 }

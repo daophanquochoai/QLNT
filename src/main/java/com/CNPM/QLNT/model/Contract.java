@@ -20,12 +20,12 @@ public class Contract {
     private int contractId;
 
     @OneToOne( fetch = FetchType.EAGER)
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({org.hibernate.annotations.CascadeType.DETACH})
     @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
     private Customer customer;
 
     @OneToOne
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({org.hibernate.annotations.CascadeType.DETACH})
     @JoinColumn(name = "roomId", referencedColumnName = "roomId", nullable = false, unique = true)
     private Room room;
 

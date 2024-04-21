@@ -49,10 +49,10 @@ public class ContractService implements IContracService {
         if( room.isEmpty() ) throw new ResourceNotFoundException("Khong tim thay phong");
         Contract contract = new Contract();
         if( infoContract.getBeginDate() == null ) throw new ResourceNotFoundException("beginDate");
-        if( infoContract.getConDate() == null ) throw new ResourceNotFoundException("conDate");
+        if( infoContract.getCreatedDate() == null ) throw new ResourceNotFoundException("createDate");
         if( infoContract.getEndDate() == null ) throw new ResourceNotFoundException("endDate");
-        if( infoContract.getBeginDate().isAfter(infoContract.getConDate())) throw new ResourceNotFoundException("beginDate");
-        if( infoContract.getConDate().isAfter(infoContract.getEndDate())) throw new ResourceNotFoundException("conDate");
+        if( infoContract.getBeginDate().isAfter(infoContract.getCreatedDate())) throw new ResourceNotFoundException("beginDate");
+        if( infoContract.getCreatedDate().isAfter(infoContract.getEndDate())) throw new ResourceNotFoundException("createDate");
         if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("cusId");
         if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoom(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Room");
         Optional<HistoryCustomer> h = historyCustomerRepo.getHistoryCustomerByCustomerId(customerId);
@@ -71,7 +71,7 @@ public class ContractService implements IContracService {
         // tao hop dong
         contract.setCustomer(customer.get());
         contract.setEndDate(infoContract.getEndDate());
-        contract.setCreatedDate(infoContract.getConDate());
+        contract.setCreatedDate(infoContract.getCreatedDate());
         contract.setBeginDate(infoContract.getBeginDate());
         contract.setRoom(room.get());
         contract.setStatus(true);

@@ -1,5 +1,6 @@
 package com.CNPM.QLNT.response;
 
+import com.CNPM.QLNT.model.RoomType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ import java.math.BigDecimal;
 public class RoomRes {
     private int roomId;
     private int limit;
-    private String roomTypeName;
+    private int roomTypeId;
     private BigDecimal price;
     private Boolean status;
 }
