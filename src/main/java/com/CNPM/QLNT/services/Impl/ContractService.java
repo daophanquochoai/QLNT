@@ -79,4 +79,9 @@ public class ContractService implements IContracService {
         historyCustomerRepo.save(h1);
         contractRepo.save(contract);
     }
+
+    @Override
+    public Optional<Contract> getContractByRoomid(Integer roomId) {
+        return contractRepo.getContractsByRoomID(roomId);
+    }
 }

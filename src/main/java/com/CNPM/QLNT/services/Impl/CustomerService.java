@@ -171,6 +171,17 @@ public class CustomerService implements ICustomerService {
         Optional<Customer> C = getCustomer(id);
         if( C.isEmpty()) throw new ResourceNotFoundException("Khong tim thay customer");
         Customer Customer = C.get();
+
+        Integer room = 0;
+        if( Customer.getHistoryCustomer() != null ){
+            room = Customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId();
+        }
+        Optional<Contract> contract = iContracService.getContractByRoomid(room);
+        if( contract.isPresent()){
+            if( contract.get().getCustomer().getCustomerId() == Customer.getCustomerId()){
+                throw new ResourceNotFoundException("Khach hang la chu phong");
+            }
+        }
         boolean check = getAllCustomer().stream().anyMatch(
                 c -> (c.getCustomerId() != id && ( c.getIdentifier().equals(info.getIdentifier())|| c.getUsername().equals(info.getUsername())))
         );
@@ -214,7 +225,7 @@ public class CustomerService implements ICustomerService {
         if( info.getPassword() !=  null) {
             Customer.getUserAuthId().setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
         }
-        if( info.getRoomId() != 0 ) {
+        if( info.getRoomId() != 0 && room != info.getRoomId()) {
             Optional<HistoryCustomer> h = Customer.getHistoryCustomer().stream().filter(t-> t.getEndDate() == null).findFirst();
             if( roomRepo.findById(info.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay phong");
             if( h.isPresent()){

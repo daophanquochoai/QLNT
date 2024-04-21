@@ -3,6 +3,7 @@ package com.CNPM.QLNT.controller;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.response.InfoContract;
+import com.CNPM.QLNT.response.InfoRoom;
 import com.CNPM.QLNT.response.InfoUser;
 import com.CNPM.QLNT.services.Inter.*;
 import com.CNPM.QLNT.services.Impl.RoomService;
@@ -31,12 +32,17 @@ public class UserController {
 
     // 3. xem thong tin phong
     @GetMapping("/room/{room_id}")
-    public ResponseEntity<Optional<Room>> getRoom(@PathVariable int room_id){
+    public ResponseEntity<InfoRoom> getRoom(@PathVariable int room_id){
         Optional<Room> theRoom =roomService.getRoom(room_id);
         if( theRoom.isEmpty() ){
             throw new ResourceNotFoundException("Not Found Room");
         }
-        return ResponseEntity.ok(Optional.of(theRoom.get()));
+        Optional<Contract> contract = iContracService.getContractByRoomid(theRoom.get().getRoomId());
+        InfoRoom infoRoom = new InfoRoom();
+        infoRoom.setRoom(theRoom.get());
+        if( contract.isEmpty() ) infoRoom.setContract(null);
+        else infoRoom.setContract(contract.get());
+        return ResponseEntity.ok(infoRoom);
     }
     // 1/2. xem thong tin cua minh va ng khac
     @GetMapping("/customer/{cus_id}")
@@ -53,7 +59,7 @@ public class UserController {
         InfoUser user = new InfoUser(
                 Customer.getCustomerId(),
                 Customer.getFirstName(),
-                Customer.getFirstName(),
+                Customer.getLastName(),
                 Customer.getIdentifier(),
                 Customer.getDateOfBirth(),
                 Customer.getSex(),
