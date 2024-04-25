@@ -2,7 +2,11 @@ package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Bill;
+import com.CNPM.QLNT.model.ElectricPrice;
+import com.CNPM.QLNT.model.Room;
+import com.CNPM.QLNT.model.WaterPrice;
 import com.CNPM.QLNT.repository.BillRepo;
+import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.repository.RoomServiceRepo;
 import com.CNPM.QLNT.response.*;
 import com.CNPM.QLNT.services.Inter.IBillService;
@@ -23,6 +27,7 @@ public class BillService implements IBillService {
     private final BillRepo billRepo;
     private final IPriceService iPriceService;
     private final RoomServiceRepo roomServiceRepo;
+    private final RoomRepo roomRepo;
 
     @Override
     public List<Bill> getAllBill() {
@@ -173,18 +178,72 @@ public class BillService implements IBillService {
             }else {
                 throw new ResourceNotFoundException("electricNumberEnd");
             }
+            Optional<Room> room = roomRepo.findById(bill.getRoomId());
+            if( room.isEmpty()) throw new ResourceNotFoundException("roomId");
             b.setNote(bill.getNote());
-            Integer numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
-            Integer numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
+            int numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
+            int numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
             PriceQuotation price = iPriceService.getPriceNow();
             List<InfoService> infoService = roomServiceRepo.getAllServiceByRoomId(bill.getRoomId(),bill.getBeginDate());
-            Long total = 0L;
-            total += numberWater * price.getWaterPrice() + numberElec* price.getElectricPrice();
+            long total = 0L;
+            total += (long) numberWater * price.getWaterPrice() + (long) numberElec * price.getElectricPrice();
             total += infoService.stream().mapToLong( s -> s.getQuantity()*s.getPrice()).sum();
+
+            total += Long.parseLong(String.valueOf(room.get().getPrice()));
             b.setTotal(total);
             billRepo.save(b);
         }catch (Exception ex){
 
         }
+    }
+
+    @Override
+    public DetailBill getBillByRoomInMonthInYear(Integer roomId, Integer Month, Integer Year) {
+        List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
+        List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
+        WaterPrice water = new WaterPrice();
+        for( WaterPrice w : waterList ){
+
+            if( w.getChangedDate().getYear() < Year){
+                water = w;
+                break;
+            }else if( w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() < Month){
+                water = w;
+                break;
+            }
+        }
+        ElectricPrice electric = new ElectricPrice();
+        for( ElectricPrice e : electricList ){
+            if( e.getChangedDate().getYear() < Year){
+                electric = e;
+                break;
+            }else if( e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() < Month){
+                electric = e;
+                break;
+            }
+        }
+        Optional<Bill> bill = billRepo.getBillByRoomInMonthInYear(roomId, Month, Year);
+        if( bill.isEmpty()) throw new ResourceNotFoundException("not found");
+        List<InfoService> service = roomServiceRepo.getALlServiceByRoomId(roomId, Month, Year);
+        DetailBill detailBill = new DetailBill();
+        detailBill.setNumberBill(bill.get().getBillId());
+        detailBill.setBeginDate(bill.get().getBeginDate());
+        detailBill.setEndDate(bill.get().getEndDate());
+        detailBill.setElectricNumberBegin(bill.get().getElectricNumberBegin());
+        detailBill.setElectricNumberEnd(bill.get().getElectricNumberEnd());
+        detailBill.setWaterNumberBegin(bill.get().getWaterNumberBegin());
+        detailBill.setWaterNumberEnd(bill.get().getWaterNumberEnd());
+        detailBill.setNote(bill.get().getNote());
+        detailBill.setTotal(bill.get().getTotal());
+        detailBill.setIsPaid(bill.get().getStatus());
+        detailBill.setRoomId(roomId);
+        detailBill.setWaterPrice(water.getPrice());
+        detailBill.setElectronucPrice(electric.getPrice());
+        long total = 0L;
+        total += (long) detailBill.getWaterPrice() * (bill.get().getWaterNumberEnd() - bill.get().getWaterNumberBegin()) + (long) detailBill.getElectronucPrice() * (bill.get().getElectricNumberEnd()-bill.get().getElectricNumberBegin());
+        total += service.stream().mapToLong( s -> s.getQuantity()*s.getPrice()).sum();
+        detailBill.setRoomPrice(bill.get().getTotal() - total);
+        detailBill.setService(service);
+        return detailBill;
     }
 }

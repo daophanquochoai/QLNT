@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +93,22 @@ public class UserController {
             return ResponseEntity.ok(iBillService.getAllBillByRoom(room));
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    // xem hoa don theo thang, theo nam
+    @GetMapping("/get/bill/{room}/{month}/{year}")
+    public ResponseEntity<?> getBillByRoom(
+            @PathVariable Integer room,
+            @PathVariable Integer month,
+            @PathVariable Integer year
+    ){
+        try{
+            if( month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
+            if( year > LocalDate.now().getYear() || year < 0 ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
+            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(room,month,year));
+        }catch ( Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
