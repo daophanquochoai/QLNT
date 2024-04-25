@@ -60,7 +60,7 @@ public class RoomService implements IRoomService {
             log.info("{}", room);
             roomRepository.save(room);
         } catch (Exception ex) {
-            throw new ResourceNotFoundException("Khong tim thay loai hoac du lieu phong sai");
+            throw new ResourceNotFoundException("Dữ liệu phòng bị lỗi");
         }
     }
 
@@ -74,7 +74,7 @@ public class RoomService implements IRoomService {
             }
             if (roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
                 if( historyCustomerRepo.getCustomersByRoom(id).size() > roomRes.getLimit()){
-                    throw new ResourceNotFoundException("So nguoi lon hon limit");
+                    throw new ResourceNotFoundException("Sức chứa bé hơn số người ở hiện tại");
                 }
                 r.setLimit(roomRes.getLimit());
             }
@@ -86,7 +86,7 @@ public class RoomService implements IRoomService {
             }
             roomRepository.save(r);
         } catch (Exception ex) {
-            throw new ResourceNotFoundException("Du lieu sua doi loi can xem lai");
+            throw new ResourceNotFoundException("Dữ liệu sửa đổi không hợp lệ");
         }
     }
 

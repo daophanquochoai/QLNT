@@ -37,24 +37,24 @@ public class ContractService implements IContracService {
     public Contract getContractById(Integer id) {
         log.info("{}",contractRepo.getContractById(id));
         Optional<Contract> c = Optional.ofNullable(contractRepo.getContractById(id));
-        if( c.isEmpty()) throw new ResourceNotFoundException("Khong tim thay hop dong");
+        if( c.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
         return c.get();
     }
 
     @Override
     public void saveContract(Integer customerId, Integer roomId, InfoContract infoContract) {
         Optional<Customer> customer = customerRepo.findById(customerId);
-        if( customer.isEmpty()) throw new ResourceNotFoundException("Khong tim thay khach hang");
+        if( customer.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
         Optional<Room> room = roomRepo.findById(roomId);
-        if( room.isEmpty() ) throw new ResourceNotFoundException("Khong tim thay phong");
+        if( room.isEmpty() ) throw new ResourceNotFoundException("Không tìm thấy phòng");
         Contract contract = new Contract();
-        if( infoContract.getBeginDate() == null ) throw new ResourceNotFoundException("beginDate");
-        if( infoContract.getCreatedDate() == null ) throw new ResourceNotFoundException("createDate");
-        if( infoContract.getEndDate() == null ) throw new ResourceNotFoundException("endDate");
-        if( infoContract.getBeginDate().isAfter(infoContract.getCreatedDate())) throw new ResourceNotFoundException("beginDate");
-        if( infoContract.getCreatedDate().isAfter(infoContract.getEndDate())) throw new ResourceNotFoundException("createDate");
-        if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("cusId");
-        if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoom(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Room");
+        if( infoContract.getBeginDate() == null ) throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
+        if( infoContract.getCreatedDate() == null ) throw new ResourceNotFoundException("Ngày tạo không hợp lệ");
+        if( infoContract.getEndDate() == null ) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
+        if( infoContract.getBeginDate().isAfter(infoContract.getCreatedDate())) throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
+        if( infoContract.getCreatedDate().isAfter(infoContract.getEndDate())) throw new ResourceNotFoundException("Ngày tạo không hợp lệ");
+        if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("Không tìm thy khách thuê");
+        if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoom(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Phòng đã đầy");
         Optional<HistoryCustomer> h = historyCustomerRepo.getHistoryCustomerByCustomerId(customerId);
         if( h.isPresent() ){
             // neu dang o chuyen qua phong moi va ghi lai

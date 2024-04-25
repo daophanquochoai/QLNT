@@ -87,7 +87,7 @@ public class BillService implements IBillService {
     @Override
     public List<BillInRoom> getAllBillByRoom(int room) {
             Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByIdRoom(room));
-            if( listB.isEmpty()) throw new ResourceNotFoundException("Not found");
+            if( listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
             List<BillInRoom> listBR = new ArrayList<>();
             listB.get().stream().forEach(b-> {
                 BillInRoom br = new BillInRoom();
@@ -112,7 +112,7 @@ public class BillService implements IBillService {
     @Override
     public List<BillInRoom> getAllBillByStatus(int room, boolean status) {
         Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByStatus(status, room));
-        if( listB.isEmpty()) throw new ResourceNotFoundException("Not found");
+        if( listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
         List<BillInRoom> listBR = new ArrayList<>();
         listB.get().stream().forEach(b-> {
             BillInRoom br = new BillInRoom();
@@ -135,7 +135,7 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public Long getDoanhThu(int year) {
+    public Long getRevenue(int year) {
         return billRepo.getBillByYear(year)
                 .stream()
                 .mapToLong(bill -> {
@@ -149,17 +149,17 @@ public class BillService implements IBillService {
         try{
             Bill b = new Bill();
             if( bill.getBeginDate() == null ){
-                throw new ResourceNotFoundException("beginDate");
+                throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
             }else{
                 b.setBeginDate(bill.getBeginDate());
             }
             if( bill.getEndDate() == null){
-                throw new ResourceNotFoundException("endDate");
+                throw new ResourceNotFoundException("Ngày kêt thúc không hợp lệ");
             }else{
                 if( bill.getEndDate().isAfter(bill.getBeginDate())){
                     b.setEndDate(bill.getEndDate());
                 }else{
-                    throw new ResourceNotFoundException("endDate");
+                    throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
                 }
             }
             if( bill.getElectricNumberBegin() >= 0){
@@ -168,7 +168,7 @@ public class BillService implements IBillService {
             if( bill.getElectricNumberEnd() > bill.getElectricNumberBegin()){
                 b.setElectricNumberEnd(bill.getElectricNumberEnd());
             }else {
-                throw new ResourceNotFoundException("electricNumberEnd");
+                throw new ResourceNotFoundException("Số điện kết thúc không hợp lệ");
             }
             if( bill.getWaterNumberBegin() >= 0){
                 b.setWaterNumberBegin(bill.getWaterNumberBegin());
@@ -176,10 +176,10 @@ public class BillService implements IBillService {
             if( bill.getElectricNumberEnd() > bill.getWaterNumberBegin()){
                 b.setWaterNumberEnd(bill.getWaterNumberEnd());
             }else {
-                throw new ResourceNotFoundException("electricNumberEnd");
+                throw new ResourceNotFoundException("Số điện kết thúc không hợp lệ");
             }
             Optional<Room> room = roomRepo.findById(bill.getRoomId());
-            if( room.isEmpty()) throw new ResourceNotFoundException("roomId");
+            if( room.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy phòng");
             b.setNote(bill.getNote());
             int numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
             int numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
@@ -223,7 +223,7 @@ public class BillService implements IBillService {
             }
         }
         Optional<Bill> bill = billRepo.getBillByRoomInMonthInYear(roomId, Month, Year);
-        if( bill.isEmpty()) throw new ResourceNotFoundException("not found");
+        if( bill.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
         List<InfoService> service = roomServiceRepo.getALlServiceByRoomId(roomId, Month, Year);
         DetailBill detailBill = new DetailBill();
         detailBill.setNumberBill(bill.get().getBillId());

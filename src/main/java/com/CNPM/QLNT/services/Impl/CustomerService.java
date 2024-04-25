@@ -110,7 +110,7 @@ public class CustomerService implements ICustomerService {
             boolean check = getAllCustomer().stream().anyMatch(
                     cus -> (cus.getIdentifier().equals(info.getIdentifier()) || cus.getUsername().equals(info.getUsername()))
             );
-            if (check) throw new ResourceNotFoundException("Bi trung Identify hoac Tai khoan");
+            if (check) throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
         }
         List<InfoUser> list = getCustomerByRoomId(info.getRoomId());
         if (info.getRoomId() != 0 && !iRoomService.getAllRoomByStatus(true).isEmpty()) {
@@ -123,11 +123,11 @@ public class CustomerService implements ICustomerService {
         c.setFirstName(info.getFirstName());
         c.setLastName(info.getLastName());
         if (info.getIdentifier() == null || info.getIdentifier().length() != 12) {
-            throw new ResourceNotFoundException("Identify");
+            throw new ResourceNotFoundException("Mã CCCD không hợp lệ");
         }
         c.setIdentifier(info.getIdentifier());
         if (info.getDateOfBirth() != null) {
-            if (info.getDateOfBirth().isAfter(LocalDate.now())) throw new ResourceNotFoundException("dateOfBirth");
+            if (info.getDateOfBirth().isAfter(LocalDate.now())) throw new ResourceNotFoundException("Ngày sinh không hợp lệ");
             c.setDateOfBirth(info.getDateOfBirth());
         }
         if (info.getSex() != null) {
@@ -138,21 +138,21 @@ public class CustomerService implements ICustomerService {
         }
         if (info.getPhoneNumber() != null) {
             if (info.getPhoneNumber().length() != 10 || info.getPhoneNumber().charAt(0) != '0')
-                throw new ResourceNotFoundException("phoneNumber");
+                throw new ResourceNotFoundException("Số điện thoại không hợp lệ");
             c.setPhoneNumber(info.getPhoneNumber());
         }
         if (info.getEmail() != null) {
             Matcher matcher = pattern.matcher(info.getEmail());
-            if (!matcher.matches()) throw new ResourceNotFoundException("email");
+            if (!matcher.matches()) throw new ResourceNotFoundException("Email không hợp lệ");
             c.setEmail(info.getEmail());
         }
         HistoryCustomer historyCustomer = new HistoryCustomer();
         if (info.getRoomId() != 0) {
-            if (roomRepo.findById(info.getRoomId()).isEmpty()) throw new ResourceNotFoundException("room");
+            if (roomRepo.findById(info.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Phòng không tồn tại");
             else {
                 Room r = roomRepo.findById(info.getRoomId()).get();
                 if (r.getLimit() < historyCustomerRepo.getCustomersByRoom(r.getRoomId()).size())
-                    throw new ResourceNotFoundException("room day");
+                    throw new ResourceNotFoundException("Phòng đã đầy");
                 historyCustomer.setRoomOld(r);
                 historyCustomer.setBeginDate(LocalDate.now());
             }
@@ -175,7 +175,7 @@ public class CustomerService implements ICustomerService {
     @Override
     public void updateCustomer(int id, InfoUser info) {
         Optional<Customer> C = getCustomer(id);
-        if (C.isEmpty()) throw new ResourceNotFoundException("Khong tim thay customer");
+        if (C.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
         Customer customer = C.get();
 
         int room = 0;
@@ -183,15 +183,15 @@ public class CustomerService implements ICustomerService {
             room = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId();
         }
         Optional<Contract> contract = iContracService.getContractByRoomid(room);
-        if (contract.isPresent()) {
+        if (contract.isPresent() && info.getRoomId() != room) {
             if (contract.get().getCustomer().getCustomerId() == customer.getCustomerId()) {
-                throw new ResourceNotFoundException("Khach hang la chu phong");
+                throw new ResourceNotFoundException("Không thể đổi phòng do khách thuê đang là chủ hợp đồng");
             }
         }
         boolean check = getAllCustomer().stream().anyMatch(
                 c -> (c.getCustomerId() != id && (c.getIdentifier().equals(info.getIdentifier()) || c.getUsername().equals(info.getUsername())))
         );
-        if (check) throw new ResourceNotFoundException("Bi trung CCCD hoac TK_MK");
+        if (check) throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
         if (info.getFirstName() != null) {
             customer.setFirstName(info.getFirstName());
         }
@@ -200,7 +200,7 @@ public class CustomerService implements ICustomerService {
         }
         if (info.getIdentifier() != null) {
             if (info.getIdentifier().length() != 12) {
-                throw new ResourceNotFoundException("Identify");
+                throw new ResourceNotFoundException("Mã CCCD không hợp lệ");
             }
             customer.setIdentifier(info.getIdentifier());
         }
@@ -208,7 +208,7 @@ public class CustomerService implements ICustomerService {
             customer.setInfoAddress(info.getInfoAddress());
         }
         if (info.getDateOfBirth() != null) {
-            if (info.getDateOfBirth().isAfter(LocalDate.now())) throw new ResourceNotFoundException("dateOfBirth");
+            if (info.getDateOfBirth().isAfter(LocalDate.now())) throw new ResourceNotFoundException("Ngày sinh không hợp lệ");
             customer.setDateOfBirth(info.getDateOfBirth());
         }
         if (info.getSex() != null) {
@@ -216,12 +216,12 @@ public class CustomerService implements ICustomerService {
         }
         if (info.getPhoneNumber() != null) {
             if (info.getPhoneNumber().length() != 10 || info.getPhoneNumber().charAt(0) != '0')
-                throw new ResourceNotFoundException("phoneNumber");
+                throw new ResourceNotFoundException("Số điện thoại không hợp lệ");
             customer.setPhoneNumber(info.getPhoneNumber());
         }
         if (info.getEmail() != null) {
             Matcher matcher = pattern.matcher(info.getEmail());
-            if (!matcher.matches()) throw new ResourceNotFoundException("email");
+            if (!matcher.matches()) throw new ResourceNotFoundException("Email không hợp lệ");
             customer.setEmail(info.getEmail());
         }
         if (info.getUsername() != null) {
@@ -233,7 +233,7 @@ public class CustomerService implements ICustomerService {
         if (info.getRoomId() != 0 && info.getRoomId() != room) {
             Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
             if (roomRepo.findById(info.getRoomId()).isEmpty())
-                throw new ResourceNotFoundException("Khong tim thay phong");
+                throw new ResourceNotFoundException("Không tìm thấy phòng");
             if (h.isPresent()) {
                 h.get().setEndDate(LocalDate.now());
                 h.get().setRoomNew(roomRepo.findById(info.getRoomId()).get());
@@ -258,7 +258,7 @@ public class CustomerService implements ICustomerService {
             listCT.stream().forEach(c -> {
                 if (c.getCustomer().getCustomerId() == id && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus())) {
                     System.out.println(c.getEndDate().isBefore(LocalDate.now()));
-                    throw new ResourceNotFoundException("Con rang buoc boi Hop Dong");
+                    throw new ResourceNotFoundException("Không thể xóa do tồn tại hợp đồng");
                 }
             });
             Customer Customer = getCustomer(id).get();

@@ -19,7 +19,6 @@ import java.util.List;
 public class PriceService implements IPriceService {
     private final ElectricPriceRepo electricPriceRepo;
     private final WaterPriceRepo waterPriceRepo;
-    private final ICustomerService iCustomerService;
 
     @Override
     public List<ElectricPrice> getAllElectricPrice() {
@@ -41,13 +40,13 @@ public class PriceService implements IPriceService {
 
     @Override
     public void saveElecPrice(ElectricPrice e) {
-        if( e.getPrice() < 0 ) throw new ResourceNotFoundException("Gia dien lon 0");
+        if( e.getPrice() < 0 ) throw new ResourceNotFoundException("Giá điện phải lớn hơn 0");
         electricPriceRepo.save(e);
     }
 
     @Override
     public void saveWaterPrice(WaterPrice w) {
-        if( w.getPrice() < 0 ) throw new ResourceNotFoundException("Gia nuoc lon 0");
+        if( w.getPrice() < 0 ) throw new ResourceNotFoundException("Giá nước phải lớn hơn 0");
         waterPriceRepo.save(w);
     }
 }

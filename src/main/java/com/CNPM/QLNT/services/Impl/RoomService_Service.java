@@ -31,16 +31,16 @@ public class RoomService_Service implements IRoomService_Service {
         RoomService roomService = new RoomService();
         if( infoRoomService.getBeginDate() != null ){
             roomService.setBeginDate(infoRoomService.getBeginDate());
-        }else throw new ResourceNotFoundException("BeginDAte khác null");
+        }else throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
         if( infoRoomService.getEndDate() != null ){
             if( infoRoomService.getEndDate().isAfter(infoRoomService.getBeginDate())){
                 roomService.setEndDate(infoRoomService.getEndDate());
-            }else throw new ResourceNotFoundException("EndDate nằm sau BeginDate");
+            }else throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
         }
-        if( infoRoomService.getQuantity() < 0 ) throw new ResourceNotFoundException("Quantity lon hon 0");
+        if( infoRoomService.getQuantity() < 0 ) throw new ResourceNotFoundException("Số lượng phải lớn hơn 0");
         roomService.setQuantity(infoRoomService.getQuantity());
-        if( serviceRepo.findById(infoRoomService.getServiceId()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay service");
-        if( roomRepo.findById(infoRoomService.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Khong tim thay room");
+        if( serviceRepo.findById(infoRoomService.getServiceId()).isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch v");
+        if( roomRepo.findById(infoRoomService.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Không tìm thấy phòng");
         Room room = roomRepo.findById(infoRoomService.getRoomId()).get();
         Service service = serviceRepo.findById(infoRoomService.getServiceId()).get();
         roomService.setService(service);
@@ -51,8 +51,8 @@ public class RoomService_Service implements IRoomService_Service {
     @Override
     public void updateRoomService(Integer id, LocalDate endDate) {
         Optional<RoomService> r = roomServiceRepo.findById(id);
-        if( r.isEmpty()) throw new ResourceNotFoundException("Khong tim thay roomService");
-        if( r.get().getBeginDate().isAfter(endDate)) throw new ResourceNotFoundException("endDate");
+        if( r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ phòng");
+        if( r.get().getBeginDate().isAfter(endDate)) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
         r.get().setEndDate(endDate);
         roomServiceRepo.save(r.get());
     }

@@ -12,7 +12,7 @@ public interface IBillService {
     Report getReport( int month, int year);
     List<BillInRoom> getAllBillByRoom(int room);
     List<BillInRoom> getAllBillByStatus(int room, boolean status);
-    Long getDoanhThu(int year);
+    Long getRevenue(int year);
     void billCalculator( BillInRoom bill);
     DetailBill getBillByRoomInMonthInYear( Integer roomId, Integer Month, Integer Year);
 }

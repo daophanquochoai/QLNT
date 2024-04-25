@@ -23,7 +23,7 @@ public class RoomType implements IRoomType {
             roomTypeRepo.save(roomType);
         } else {
             // Nếu roomType đã tồn tại, ném RuntimeException
-            throw new RuntimeException("Đã tồn tại");
+            throw new RuntimeException("Loại phòng đã tồn tại");
         }
     }
 

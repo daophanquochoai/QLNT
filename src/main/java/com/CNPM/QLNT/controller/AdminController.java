@@ -50,7 +50,7 @@ public class AdminController {
         try {
             Optional<Customer> theCustomer = iCustomerService.getCustomer(cus_id);
             if (theCustomer.isEmpty()) {
-                throw new ResourceNotFoundException("Khong tim thay");
+                throw new ResourceNotFoundException("Không tìm thấy khách thuê");
             }
             InfoUser user = new InfoUser(
                     theCustomer.get().getCustomerId(),
@@ -77,9 +77,9 @@ public class AdminController {
     public ResponseEntity<?> savePriceQuotation(@RequestBody ElectricPrice e) {
         try {
             iPriceService.saveElecPrice(e);
-            return ResponseEntity.ok("Chinh sua thanh cong");
+            return ResponseEntity.ok("Thay đổi giá điện thành công");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
         }
     }
 
@@ -88,9 +88,9 @@ public class AdminController {
     public ResponseEntity<?> savePriceQuotation(@RequestBody WaterPrice w) {
         try {
             iPriceService.saveWaterPrice(w);
-            return ResponseEntity.ok("Chinh sua thanh cong");
+            return ResponseEntity.ok("Thay đổi giá nước thành công");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi he thong");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
         }
     }
 
@@ -122,8 +122,8 @@ public class AdminController {
     public ResponseEntity<?> addCustomer(@RequestBody InfoUser info) {
         try {
             Boolean check = iCustomerService.addCustomer(info);
-            return check ? ResponseEntity.ok("Them thanh cong")
-                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phong day");
+            return check ? ResponseEntity.ok("Thêm khách thuể thành công")
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phòng đã đầy");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -136,7 +136,7 @@ public class AdminController {
                                             @RequestBody InfoUser info) {
         try {
             iCustomerService.updateCustomer(id, info);
-            return ResponseEntity.ok("Them thanh cong");
+            return ResponseEntity.ok("Thay đổi thông tin khách thuê thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -152,7 +152,7 @@ public class AdminController {
                 InfoUser infoUser = new InfoUser();
                 iCustomerService.updateCustomer(customerId,infoUser);
             } else iCustomerService.deleteCustomer(customerId);
-            return ResponseEntity.ok("Xoa thanh cong");
+            return ResponseEntity.ok("Xóa khách thuê thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -166,7 +166,7 @@ public class AdminController {
             Room r = Room.get();
             return ResponseEntity.ok(new RoomRes(r.getRoomId(), r.getLimit(), r.getRoomType().getRoomTypeId(), r.getPrice(), r.getStatus()));
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong tim thay phong");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không tìm thấy phòng");
         }
     }
 
@@ -175,7 +175,7 @@ public class AdminController {
     public ResponseEntity<?> addRoom(@RequestBody RoomRes roomRes) {
         try {
             iRoomService.addRoom(roomRes);
-            return ResponseEntity.ok("Them thanh cong");
+            return ResponseEntity.ok("Thêm phòng thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -188,9 +188,9 @@ public class AdminController {
             Optional<Room> Room = iRoomService.getRoom(roomId);
             if (Room.isPresent()) {
                 iRoomService.updateRoom(roomId, roomRes);
-                return ResponseEntity.ok("Update thanh cong");
+                return ResponseEntity.ok("Thay đổi thông tin phòng thành công");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong the tim thay phong do");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không thể tìm thấy phòng");
             }
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -204,20 +204,20 @@ public class AdminController {
             iCustomerService.getAllCustomer().stream().forEach(
                     c -> {
                         if (c.getRoomId() == roomId) {
-                            throw new ResourceNotFoundException("Co khach con o trong phong");
+                            throw new ResourceNotFoundException("Phòng đang có người ở");
                         }
                     }
             );
             iContracService.getAllContract().stream().forEach(
                     c -> {
                         if (c.getRoom().getRoomId() == roomId && c.getEndDate().isAfter(LocalDate.now())) {
-                            throw new ResourceNotFoundException("Hop dong chua het han");
+                            throw new ResourceNotFoundException("Hợp đồng chưa hết hạn");
                         }
                     }
             );
 
             iRoomService.deleteRoom(roomId);
-            return ResponseEntity.ok("Xoa thanh cong");
+            return ResponseEntity.ok("Xóa phòng thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -231,9 +231,9 @@ public class AdminController {
     public ResponseEntity<?> addRoomType(@RequestBody RoomType roomType) {
         try {
             iRoomType.addRoomType(roomType);
-            return ResponseEntity.ok("Them loai phong thanh cong");
+            return ResponseEntity.ok("Thêm loại phòng thành công");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Khong the them");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể thêm loại phòng");
         }
     }
 
@@ -310,7 +310,7 @@ public class AdminController {
     public ResponseEntity<?> updateRequest(@PathVariable int id) {
         try {
             iRequestService.updateRequest(id);
-            return ResponseEntity.ok("Update Success");
+            return ResponseEntity.ok("Đã xử lý yêu cầu");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -331,7 +331,7 @@ public class AdminController {
     public ResponseEntity<?> getStatistical() {
         try {
             Statistical sta = new Statistical();
-            sta.setRevenue(iBillService.getDoanhThu(LocalDate.now().getYear()));
+            sta.setRevenue(iBillService.getRevenue(LocalDate.now().getYear()));
             sta.setNumberOfPaidRoom(iBillService.getReport(LocalDate.now().getMonth().getValue() - 1, LocalDate.now().getYear()).getPaidRoomList().size());
             sta.setNumberOfUnpaidRoom(iBillService.getReport(LocalDate.now().getMonth().getValue() - 1, LocalDate.now().getYear()).getUnpaidRoomList().size());
             sta.setNumberOfFullRoom(iRoomService.getAllRoomByLimit(3).size());
@@ -349,7 +349,7 @@ public class AdminController {
     public ResponseEntity<?> deleteNoticeById(@PathVariable int id) {
         try {
             iRequestService.deleteCommunication(id);
-            return ResponseEntity.ok("Notice was deleted");
+            return ResponseEntity.ok("Yêu cầu đã được xóa");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -371,7 +371,7 @@ public class AdminController {
     public ResponseEntity<?> billCalculation(@RequestBody BillInRoom billInRoom) {
         try {
             iBillService.billCalculator(billInRoom);
-            return ResponseEntity.ok("Them hoa don thanh cong");
+            return ResponseEntity.ok("Thêm hóa đơn thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -402,7 +402,7 @@ public class AdminController {
     public ResponseEntity<?> saveService(@RequestBody Service service) {
         try {
             iServiceService.saveService(service);
-            return ResponseEntity.ok("Them service thanh cong");
+            return ResponseEntity.ok("Thêm dịch vụ thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -413,7 +413,7 @@ public class AdminController {
     public ResponseEntity<?> updateService(@PathVariable Integer id, @RequestBody Service service) {
         try {
             iServiceService.updateService(id, service);
-            return ResponseEntity.ok("Cap nhat service thanh cong");
+            return ResponseEntity.ok("Cập nhật dịch vụ thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -425,7 +425,7 @@ public class AdminController {
                                              @RequestBody InfoRoomService infoRoomService) {
         try {
             iRoomServiceService.saveRoomService(id, infoRoomService);
-            return ResponseEntity.ok("Them service thanh cong");
+            return ResponseEntity.ok("Thêm dịch vụ thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -447,7 +447,7 @@ public class AdminController {
                                           @RequestBody InfoContract infoContract) {
         try {
             iContracService.saveContract(customerId, roomId, infoContract);
-            return ResponseEntity.ok("Luu thanh cong hop dong");
+            return ResponseEntity.ok("Lưu hợp đồng thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

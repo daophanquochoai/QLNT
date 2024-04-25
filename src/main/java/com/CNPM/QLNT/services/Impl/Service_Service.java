@@ -18,7 +18,7 @@ public class Service_Service implements IService_Service {
     @Override
     public void saveService(Service service) {
         if( service.getPrice() < 0){
-            throw new ResourceNotFoundException("price lon hon 0");
+            throw new ResourceNotFoundException("Giá phải lớn hơn 0");
         }
         serviceRepo.save(service);
     }
@@ -26,7 +26,7 @@ public class Service_Service implements IService_Service {
     @Override
     public void updateService(Integer id, Service service) {
         Optional<Service> s = serviceRepo.findById(id);
-        if( s.isEmpty()) throw new ResourceNotFoundException("Khong tim thay service");
+        if( s.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
         Service ser = s.get();
         if( service.getPrice() >= 0){
             ser.setPrice(service.getPrice());
