@@ -15,7 +15,7 @@ public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int serviceId;
-    @Column(name = "serviceName", unique = true)
+    @Column(name = "serviceName", unique = true, columnDefinition = "nvarchar(55)")
     private String serviceName;
     @Column(columnDefinition = "MONEY")
     private Long price;

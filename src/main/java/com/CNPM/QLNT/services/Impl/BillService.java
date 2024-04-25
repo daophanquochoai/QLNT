@@ -32,7 +32,7 @@ public class BillService implements IBillService {
     @Override
     public Report getReport(int month, int year) {
         try{
-            List<Bill> list = billRepo.getRepost(month, year);
+            List<Bill> list = billRepo.getReport(month, year);
             Report r = new Report();
             List<Bill> l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
             List<BillInRoom> unpaidList = (List<BillInRoom>) l.stream().map(b -> {

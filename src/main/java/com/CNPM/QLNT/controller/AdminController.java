@@ -146,12 +146,12 @@ public class AdminController {
     @DeleteMapping("/remove/customer/{customerId}")
     public ResponseEntity<?> deleteCustomer(@PathVariable int customerId) {
         try {
-            if (iCustomerService.getCustomer(customerId).get().getHistoryCustomer() == null ?
-                    true :
-                    iCustomerService.getCustomer(customerId).get().getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().isPresent()) {
-                throw new ResourceNotFoundException("Khach hang da thue tro");
-            }
-            iCustomerService.deleteCustomer(customerId);
+            Customer customer = iCustomerService.getCustomer(customerId).get();
+            Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
+            if (h.isPresent()) {
+                InfoUser infoUser = new InfoUser();
+                iCustomerService.updateCustomer(customerId,infoUser);
+            } else iCustomerService.deleteCustomer(customerId);
             return ResponseEntity.ok("Xoa thanh cong");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -264,6 +264,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+
     @GetMapping("/getAllRoomWithContract")
     public ResponseEntity<?> getAllRoomWithContract() {
         try {
@@ -367,9 +368,9 @@ public class AdminController {
     //     tinh hoa don
     @PostMapping("add/bill")
     @Transactional
-    public ResponseEntity<?> billCalculation(@RequestBody BillInRoom bIllInRoom) {
+    public ResponseEntity<?> billCalculation(@RequestBody BillInRoom billInRoom) {
         try {
-            iBillService.billCalculator(bIllInRoom);
+            iBillService.billCalculator(billInRoom);
             return ResponseEntity.ok("Them hoa don thanh cong");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());

@@ -13,17 +13,17 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "RoomService")
+@Table(name = "RoomService", uniqueConstraints = @UniqueConstraint(columnNames = {"roomId", "serviceId"}))
 public class RoomService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "roomServiceId")
     private int roomServiceId;
     @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "roomId")
+    @JoinColumn(name = "roomId",referencedColumnName = "roomId")
     private Room room;
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "serviceId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "serviceId",referencedColumnName = "serviceId")
     private Service service;
     private int quantity;
     private LocalDate beginDate;
