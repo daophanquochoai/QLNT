@@ -66,28 +66,24 @@ public class RoomService implements IRoomService {
 
     @Override
     public void updateRoom(int id, RoomRes roomRes) {
-        try {
-            if (getRoom(id).isEmpty() || id == 0) throw new ResourceNotFoundException("Phong khong ton tai");
-            Room r = getRoom(id).get();
-            if (roomRes.getRoomTypeId() != 0) {
-                r.setRoomType(iRoomType.getRoomTypeByRoomTypeId(roomRes.getRoomTypeId()));
-            }
-            if (roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
-                if( historyCustomerRepo.getCustomersByRoom(id).size() > roomRes.getLimit()){
-                    throw new ResourceNotFoundException("Sức chứa bé hơn số người ở hiện tại");
-                }
-                r.setLimit(roomRes.getLimit());
-            }
-            if (roomRes.getStatus() != null) {
-                r.setStatus(roomRes.getStatus());
-            }
-            if (roomRes.getPrice() != null) {
-                r.setPrice(roomRes.getPrice());
-            }
-            roomRepository.save(r);
-        } catch (Exception ex) {
-            throw new ResourceNotFoundException("Dữ liệu sửa đổi không hợp lệ");
+        if (getRoom(id).isEmpty() || id == 0) throw new ResourceNotFoundException("Phòng không tồn tại");
+        Room r = getRoom(id).get();
+        if (roomRes.getRoomTypeId() != 0) {
+            r.setRoomType(iRoomType.getRoomTypeByRoomTypeId(roomRes.getRoomTypeId()));
         }
+        if (roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
+            if (historyCustomerRepo.getCustomersByRoom(id).size() > roomRes.getLimit()) {
+                throw new ResourceNotFoundException("Sức chứa bé hơn số người ở hiện tại");
+            }
+            r.setLimit(roomRes.getLimit());
+        }
+        if (roomRes.getStatus() != null) {
+            r.setStatus(roomRes.getStatus());
+        }
+        if (roomRes.getPrice() != null) {
+            r.setPrice(roomRes.getPrice());
+        }
+        roomRepository.save(r);
     }
 
     @Override
@@ -140,9 +136,10 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public List<Room> getAllRoomWithoutContract(){
+    public List<Room> getAllRoomWithoutContract() {
         return roomRepository.getRoomWithContract();
     }
+
     @Override
     public List<RoomRes> getRoomForBill() {
         List<Room> list = roomRepository.getRoomByStatus(true);

@@ -107,10 +107,14 @@ public class CustomerService implements ICustomerService {
         List<InfoUser> listCus = getAllCustomer();
         Customer c = new Customer();
         if (!listCus.isEmpty()) {
-            boolean check = getAllCustomer().stream().anyMatch(
-                    cus -> (cus.getIdentifier().equals(info.getIdentifier()) || cus.getUsername().equals(info.getUsername()))
-            );
-            if (check) throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
+            listCus.forEach(cus -> {
+                if (cus.getIdentifier().equals(info.getIdentifier()))
+                    throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
+                if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
+                    throw new ResourceNotFoundException("Số điện thoại đã tồn tại");
+                if (cus.getEmail().equals(info.getEmail()))
+                    throw new ResourceNotFoundException("Email đã tồn tại");
+            });
         }
         List<InfoUser> list = getCustomerByRoomId(info.getRoomId());
         if (info.getRoomId() != 0 && !iRoomService.getAllRoomByStatus(true).isEmpty()) {
@@ -188,10 +192,16 @@ public class CustomerService implements ICustomerService {
                 throw new ResourceNotFoundException("Không thể đổi phòng do khách thuê đang là chủ hợp đồng");
             }
         }
-        boolean check = getAllCustomer().stream().anyMatch(
-                c -> (c.getCustomerId() != id && (c.getIdentifier().equals(info.getIdentifier()) || c.getUsername().equals(info.getUsername())))
-        );
-        if (check) throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
+        getAllCustomer().forEach(cus -> {
+            if(cus.getCustomerId() != id){
+                if (cus.getIdentifier().equals(info.getIdentifier()))
+                    throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
+                if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
+                    throw new ResourceNotFoundException("Số điện thoại đã tồn tại");
+                if (cus.getEmail().equals(info.getEmail()))
+                    throw new ResourceNotFoundException("Email đã tồn tại");
+            }
+        });
         if (info.getFirstName() != null) {
             customer.setFirstName(info.getFirstName());
         }

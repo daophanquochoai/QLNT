@@ -122,7 +122,7 @@ public class AdminController {
     public ResponseEntity<?> addCustomer(@RequestBody InfoUser info) {
         try {
             Boolean check = iCustomerService.addCustomer(info);
-            return check ? ResponseEntity.ok("Thêm khách thuể thành công")
+            return check ? ResponseEntity.ok("Thêm khách thuê thành công")
                     : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phòng đã đầy");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
