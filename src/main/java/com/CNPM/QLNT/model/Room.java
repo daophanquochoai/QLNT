@@ -26,9 +26,6 @@ public class Room {
     @Column(name = "limit", nullable = false)
     private int limit;
 
-    @Column(name = "status", nullable = false)
-    private Boolean status;
-
     @Column(name = "price", nullable = false, columnDefinition = "money")
     private BigDecimal price;
 

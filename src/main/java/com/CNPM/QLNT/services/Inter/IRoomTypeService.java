@@ -4,8 +4,9 @@ import com.CNPM.QLNT.model.RoomType;
 
 import java.util.List;
 
-public interface IRoomType {
+public interface IRoomTypeService {
     void addRoomType(RoomType homeCate);
+    void deleteRoomType(int roomTypeId);
     List<RoomType> getAllRoomType();
     RoomType getRoomTypeByRoomTypeId(int roomTypeId);
 }

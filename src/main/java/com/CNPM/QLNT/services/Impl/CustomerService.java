@@ -117,8 +117,8 @@ public class CustomerService implements ICustomerService {
             });
         }
         List<InfoUser> list = getCustomerByRoomId(info.getRoomId());
-        if (info.getRoomId() != 0 && !iRoomService.getAllRoomByStatus(true).isEmpty()) {
-            Room Room = iRoomService.getRoom(info.getRoomId()).get();
+        if (info.getRoomId() != 0 && !iRoomService.getAllRoom().isEmpty()) {
+            Room Room = iRoomService.getRoomByRoomId(info.getRoomId()).get();
             if (Room.getLimit() == list.size()) {
                 return false;
             }
@@ -189,7 +189,7 @@ public class CustomerService implements ICustomerService {
         Optional<Contract> contract = iContracService.getContractByRoomid(room);
         if (contract.isPresent() && info.getRoomId() != room) {
             if (contract.get().getCustomer().getCustomerId() == customer.getCustomerId()) {
-                throw new ResourceNotFoundException("Không thể đổi phòng do khách thuê đang là chủ hợp đồng");
+                throw new ResourceNotFoundException("Khách thuê đang là chủ hợp đồng của phòng hiện tại");
             }
         }
         getAllCustomer().forEach(cus -> {

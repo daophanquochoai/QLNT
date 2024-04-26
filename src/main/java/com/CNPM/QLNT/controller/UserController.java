@@ -33,8 +33,8 @@ public class UserController {
 
     // 3. xem thong tin phong
     @GetMapping("/room/{room_id}")
-    public ResponseEntity<InfoRoom> getRoom(@PathVariable int room_id){
-        Optional<Room> theRoom =roomService.getRoom(room_id);
+    public ResponseEntity<InfoRoom> getRoom(@PathVariable int roomId){
+        Optional<Room> theRoom =roomService.getRoomByRoomId(roomId);
         if( theRoom.isEmpty() ){
             throw new ResourceNotFoundException("Not Found Room");
         }

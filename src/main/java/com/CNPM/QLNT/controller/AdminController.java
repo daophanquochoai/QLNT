@@ -25,7 +25,7 @@ public class AdminController {
     private final IContracService iContracService;
     private final IPriceService iPriceService;
     private final IRoomService iRoomService;
-    private final IRoomType iRoomType;
+    private final IRoomTypeService iRoomTypeService;
     private final IBillService iBillService;
     private final IRequestService iRequestService;
     private final IHistoryCustomerService iHistoryCustomerService;
@@ -35,7 +35,7 @@ public class AdminController {
     // lay tat ca phong
     @GetMapping("/getAllRoom")
     public ResponseEntity<List<RoomRes>> getAllRoom() throws SQLException {
-        return ResponseEntity.ok(iRoomService.allRoom());
+        return ResponseEntity.ok(iRoomService.getAllRoom());
     }
 
     // 1. lay thong tin customer
@@ -161,10 +161,10 @@ public class AdminController {
     //4.them phong///////////////////////////////////////////////////////////////////////////
     @GetMapping("/get/room/{roomId}")
     public ResponseEntity<?> getRoom(@PathVariable int roomId) {
-        Optional<Room> Room = iRoomService.getRoom(roomId);
+        Optional<Room> Room = iRoomService.getRoomByRoomId(roomId);
         if (Room.isPresent()) {
             Room r = Room.get();
-            return ResponseEntity.ok(new RoomRes(r.getRoomId(), r.getLimit(), r.getRoomType().getRoomTypeId(), r.getPrice(), r.getStatus()));
+            return ResponseEntity.ok(new RoomRes(r.getRoomId(), r.getLimit(), r.getRoomType().getRoomTypeId(), r.getPrice()));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không tìm thấy phòng");
         }
@@ -185,7 +185,7 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> updateRoom(@PathVariable int roomId, @RequestBody RoomRes roomRes) {
         try {
-            Optional<Room> Room = iRoomService.getRoom(roomId);
+            Optional<Room> Room = iRoomService.getRoomByRoomId(roomId);
             if (Room.isPresent()) {
                 iRoomService.updateRoom(roomId, roomRes);
                 return ResponseEntity.ok("Thay đổi thông tin phòng thành công");
@@ -222,6 +222,23 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+    @DeleteMapping("remove/roomType/{roomTypeId}")
+    @Transactional
+    public ResponseEntity<?> deleteRoomType(@PathVariable int roomTypeId) {
+        try {
+            iRoomService.getAllRoom().stream().forEach(
+                    r -> {
+                        if (r.getRoomTypeId() == roomTypeId) {
+                            throw new ResourceNotFoundException("Đang có phòng thuộc loại này");
+                        }
+                    }
+            );
+            iRoomTypeService.deleteRoomType(roomTypeId);
+            return ResponseEntity.ok("Xóa loại phòng thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -230,29 +247,17 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> addRoomType(@RequestBody RoomType roomType) {
         try {
-            iRoomType.addRoomType(roomType);
+            iRoomTypeService.addRoomType(roomType);
             return ResponseEntity.ok("Thêm loại phòng thành công");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể thêm loại phòng");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
     //4. lay cac loai phong
     @GetMapping("/get/roomType")
     public ResponseEntity<?> getAllRoomType() {
-        return ResponseEntity.ok(iRoomType.getAllRoomType());
-    }
-
-
-    // 6. Loc theo trang thai
-    @GetMapping("get/room/status/{status}")
-    public ResponseEntity<?> getAllRoomByStaTus(@PathVariable boolean status) {
-        try {
-            List<RoomRes> list = iRoomService.getAllRoomByStatus(status);
-            return ResponseEntity.ok(list);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+        return ResponseEntity.ok(iRoomTypeService.getAllRoomType());
     }
 
     // 6. Lay theo phong trong
@@ -268,7 +273,7 @@ public class AdminController {
     @GetMapping("/getAllRoomWithContract")
     public ResponseEntity<?> getAllRoomWithContract() {
         try {
-            return ResponseEntity.ok(iRoomService.getAllRoomWithoutContract());
+            return ResponseEntity.ok(iRoomService.getAllRoomWithContract());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

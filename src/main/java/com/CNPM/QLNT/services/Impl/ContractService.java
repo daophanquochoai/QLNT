@@ -53,7 +53,7 @@ public class ContractService implements IContracService {
         if( infoContract.getEndDate() == null ) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
         if( infoContract.getBeginDate().isBefore(infoContract.getCreatedDate())) throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
         if( infoContract.getEndDate().isBefore(infoContract.getBeginDate())) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
-        if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("Không tìm thy khách thuê");
+        if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
         if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoom(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Phòng đã đầy");
         Optional<HistoryCustomer> h = historyCustomerRepo.getHistoryCustomerByCustomerId(customerId);
         if( h.isPresent() ){

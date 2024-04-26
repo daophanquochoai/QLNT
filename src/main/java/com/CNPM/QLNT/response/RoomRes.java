@@ -15,5 +15,4 @@ public class RoomRes {
     private int limit;
     private int roomTypeId;
     private BigDecimal price;
-    private Boolean status;
 }
