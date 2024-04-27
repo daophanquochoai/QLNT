@@ -375,19 +375,35 @@ public class AdminController {
     @Transactional
     public ResponseEntity<?> billCalculation(@RequestBody BillInRoom billInRoom) {
         try {
-            iBillService.billCalculator(billInRoom);
+            iBillService.addBill(billInRoom);
             return ResponseEntity.ok("Thêm hóa đơn thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-    // lay dich vu tai thoi diem
-    @GetMapping("get/service/{roomId}/{date}")
+    @GetMapping("/get/bill/{room}/{month}/{year}")
+    public ResponseEntity<?> getBillByRoom(
+            @PathVariable Integer room,
+            @PathVariable Integer month,
+            @PathVariable Integer year
+    ){
+        try{
+            if( month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
+            if( year > LocalDate.now().getYear() || year < 0 ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
+            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(room,month,year));
+        }catch ( Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    // Lấy thông tin phòng để tính hóa đơn
+    @GetMapping("get/invoiceInfo/{roomId}/{month}/{year}")
     public ResponseEntity<?> getServiceByRoomIdAndDate(@PathVariable Integer roomId,
-                                                       @PathVariable LocalDate date) {
+                                                       @PathVariable Integer month,
+                                                       @PathVariable Integer year) {
         try {
-            return ResponseEntity.ok(iRoomServiceService.getServiceByRoomIdAndDate(roomId, date));
+            return ResponseEntity.ok(iBillService.getInfoToAddInvoice(roomId, month,year));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

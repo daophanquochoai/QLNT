@@ -87,10 +87,10 @@ public class UserController {
     }
 
     // 5. Xem hoa don cua phong minh
-    @GetMapping("get/bill/{room}")
-    public ResponseEntity<?>  getAllBillByRoom(@PathVariable int room){
+    @GetMapping("get/bill/{roomId}")
+    public ResponseEntity<?>  getAllBillByRoom(@PathVariable int roomId){
         try {
-            return ResponseEntity.ok(iBillService.getAllBillByRoom(room));
+            return ResponseEntity.ok(iBillService.getAllBillByRoomId(roomId));
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }

@@ -11,6 +11,7 @@ import com.CNPM.QLNT.repository.RoomServiceRepo;
 import com.CNPM.QLNT.response.*;
 import com.CNPM.QLNT.services.Inter.IBillService;
 import com.CNPM.QLNT.services.Inter.IPriceService;
+import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class BillService implements IBillService {
     private final BillRepo billRepo;
     private final IPriceService iPriceService;
+    private final IRoomService iRoomService;
     private final RoomServiceRepo roomServiceRepo;
     private final RoomRepo roomRepo;
 
@@ -36,11 +38,12 @@ public class BillService implements IBillService {
 
     @Override
     public Report getReport(int month, int year) {
-        try{
+        try {
             List<Bill> list = billRepo.getReport(month, year);
             Report r = new Report();
-            List<Bill> l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
+            List<Bill> l = list.stream().filter(b -> (b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
             List<BillInRoom> unpaidList = (List<BillInRoom>) l.stream().map(b -> {
+                System.out.println(b);
                 BillInRoom br = new BillInRoom();
                 br.setElectricNumberBegin(b.getElectricNumberBegin());
                 br.setElectricNumberEnd(b.getElectricNumberEnd());
@@ -51,15 +54,15 @@ public class BillService implements IBillService {
                 br.setWaterNumberEnd(b.getWaterNumberEnd());
                 br.setNote(b.getNote());
                 br.setTotal(
-                    b.getTotal()
+                        b.getTotal()
                 );
-                br.setPaid( b.getStatus());
+                br.setPaid(b.getStatus());
                 br.setRoomId(b.getRoom().getRoomId());
                 return br;
             }).collect(Collectors.toList());
             r.setUnpaidRoomList(unpaidList);
 
-            l = list.stream().filter( b -> (b.getBeginDate().getMonth().getValue() == month && b.getBeginDate().getYear() == year && b.getStatus() == Boolean.TRUE)).collect(Collectors.toList());
+            l = list.stream().filter(b -> (b.getStatus() == Boolean.TRUE)).collect(Collectors.toList());
             List<BillInRoom> paidList = (List<BillInRoom>) l.stream().map(b -> {
                 BillInRoom br = new BillInRoom();
                 br.setElectricNumberBegin(b.getElectricNumberBegin());
@@ -73,7 +76,7 @@ public class BillService implements IBillService {
                 br.setTotal(
                         b.getTotal()
                 );
-                br.setPaid( b.getStatus());
+                br.setPaid(b.getStatus());
                 br.setRoomId(b.getRoom().getRoomId());
                 return br;
             }).collect(Collectors.toList());
@@ -85,36 +88,11 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public List<BillInRoom> getAllBillByRoom(int room) {
-            Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByIdRoom(room));
-            if( listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
-            List<BillInRoom> listBR = new ArrayList<>();
-            listB.get().stream().forEach(b-> {
-                BillInRoom br = new BillInRoom();
-                br.setElectricNumberBegin(b.getElectricNumberBegin());
-                br.setElectricNumberEnd(b.getElectricNumberEnd());
-                br.setNumberBill(b.getBillId());
-                br.setBeginDate(b.getBeginDate());
-                br.setEndDate(b.getEndDate());
-                br.setWaterNumberBegin(b.getWaterNumberBegin());
-                br.setWaterNumberEnd(b.getWaterNumberEnd());
-                br.setNote(b.getNote());
-                br.setTotal(
-                        b.getTotal()
-                );
-                br.setPaid( b.getStatus());
-                br.setRoomId(b.getRoom().getRoomId());
-                listBR.add(br);
-                });
-            return listBR;
-    }
-
-    @Override
-    public List<BillInRoom> getAllBillByStatus(int room, boolean status) {
-        Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByStatus(status, room));
-        if( listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+    public List<BillInRoom> getAllBillByRoomId(int roomId) {
+        Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByRoomId(roomId));
+        if (listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
         List<BillInRoom> listBR = new ArrayList<>();
-        listB.get().stream().forEach(b-> {
+        listB.get().stream().forEach(b -> {
             BillInRoom br = new BillInRoom();
             br.setElectricNumberBegin(b.getElectricNumberBegin());
             br.setElectricNumberEnd(b.getElectricNumberEnd());
@@ -124,9 +102,30 @@ public class BillService implements IBillService {
             br.setWaterNumberBegin(b.getWaterNumberBegin());
             br.setWaterNumberEnd(b.getWaterNumberEnd());
             br.setNote(b.getNote());
-            br.setTotal(
-                    b.getTotal()
-            );
+            br.setTotal(b.getTotal());
+            br.setPaid(b.getStatus());
+            br.setRoomId(b.getRoom().getRoomId());
+            listBR.add(br);
+        });
+        return listBR;
+    }
+
+    @Override
+    public List<BillInRoom> getAllBillByStatus(int room, boolean status) {
+        Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByStatus(status, room));
+        if (listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        List<BillInRoom> listBR = new ArrayList<>();
+        listB.get().stream().forEach(b -> {
+            BillInRoom br = new BillInRoom();
+            br.setElectricNumberBegin(b.getElectricNumberBegin());
+            br.setElectricNumberEnd(b.getElectricNumberEnd());
+            br.setNumberBill(b.getBillId());
+            br.setBeginDate(b.getBeginDate());
+            br.setEndDate(b.getEndDate());
+            br.setWaterNumberBegin(b.getWaterNumberBegin());
+            br.setWaterNumberEnd(b.getWaterNumberEnd());
+            br.setNote(b.getNote());
+            br.setTotal(b.getTotal());
             br.setPaid(b.getStatus());
             br.setRoomId(b.getRoom().getRoomId());
             listBR.add(br);
@@ -145,55 +144,48 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public void billCalculator(BillInRoom bill) {
-        try{
+    public void addBill(BillInRoom billInRoom) {
+        try {
             Bill b = new Bill();
-            if( bill.getBeginDate() == null ){
+            if (billInRoom.getBeginDate() == null) {
                 throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
-            }else{
-                b.setBeginDate(bill.getBeginDate());
+            } else {
+                b.setBeginDate(billInRoom.getBeginDate());
             }
-            if( bill.getEndDate() == null){
-                throw new ResourceNotFoundException("Ngày kêt thúc không hợp lệ");
-            }else{
-                if( bill.getEndDate().isAfter(bill.getBeginDate())){
-                    b.setEndDate(bill.getEndDate());
-                }else{
+            if (billInRoom.getEndDate() == null) {
+                throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
+            } else {
+                if (billInRoom.getEndDate().isAfter(billInRoom.getBeginDate())) {
+                    b.setEndDate(billInRoom.getEndDate());
+                } else {
                     throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
                 }
             }
-            if( bill.getElectricNumberBegin() >= 0){
-                b.setElectricNumberBegin(bill.getElectricNumberBegin());
-            }
-            if( bill.getElectricNumberEnd() > bill.getElectricNumberBegin()){
-                b.setElectricNumberEnd(bill.getElectricNumberEnd());
-            }else {
+            if (billInRoom.getElectricNumberBegin() >= 0) {
+                b.setElectricNumberBegin(billInRoom.getElectricNumberBegin());
+            } else throw new ResourceNotFoundException("1");
+            if (billInRoom.getElectricNumberEnd() >= billInRoom.getElectricNumberBegin()) {
+                b.setElectricNumberEnd(billInRoom.getElectricNumberEnd());
+            } else {
                 throw new ResourceNotFoundException("Số điện kết thúc không hợp lệ");
             }
-            if( bill.getWaterNumberBegin() >= 0){
-                b.setWaterNumberBegin(bill.getWaterNumberBegin());
+            if (billInRoom.getWaterNumberBegin() >= 0) {
+                b.setWaterNumberBegin(billInRoom.getWaterNumberBegin());
+            } else throw new ResourceNotFoundException("2");
+            if (billInRoom.getWaterNumberEnd() >= billInRoom.getWaterNumberBegin()) {
+                b.setWaterNumberEnd(billInRoom.getWaterNumberEnd());
+            } else {
+                throw new ResourceNotFoundException("Số nước kết thúc không hợp lệ");
             }
-            if( bill.getElectricNumberEnd() > bill.getWaterNumberBegin()){
-                b.setWaterNumberEnd(bill.getWaterNumberEnd());
-            }else {
-                throw new ResourceNotFoundException("Số điện kết thúc không hợp lệ");
-            }
-            Optional<Room> room = roomRepo.findById(bill.getRoomId());
-            if( room.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy phòng");
-            b.setNote(bill.getNote());
-            int numberElec = bill.getElectricNumberEnd() - bill.getElectricNumberBegin();
-            int numberWater = bill.getWaterNumberEnd() - bill.getWaterNumberBegin();
-            PriceQuotation price = iPriceService.getPriceNow();
-            List<InfoService> infoService = roomServiceRepo.getAllServiceByRoomId(bill.getRoomId(),bill.getBeginDate());
-            long total = 0L;
-            total += (long) numberWater * price.getWaterPrice() + (long) numberElec * price.getElectricPrice();
-            total += infoService.stream().mapToLong( s -> s.getQuantity()*s.getPrice()).sum();
-
-            total += Long.parseLong(String.valueOf(room.get().getPrice()));
-            b.setTotal(total);
+            Optional<Room> room = iRoomService.getRoomByRoomId(billInRoom.getRoomId());
+            if (room.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy phòng");
+            else b.setRoom(room.get());
+            b.setNote(billInRoom.getNote());
+            b.setTotal(billInRoom.getTotal());
+            b.setStatus(false);
             billRepo.save(b);
-        }catch (Exception ex){
-
+        } catch (Exception ex) {
+            throw new ResourceNotFoundException("Dữ liệu sai");
         }
     }
 
@@ -202,31 +194,31 @@ public class BillService implements IBillService {
         List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
         List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
         WaterPrice water = new WaterPrice();
-        for( WaterPrice w : waterList ){
+        for (WaterPrice w : waterList) {
 
-            if( w.getChangedDate().getYear() < Year){
+            if (w.getChangedDate().getYear() < Year) {
                 water = w;
                 break;
-            }else if( w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() < Month){
+            } else if (w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() < Month) {
                 water = w;
                 break;
             }
         }
         ElectricPrice electric = new ElectricPrice();
-        for( ElectricPrice e : electricList ){
-            if( e.getChangedDate().getYear() < Year){
+        for (ElectricPrice e : electricList) {
+            if (e.getChangedDate().getYear() < Year) {
                 electric = e;
                 break;
-            }else if( e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() < Month){
+            } else if (e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() < Month) {
                 electric = e;
                 break;
             }
         }
         Optional<Bill> bill = billRepo.getBillByRoomInMonthInYear(roomId, Month, Year);
-        if( bill.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
-        List<InfoService> service = roomServiceRepo.getALlServiceByRoomId(roomId, Month, Year);
+        if (bill.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        List<InfoService> service = roomServiceRepo.getAllServiceByRoomIdMonthYear(roomId, Month, Year);
         DetailBill detailBill = new DetailBill();
-        detailBill.setNumberBill(bill.get().getBillId());
+        detailBill.setBillId(bill.get().getBillId());
         detailBill.setBeginDate(bill.get().getBeginDate());
         detailBill.setEndDate(bill.get().getEndDate());
         detailBill.setElectricNumberBegin(bill.get().getElectricNumberBegin());
@@ -238,12 +230,54 @@ public class BillService implements IBillService {
         detailBill.setIsPaid(bill.get().getStatus());
         detailBill.setRoomId(roomId);
         detailBill.setWaterPrice(water.getPrice());
-        detailBill.setElectronucPrice(electric.getPrice());
+        detailBill.setElectricPrice(electric.getPrice());
         long total = 0L;
-        total += (long) detailBill.getWaterPrice() * (bill.get().getWaterNumberEnd() - bill.get().getWaterNumberBegin()) + (long) detailBill.getElectronucPrice() * (bill.get().getElectricNumberEnd()-bill.get().getElectricNumberBegin());
-        total += service.stream().mapToLong( s -> s.getQuantity()*s.getPrice()).sum();
+        total += (long) detailBill.getWaterPrice() * (bill.get().getWaterNumberEnd() - bill.get().getWaterNumberBegin()) + (long) detailBill.getElectricPrice() * (bill.get().getElectricNumberEnd() - bill.get().getElectricNumberBegin());
+        total += service.stream().mapToLong(s -> s.getQuantity() * s.getPrice()).sum();
         detailBill.setRoomPrice(bill.get().getTotal() - total);
         detailBill.setService(service);
         return detailBill;
+    }
+
+    @Override
+    public InfoInvoice getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year) {
+        List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
+        List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
+        WaterPrice water = new WaterPrice();
+        for (WaterPrice w : waterList) {
+            if (w.getChangedDate().getYear() < Year) {
+                water = w;
+                break;
+            } else if (w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() < Month) {
+                water = w;
+                break;
+            }
+        }
+        ElectricPrice electric = new ElectricPrice();
+        for (ElectricPrice e : electricList) {
+            if (e.getChangedDate().getYear() < Year) {
+                electric = e;
+                break;
+            } else if (e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() < Month) {
+                electric = e;
+                break;
+            }
+        }
+        InfoInvoice infoInvoice = new InfoInvoice();
+        Optional<Room> room = iRoomService.getRoomByRoomId(roomId);
+        Optional<Bill> bill = billRepo.getBillByRoomInMonthInYear(roomId, Month - 1, Year);
+        List<InfoService> service = roomServiceRepo.getAllServiceByRoomIdMonthYear(roomId, Month, Year);
+        if (bill.isEmpty()) {
+            infoInvoice.setElectricNumberBegin(0);
+            infoInvoice.setWaterNumberBegin(0);
+        } else {
+            infoInvoice.setElectricNumberBegin(bill.get().getElectricNumberEnd());
+            infoInvoice.setWaterNumberBegin(bill.get().getWaterNumberEnd());
+        }
+        infoInvoice.setWaterPrice(water.getPrice());
+        infoInvoice.setElectricPrice(electric.getPrice());
+        infoInvoice.setRoomPrice(room.get().getPrice());
+        infoInvoice.setService(service);
+        return infoInvoice;
     }
 }
