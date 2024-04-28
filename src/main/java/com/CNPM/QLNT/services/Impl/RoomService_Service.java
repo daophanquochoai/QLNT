@@ -24,8 +24,9 @@ public class RoomService_Service implements IRoomService_Service {
     private final ServiceRepo serviceRepo;
 
     @Override
-    public List<InfoService> getServiceByRoomIdMonthYear(Integer roomId, Integer month, Integer year) {
-        return roomServiceRepo.getAllServiceByRoomIdMonthYear(roomId, month, year);
+    public List<InfoService> getServiceByRoomIdMonthYear(Integer roomId) {
+        LocalDate currentDate = LocalDate.now();
+        return roomServiceRepo.getAllServiceByRoomIdMonthYear(roomId, currentDate.getMonthValue(), currentDate.getYear());
     }
 
     @Override

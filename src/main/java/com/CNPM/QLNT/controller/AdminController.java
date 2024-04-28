@@ -107,7 +107,7 @@ public class AdminController {
 
 
     //1 .lay customer theo so phong
-    @GetMapping("/customer/room/{roomId}")
+    @GetMapping("/get/customer/{roomId}")
     public ResponseEntity<?> getAllCustomerByRoomId(@PathVariable int roomId) {
         try {
             return ResponseEntity.ok(iCustomerService.getCustomerByRoomId(roomId));
@@ -382,16 +382,16 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/get/bill/{room}/{month}/{year}")
+    @GetMapping("/get/bill/{roomId}/{month}/{year}")
     public ResponseEntity<?> getBillByRoom(
-            @PathVariable Integer room,
+            @PathVariable Integer roomId,
             @PathVariable Integer month,
             @PathVariable Integer year
     ){
         try{
             if( month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
             if( year > LocalDate.now().getYear() || year < 0 ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
-            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(room,month,year));
+            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(roomId,month,year));
         }catch ( Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -448,6 +448,17 @@ public class AdminController {
             iRoomServiceService.saveRoomService(id, infoRoomService);
             return ResponseEntity.ok("Thêm dịch vụ thành công");
         } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/get/roomService/{roomId}")
+    public ResponseEntity<?> getServiceByRoom(
+            @PathVariable Integer roomId
+    ){
+        try{;
+            return ResponseEntity.ok(iRoomServiceService.getServiceByRoomIdMonthYear(roomId));
+        }catch ( Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
