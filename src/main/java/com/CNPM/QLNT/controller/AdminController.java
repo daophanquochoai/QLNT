@@ -162,7 +162,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/customer/{roomId}")
+    @GetMapping("/customer/room/{roomId}")
     public ResponseEntity<?> getAllCustomerByRoomId(@PathVariable int roomId) {
         try {
             return ResponseEntity.ok(iCustomerService.getCustomerByRoomId(roomId));
