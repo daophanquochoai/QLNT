@@ -7,6 +7,7 @@ import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.InfoLogin;
 import com.CNPM.QLNT.response.InfoUser;
+import com.CNPM.QLNT.security.JwtSecurityConfig;
 import com.CNPM.QLNT.services.Inter.IContracService;
 import com.CNPM.QLNT.services.Inter.ICustomerService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
@@ -33,6 +34,7 @@ public class CustomerService implements ICustomerService {
     private final IContracService iContracService;
     private final HistoryCustomerRepo historyCustomerRepo;
     private final RoomRepo roomRepo;
+    private final JwtSecurityConfig security;
     private final String Email_Regex = "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
 
     private final Pattern pattern = Pattern.compile(Email_Regex);
@@ -77,8 +79,8 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public List<InfoUser> getCustomerByRoomId(Integer room_id) {
-        List<Customer> list = historyCustomerRepo.getCustomersByRoom(room_id);
+    public List<InfoUser> getCustomerByRoomId(Integer roomId) {
+        List<Customer> list = historyCustomerRepo.getCustomersByRoomId(roomId);
         List<InfoUser> l = list.stream().map(
                 c ->
                 {
@@ -92,7 +94,7 @@ public class CustomerService implements ICustomerService {
                             c.getInfoAddress(),
                             c.getPhoneNumber(),
                             c.getEmail(),
-                            room_id,
+                            roomId,
                             c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
                             c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
                     );
@@ -155,7 +157,7 @@ public class CustomerService implements ICustomerService {
             if (roomRepo.findById(info.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Phòng không tồn tại");
             else {
                 Room r = roomRepo.findById(info.getRoomId()).get();
-                if (r.getLimit() < historyCustomerRepo.getCustomersByRoom(r.getRoomId()).size())
+                if (r.getLimit() < historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).size())
                     throw new ResourceNotFoundException("Phòng đã đầy");
                 historyCustomer.setRoomOld(r);
                 historyCustomer.setBeginDate(LocalDate.now());
@@ -281,6 +283,14 @@ public class CustomerService implements ICustomerService {
     @Override
     public InfoLogin getLogin(String name) {
         return customerRepository.getLogin(name);
+    }
+
+    @Override
+    public void updatePassword(String password, Integer customerId) {
+        Optional<Customer> customer = getCustomer(customerId);
+        if( customer.isEmpty() ) throw new ResourceNotFoundException("customerId");
+        customer.get().getUserAuthId().setPassword(security.passwordEncoder().encode(password));
+        customerRepository.save(customer.get());
     }
 
 }

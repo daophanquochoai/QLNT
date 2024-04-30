@@ -13,5 +13,5 @@ public interface HistoryCustomerRepo extends JpaRepository<HistoryCustomer, Inte
     Optional<HistoryCustomer> getHistoryCustomerByCustomerId(Integer CustomerId);
     // lay tat ca khach thue cua 1 phong
     @Query("select h.customer from HistoryCustomer h where h.roomOld.roomId = :roomId and h.endDate is null and h.roomNew is null")
-    public List<Customer> getCustomersByRoom(Integer roomId);
+    public List<Customer> getCustomersByRoomId(Integer roomId);
 }

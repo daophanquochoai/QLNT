@@ -47,7 +47,7 @@ public class HistoryCustomerService implements IHistoryCustomerService {
     }
 
     @Override
-    public List<Customer> getAllCustomerByRoom(Integer roomId) {
-        return historyCustomerRepo.getCustomersByRoom(roomId);
+    public List<Customer> getAllCustomerByRoomId(Integer roomId) {
+        return historyCustomerRepo.getCustomersByRoomId(roomId);
     }
 }

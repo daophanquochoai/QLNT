@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface IHistoryCustomerService {
     List<History> getAllHistoryCustomer();
-    List<Customer> getAllCustomerByRoom(Integer roomId);
+    List<Customer> getAllCustomerByRoomId(Integer roomId);
 }

@@ -72,7 +72,7 @@ public class RoomService implements IRoomService {
             r.setRoomType(iRoomTypeService.getRoomTypeByRoomTypeId(roomRes.getRoomTypeId()));
         }
         if (roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
-            if (historyCustomerRepo.getCustomersByRoom(roomId).size() > roomRes.getLimit()) {
+            if (historyCustomerRepo.getCustomersByRoomId(roomId).size() > roomRes.getLimit()) {
                 throw new ResourceNotFoundException("Sức chứa bé hơn số người ở hiện tại");
             }
             r.setLimit(roomRes.getLimit());
@@ -95,11 +95,11 @@ public class RoomService implements IRoomService {
         List<Room> l;
         List<Room> r = roomRepo.findAll();
         if (type == 1) {
-            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoom(temp.getRoomId()).size() == 0).collect(Collectors.toList());
+            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() == 0).collect(Collectors.toList());
         } else if (type == 2) {
-            l = r.stream().filter(temp -> (historyCustomerRepo.getCustomersByRoom(temp.getRoomId()).size() < temp.getLimit() && historyCustomerRepo.getCustomersByRoom(temp.getRoomId()).size() > 0)).collect(Collectors.toList());
+            l = r.stream().filter(temp -> (historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() < temp.getLimit() && historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() > 0)).collect(Collectors.toList());
         } else {
-            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoom(temp.getRoomId()).size() == temp.getLimit()).collect(Collectors.toList());
+            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() == temp.getLimit()).collect(Collectors.toList());
         }
         List<RoomRes> list = l.stream().map(
                 temp ->
@@ -122,7 +122,7 @@ public class RoomService implements IRoomService {
     @Override
     public List<RoomRes> getRoomForBill() {
         List<Room> list = roomRepo.findAll();
-        list = list.stream().filter(r -> historyCustomerRepo.getCustomersByRoom(r.getRoomId()).size() != 0 &&
+        list = list.stream().filter(r -> historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).size() != 0 &&
                         !r.getBill().stream().anyMatch(b -> b.getBeginDate().getMonth().getValue() == LocalDate.now().getMonth().getValue() - 1
                                 && b.getBeginDate().getYear() == LocalDate.now().getYear()
                         ))
