@@ -9,7 +9,7 @@ public interface IRequestService {
     void addRequest_DonGia(Request re);
     List<RequestInfo> getAllRequestOfCustomerByStatus(boolean status);
     List<Request> getAllRequestOfCustomer();
-    void updateRequest(int id);
-    void deleteCommunication(int id);
-    List<Request> getNoticeBySender(Integer id);
+    void updateRequest(int requestId);
+    void deleteCommunication(int requestId);
+    List<Request> getRequestOfAdmin(Integer customerId);
 }

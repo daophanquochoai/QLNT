@@ -34,9 +34,9 @@ public class ContractService implements IContracService {
     }
 
     @Override
-    public Contract getContractById(Integer id) {
-        log.info("{}",contractRepo.getContractById(id));
-        Optional<Contract> c = Optional.ofNullable(contractRepo.getContractById(id));
+    public Contract getContractByCustomerId(Integer customerId) {
+        log.info("{}",contractRepo.getContractByCustomerId(customerId));
+        Optional<Contract> c = Optional.ofNullable(contractRepo.getContractByCustomerId(customerId));
         if( c.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
         return c.get();
     }
@@ -81,7 +81,7 @@ public class ContractService implements IContracService {
     }
 
     @Override
-    public Optional<Contract> getContractByRoomid(Integer roomId) {
-        return contractRepo.getContractsByRoomID(roomId);
+    public Optional<Contract> getContractByRoomId(Integer roomId) {
+        return contractRepo.getContractsByRoomId(roomId);
     }
 }

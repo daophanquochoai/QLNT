@@ -24,8 +24,8 @@ public class Service_Service implements IService_Service {
     }
 
     @Override
-    public void updateService(Integer id, Service service) {
-        Optional<Service> s = serviceRepo.findById(id);
+    public void updateService(Integer serviceId, Service service) {
+        Optional<Service> s = serviceRepo.findById(serviceId);
         if( s.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
         Service ser = s.get();
         if( service.getPrice() >= 0){

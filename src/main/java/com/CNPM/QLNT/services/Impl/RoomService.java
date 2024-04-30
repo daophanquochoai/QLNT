@@ -65,14 +65,14 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public void updateRoom(int id, RoomRes roomRes) {
-        if (getRoomByRoomId(id).isEmpty() || id == 0) throw new ResourceNotFoundException("Phòng không tồn tại");
-        Room r = getRoomByRoomId(id).get();
+    public void updateRoom(int roomId, RoomRes roomRes) {
+        if (getRoomByRoomId(roomId).isEmpty() || roomId == 0) throw new ResourceNotFoundException("Phòng không tồn tại");
+        Room r = getRoomByRoomId(roomId).get();
         if (roomRes.getRoomTypeId() != 0) {
             r.setRoomType(iRoomTypeService.getRoomTypeByRoomTypeId(roomRes.getRoomTypeId()));
         }
         if (roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
-            if (historyCustomerRepo.getCustomersByRoom(id).size() > roomRes.getLimit()) {
+            if (historyCustomerRepo.getCustomersByRoom(roomId).size() > roomRes.getLimit()) {
                 throw new ResourceNotFoundException("Sức chứa bé hơn số người ở hiện tại");
             }
             r.setLimit(roomRes.getLimit());
@@ -84,8 +84,8 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public void deleteRoom(int id) throws Exception {
-        Room Room = getRoomByRoomId(id).get();
+    public void deleteRoom(int roomId) throws Exception {
+        Room Room = getRoomByRoomId(roomId).get();
         Room.setRoomType(null);
         roomRepo.delete(Room);
     }

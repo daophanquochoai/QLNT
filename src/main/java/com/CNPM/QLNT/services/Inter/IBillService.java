@@ -3,7 +3,7 @@ package com.CNPM.QLNT.services.Inter;
 import com.CNPM.QLNT.model.Bill;
 import com.CNPM.QLNT.response.BillInRoom;
 import com.CNPM.QLNT.response.DetailBill;
-import com.CNPM.QLNT.response.InfoInvoice;
+import com.CNPM.QLNT.response.InfoBill;
 import com.CNPM.QLNT.response.Report;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public interface IBillService {
     Long getRevenue(int year);
     void addBill( BillInRoom bill);
     DetailBill getBillByRoomInMonthInYear( Integer roomId, Integer Month, Integer Year);
-    InfoInvoice getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year);
+    InfoBill getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year);
 }

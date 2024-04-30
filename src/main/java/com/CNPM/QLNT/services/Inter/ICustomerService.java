@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface ICustomerService {
     List<InfoUser> getAllCustomer();
-    Optional<Customer> getCustomer(int cus_id);
-    List<InfoUser> getCustomerByRoomId(Integer room_id);
+    Optional<Customer> getCustomer(int customerId);
+    List<InfoUser> getCustomerByRoomId(Integer roomId);
     Boolean addCustomer(InfoUser info) throws Exception;
-    void updateCustomer(int id, InfoUser info);
-    void deleteCustomer(int id);
+    void updateCustomer(int customerId, InfoUser info);
+    void deleteCustomer(int customerId);
     InfoLogin getLogin(String name);
 }

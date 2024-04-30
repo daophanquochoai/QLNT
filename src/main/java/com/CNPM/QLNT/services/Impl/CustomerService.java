@@ -72,8 +72,8 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public Optional<Customer> getCustomer(int cus_id) {
-        return Optional.of(customerRepository.findById(cus_id).get());
+    public Optional<Customer> getCustomer(int customerId) {
+        return Optional.of(customerRepository.findById(customerId).get());
     }
 
     @Override
@@ -177,8 +177,8 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public void updateCustomer(int id, InfoUser info) {
-        Optional<Customer> C = getCustomer(id);
+    public void updateCustomer(int customerId, InfoUser info) {
+        Optional<Customer> C = getCustomer(customerId);
         if (C.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
         Customer customer = C.get();
 
@@ -186,14 +186,14 @@ public class CustomerService implements ICustomerService {
         if (customer.getHistoryCustomer() != null) {
             room = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId();
         }
-        Optional<Contract> contract = iContracService.getContractByRoomid(room);
+        Optional<Contract> contract = iContracService.getContractByRoomId(room);
         if (contract.isPresent() && info.getRoomId() != room) {
             if (contract.get().getCustomer().getCustomerId() == customer.getCustomerId()) {
                 throw new ResourceNotFoundException("Khách thuê đang là chủ hợp đồng của phòng hiện tại");
             }
         }
         getAllCustomer().forEach(cus -> {
-            if(cus.getCustomerId() != id){
+            if(cus.getCustomerId() != customerId){
                 if (cus.getIdentifier().equals(info.getIdentifier()))
                     throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
                 if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
@@ -262,16 +262,16 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public void deleteCustomer(int id) {
+    public void deleteCustomer(int customerId) {
         try {
             List<Contract> listCT = iContracService.getAllContract();
             listCT.stream().forEach(c -> {
-                if (c.getCustomer().getCustomerId() == id && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus())) {
+                if (c.getCustomer().getCustomerId() == customerId && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus())) {
                     System.out.println(c.getEndDate().isBefore(LocalDate.now()));
                     throw new ResourceNotFoundException("Không thể xóa do tồn tại hợp đồng");
                 }
             });
-            Customer Customer = getCustomer(id).get();
+            Customer Customer = getCustomer(customerId).get();
             customerRepository.delete(Customer);
         } catch (Exception ex) {
             throw new ResourceNotFoundException(ex.getMessage());

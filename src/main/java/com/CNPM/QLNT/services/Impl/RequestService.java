@@ -56,23 +56,23 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public void updateRequest(int id) {
-        Optional<Request> r = requestRepo.findById(id);
+    public void updateRequest(int requestId) {
+        Optional<Request> r = requestRepo.findById(requestId);
         if( r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy yêu cầu");
         r.get().setStatus(true);
         requestRepo.save(r.get());
     }
 
     @Override
-    public void deleteCommunication(int id) {
-        Optional<Request> r = requestRepo.findById(id);
+    public void deleteCommunication(int requestId) {
+        Optional<Request> r = requestRepo.findById(requestId);
         if( r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy yêu cầu");
         if( r.get().getStatus() == false) throw new ResourceNotFoundException("Vui lòng đáp ứng yêu cầu trước");
         requestRepo.delete(r.get());
     }
 
     @Override
-    public List<Request> getNoticeBySender(Integer id) {
-        return requestRepo.getAllRequestOfAdmin(id);
+    public List<Request> getRequestOfAdmin(Integer customerId) {
+        return requestRepo.getAllRequestOfAdmin(customerId);
     }
 }

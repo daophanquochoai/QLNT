@@ -9,10 +9,10 @@ import java.util.Optional;
 @Repository
 public interface ContractRepo extends JpaRepository<Contract, Integer> {
     @Query("select c from Contract c where c.customer.customerId = :customerId")
-    Contract getContractById(Integer customerId);
+    Contract getContractByCustomerId(Integer customerId);
 
     @Query("select c from Contract c where c.customer.customerId = :customerId and c.status = :status")
     Optional<Contract> getContractsByCusIdAndStatus(Integer customerId, Boolean status);
     @Query("select  c from Contract c where c.room.roomId = :roomId")
-    Optional<Contract> getContractsByRoomID(Integer roomId);
+    Optional<Contract> getContractsByRoomId(Integer roomId);
 }

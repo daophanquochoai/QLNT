@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class InfoInvoice {
+public class InfoBill {
     private Integer electricNumberBegin;
     private Integer waterNumberBegin;
     private Integer electricPrice;

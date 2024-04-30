@@ -10,7 +10,7 @@ import java.util.List;
 public interface IPriceService {
     List<ElectricPrice> getAllElectricPrice();
     List<WaterPrice> getAllWaterPrice();
-    void saveElecPrice(ElectricPrice e);
+    void saveElectricPrice(ElectricPrice e);
     void saveWaterPrice(WaterPrice w);
     PriceQuotation getPriceNow();
 }

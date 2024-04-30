@@ -54,8 +54,8 @@ public class RoomService_Service implements IRoomService_Service {
     }
 
     @Override
-    public void updateRoomService(Integer id, LocalDate endDate) {
-        Optional<RoomService> r = roomServiceRepo.findById(id);
+    public void updateRoomService(Integer roomServiceId, LocalDate endDate) {
+        Optional<RoomService> r = roomServiceRepo.findById(roomServiceId);
         if (r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ phòng");
         if (r.get().getBeginDate().isAfter(endDate)) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
         r.get().setEndDate(endDate);

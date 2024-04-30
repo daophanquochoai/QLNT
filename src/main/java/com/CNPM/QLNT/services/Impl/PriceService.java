@@ -39,7 +39,7 @@ public class PriceService implements IPriceService {
     }
 
     @Override
-    public void saveElecPrice(ElectricPrice e) {
+    public void saveElectricPrice(ElectricPrice e) {
         if( e.getPrice() < 0 ) throw new ResourceNotFoundException("Giá điện phải lớn hơn 0");
         electricPriceRepo.save(e);
     }

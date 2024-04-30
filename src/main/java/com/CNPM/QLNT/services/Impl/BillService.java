@@ -240,7 +240,7 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public InfoInvoice getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year) {
+    public InfoBill getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year) {
         List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
         List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
         WaterPrice water = new WaterPrice();
@@ -263,21 +263,21 @@ public class BillService implements IBillService {
                 break;
             }
         }
-        InfoInvoice infoInvoice = new InfoInvoice();
+        InfoBill infoBill = new InfoBill();
         Optional<Room> room = iRoomService.getRoomByRoomId(roomId);
         Optional<Bill> bill = billRepo.getBillByRoomInMonthInYear(roomId, Month - 1, Year);
         List<InfoService> service = roomServiceRepo.getAllServiceByRoomIdMonthYear(roomId, Month, Year);
         if (bill.isEmpty()) {
-            infoInvoice.setElectricNumberBegin(0);
-            infoInvoice.setWaterNumberBegin(0);
+            infoBill.setElectricNumberBegin(0);
+            infoBill.setWaterNumberBegin(0);
         } else {
-            infoInvoice.setElectricNumberBegin(bill.get().getElectricNumberEnd());
-            infoInvoice.setWaterNumberBegin(bill.get().getWaterNumberEnd());
+            infoBill.setElectricNumberBegin(bill.get().getElectricNumberEnd());
+            infoBill.setWaterNumberBegin(bill.get().getWaterNumberEnd());
         }
-        infoInvoice.setWaterPrice(water.getPrice());
-        infoInvoice.setElectricPrice(electric.getPrice());
-        infoInvoice.setRoomPrice(room.get().getPrice());
-        infoInvoice.setService(service);
-        return infoInvoice;
+        infoBill.setWaterPrice(water.getPrice());
+        infoBill.setElectricPrice(electric.getPrice());
+        infoBill.setRoomPrice(room.get().getPrice());
+        infoBill.setService(service);
+        return infoBill;
     }
 }

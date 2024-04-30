@@ -10,8 +10,8 @@ public interface IRoomService {
     List<RoomRes> getAllRoom();
     Optional<Room> getRoomByRoomId(Integer roomId);
     void addRoom(RoomRes roomRes);
-    void updateRoom(int id,RoomRes roomRes);
-    void deleteRoom(int id) throws Exception;
+    void updateRoom(int roomId,RoomRes roomRes);
+    void deleteRoom(int roomId) throws Exception;
     List<RoomRes> getAllRoomByLimit(int type);
     List<Room> getAllRoomWithContract();
     List<RoomRes> getRoomForBill();

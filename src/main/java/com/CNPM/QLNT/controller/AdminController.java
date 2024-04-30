@@ -32,134 +32,12 @@ public class AdminController {
     private final IRoomService_Service iRoomServiceService;
     private final IService_Service iServiceService;
 
-    // lay tat ca phong
-    @GetMapping("/getAllRoom")
+    //===========================ROOM===========================
+    @GetMapping("/room/all")
     public ResponseEntity<List<RoomRes>> getAllRoom() throws SQLException {
         return ResponseEntity.ok(iRoomService.getAllRoom());
     }
-
-    // 1. lay thong tin customer
-    @GetMapping("/getAllCustomer")
-    public ResponseEntity<List<InfoUser>> getAllCustomer() {
-        return ResponseEntity.ok(iCustomerService.getAllCustomer());
-    }
-
-    // 8. lay thong tin ng dung
-    @GetMapping("/customer/{cus_id}")
-    public ResponseEntity<?> getCustomerById(@PathVariable int cus_id) {
-        try {
-            Optional<Customer> theCustomer = iCustomerService.getCustomer(cus_id);
-            if (theCustomer.isEmpty()) {
-                throw new ResourceNotFoundException("Không tìm thấy khách thuê");
-            }
-            InfoUser user = new InfoUser(
-                    theCustomer.get().getCustomerId(),
-                    theCustomer.get().getFirstName(),
-                    theCustomer.get().getLastName(),
-                    theCustomer.get().getIdentifier(),
-                    theCustomer.get().getDateOfBirth(),
-                    theCustomer.get().getSex(),
-                    theCustomer.get().getInfoAddress(),
-                    theCustomer.get().getPhoneNumber(),
-                    theCustomer.get().getEmail(),
-                    theCustomer.get().getHistoryCustomer() == null ? null : theCustomer.get().getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId(),
-                    theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getUsername(),
-                    theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getPassword());
-            return ResponseEntity.of(Optional.of(user));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // 9. thay doi don gia
-    @PostMapping("/price/electricPrice/add")
-    @Transactional
-    public ResponseEntity<?> savePriceQuotation(@RequestBody ElectricPrice e) {
-        try {
-            iPriceService.saveElecPrice(e);
-            return ResponseEntity.ok("Thay đổi giá điện thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
-        }
-    }
-
-    @PostMapping("/price/waterPrice/add")
-    @Transactional
-    public ResponseEntity<?> savePriceQuotation(@RequestBody WaterPrice w) {
-        try {
-            iPriceService.saveWaterPrice(w);
-            return ResponseEntity.ok("Thay đổi giá nước thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
-        }
-    }
-
-    // 13. lay don gia
-    @GetMapping("/price/waterPrice/all")
-    public ResponseEntity<List<?>> getAllWaterPrice() {
-        return ResponseEntity.ok(iPriceService.getAllWaterPrice());
-    }
-
-    @GetMapping("/price/electricPrice/all")
-    public ResponseEntity<List<?>> getAllElectricPrice() {
-        return ResponseEntity.ok(iPriceService.getAllElectricPrice());
-    }
-
-
-    //1 .lay customer theo so phong
-    @GetMapping("/get/customer/{roomId}")
-    public ResponseEntity<?> getAllCustomerByRoomId(@PathVariable int roomId) {
-        try {
-            return ResponseEntity.ok(iCustomerService.getCustomerByRoomId(roomId));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // 3.them ng thue
-    @PostMapping("/add/customer")
-    @Transactional
-    public ResponseEntity<?> addCustomer(@RequestBody InfoUser info) {
-        try {
-            Boolean check = iCustomerService.addCustomer(info);
-            return check ? ResponseEntity.ok("Thêm khách thuê thành công")
-                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phòng đã đầy");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // 3.Sua nguoi thua
-    @PutMapping("/update/customer/{id}")
-    @Transactional
-    public ResponseEntity<?> updateCustomer(@PathVariable int id,
-                                            @RequestBody InfoUser info) {
-        try {
-            iCustomerService.updateCustomer(id, info);
-            return ResponseEntity.ok("Thay đổi thông tin khách thuê thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // 3.Xoa khach thue
-    @DeleteMapping("/remove/customer/{customerId}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable int customerId) {
-        try {
-            Customer customer = iCustomerService.getCustomer(customerId).get();
-            Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
-            if (h.isPresent()) {
-                InfoUser infoUser = new InfoUser();
-                iCustomerService.updateCustomer(customerId,infoUser);
-            } else iCustomerService.deleteCustomer(customerId);
-            return ResponseEntity.ok("Xóa khách thuê thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    //4.them phong///////////////////////////////////////////////////////////////////////////
-    @GetMapping("/get/room/{roomId}")
+    @GetMapping("/room/{roomId}")
     public ResponseEntity<?> getRoom(@PathVariable int roomId) {
         Optional<Room> Room = iRoomService.getRoomByRoomId(roomId);
         if (Room.isPresent()) {
@@ -170,7 +48,36 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/add/room")
+    @GetMapping("/room/withContract")
+    public ResponseEntity<?> getAllRoomWithContract() {
+        try {
+            return ResponseEntity.ok(iRoomService.getAllRoomWithContract());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    // Lấy ra các phòng cần tính hóa đơn
+    @GetMapping("/room/bill")
+    public ResponseEntity<?> getRoomForBill() {
+        try {
+            return ResponseEntity.ok(iRoomService.getRoomForBill());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    //Lấy ra các phòng tùy theo trạng thái (trống/chưa đầy/đầy)
+    @GetMapping("/room/limit/{type}")
+    public ResponseEntity<?> getAllRoomByLimit(@PathVariable int type) {
+        try {
+            return ResponseEntity.ok(iRoomService.getAllRoomByLimit(type));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/room/add")
     @Transactional
     public ResponseEntity<?> addRoom(@RequestBody RoomRes roomRes) {
         try {
@@ -181,7 +88,7 @@ public class AdminController {
         }
     }
 
-    @PutMapping("update/room/{roomId}")
+    @PutMapping("/room/{roomId}/update")
     @Transactional
     public ResponseEntity<?> updateRoom(@PathVariable int roomId, @RequestBody RoomRes roomRes) {
         try {
@@ -197,7 +104,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("remove/room/{roomId}")
+    @DeleteMapping("/room/{roomId}/delete")
     @Transactional
     public ResponseEntity<?> deleteRoom(@PathVariable int roomId) {
         try {
@@ -222,7 +129,138 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
-    @DeleteMapping("remove/roomType/{roomTypeId}")
+
+    //===========================CUSTOMER===========================
+    @GetMapping("/customer/all")
+    public ResponseEntity<List<InfoUser>> getAllCustomer() {
+        return ResponseEntity.ok(iCustomerService.getAllCustomer());
+    }
+
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<?> getCustomerByCustomerId(@PathVariable int customerId) {
+        try {
+            Optional<Customer> theCustomer = iCustomerService.getCustomer(customerId);
+            if (theCustomer.isEmpty()) {
+                throw new ResourceNotFoundException("Không tìm thấy khách thuê");
+            }
+            InfoUser user = new InfoUser(
+                    theCustomer.get().getCustomerId(),
+                    theCustomer.get().getFirstName(),
+                    theCustomer.get().getLastName(),
+                    theCustomer.get().getIdentifier(),
+                    theCustomer.get().getDateOfBirth(),
+                    theCustomer.get().getSex(),
+                    theCustomer.get().getInfoAddress(),
+                    theCustomer.get().getPhoneNumber(),
+                    theCustomer.get().getEmail(),
+                    theCustomer.get().getHistoryCustomer() == null ? null : theCustomer.get().getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId(),
+                    theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getUsername(),
+                    theCustomer.get().getUserAuthId() == null ? "Chưa có tài khoản" : theCustomer.get().getUserAuthId().getPassword());
+            return ResponseEntity.of(Optional.of(user));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/customer/{roomId}")
+    public ResponseEntity<?> getAllCustomerByRoomId(@PathVariable int roomId) {
+        try {
+            return ResponseEntity.ok(iCustomerService.getCustomerByRoomId(roomId));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/customer/add")
+    @Transactional
+    public ResponseEntity<?> addCustomer(@RequestBody InfoUser info) {
+        try {
+            Boolean check = iCustomerService.addCustomer(info);
+            return check ? ResponseEntity.ok("Thêm khách thuê thành công")
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phòng đã đầy");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping("/customer/{customerId}/update")
+    @Transactional
+    public ResponseEntity<?> updateCustomer(@PathVariable int customerId,
+                                            @RequestBody InfoUser info) {
+        try {
+            iCustomerService.updateCustomer(customerId, info);
+            return ResponseEntity.ok("Thay đổi thông tin khách thuê thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/customer/{customerId}/delete")
+    public ResponseEntity<?> deleteCustomer(@PathVariable int customerId) {
+        try {
+            Customer customer = iCustomerService.getCustomer(customerId).get();
+            Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
+            if (h.isPresent()) {
+                InfoUser infoUser = new InfoUser();
+                iCustomerService.updateCustomer(customerId,infoUser);
+            } else iCustomerService.deleteCustomer(customerId);
+            return ResponseEntity.ok("Xóa khách thuê thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    //===========================PRICE QUOTATION===========================
+    @GetMapping("/price/water/all")
+    public ResponseEntity<List<?>> getAllWaterPrice() {
+        return ResponseEntity.ok(iPriceService.getAllWaterPrice());
+    }
+
+    @GetMapping("/price/electric/all")
+    public ResponseEntity<List<?>> getAllElectricPrice() {
+        return ResponseEntity.ok(iPriceService.getAllElectricPrice());
+    }
+
+    @PostMapping("/price/electric/add")
+    @Transactional
+    public ResponseEntity<?> savePriceQuotation(@RequestBody ElectricPrice e) {
+        try {
+            iPriceService.saveElectricPrice(e);
+            return ResponseEntity.ok("Thay đổi giá điện thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
+        }
+    }
+
+    @PostMapping("/price/water/add")
+    @Transactional
+    public ResponseEntity<?> savePriceQuotation(@RequestBody WaterPrice w) {
+        try {
+            iPriceService.saveWaterPrice(w);
+            return ResponseEntity.ok("Thay đổi giá nước thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống");
+        }
+    }
+
+    //===========================ROOM TYPE===========================
+    @GetMapping("/roomType/all")
+    public ResponseEntity<?> getAllRoomType() {
+        return ResponseEntity.ok(iRoomTypeService.getAllRoomType());
+    }
+
+    @PostMapping("/roomType/add")
+    @Transactional
+    public ResponseEntity<?> addRoomType(@RequestBody RoomType roomType) {
+        try {
+            iRoomTypeService.addRoomType(roomType);
+            return ResponseEntity.ok("Thêm loại phòng thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/roomType/{roomTypeId}/delete")
     @Transactional
     public ResponseEntity<?> deleteRoomType(@PathVariable int roomTypeId) {
         try {
@@ -240,47 +278,46 @@ public class AdminController {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-
-    //4.them home cate
-    @PostMapping("/add/roomType")
+    //===========================BILL===========================
+    @PostMapping("/bill/add")
     @Transactional
-    public ResponseEntity<?> addRoomType(@RequestBody RoomType roomType) {
+    public ResponseEntity<?> billCalculation(@RequestBody BillInRoom billInRoom) {
         try {
-            iRoomTypeService.addRoomType(roomType);
-            return ResponseEntity.ok("Thêm loại phòng thành công");
+            iBillService.addBill(billInRoom);
+            return ResponseEntity.ok("Thêm hóa đơn thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-    //4. lay cac loai phong
-    @GetMapping("/get/roomType")
-    public ResponseEntity<?> getAllRoomType() {
-        return ResponseEntity.ok(iRoomTypeService.getAllRoomType());
+    @GetMapping("/bill/{roomId}/{month}/{year}")
+    public ResponseEntity<?> getBillByRoomId(
+            @PathVariable Integer roomId,
+            @PathVariable Integer month,
+            @PathVariable Integer year
+    ){
+        try{
+            if( month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
+            if( year > LocalDate.now().getYear() || year < 0 ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
+            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(roomId,month,year));
+        }catch ( Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
     }
 
-    // 6. Lay theo phong trong
-    @GetMapping("/get/room/limit/{type}")
-    public ResponseEntity<?> getAllRoomByLimit(@PathVariable int type) {
+    // Lấy thông tin phòng để tính hóa đơn
+    @GetMapping("bill/info/{roomId}/{month}/{year}")
+    public ResponseEntity<?> getServiceByRoomIdAndDate(@PathVariable Integer roomId,
+                                                       @PathVariable Integer month,
+                                                       @PathVariable Integer year) {
         try {
-            return ResponseEntity.ok(iRoomService.getAllRoomByLimit(type));
+            return ResponseEntity.ok(iBillService.getInfoToAddInvoice(roomId, month,year));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-    @GetMapping("/getAllRoomWithContract")
-    public ResponseEntity<?> getAllRoomWithContract() {
-        try {
-            return ResponseEntity.ok(iRoomService.getAllRoomWithContract());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    //12 . Xem bao cao phong chua dong va so tien nhan duoc trong thang
-    @GetMapping("get/report/{month}/{year}")
+    @GetMapping("/report/{month}/{year}")
     public ResponseEntity<?> getReport(@PathVariable int month, @PathVariable int year) {
         try {
             Report r = iBillService.getReport(month, year);
@@ -290,18 +327,8 @@ public class AdminController {
         }
     }
 
-    // lay yeu cau nguoi thue gui
-    @GetMapping("get/notice/{status}")
-    public ResponseEntity<?> getRequest(@PathVariable boolean status) {
-        try {
-            return ResponseEntity.ok(iRequestService.getAllRequestOfCustomerByStatus(status));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // lay tat ca yeu cau
-    @GetMapping("get/notice/all")
+    //===========================REQUEST===========================
+    @GetMapping("/request/all")
     public ResponseEntity<?> getAll() {
         try {
             return ResponseEntity.ok(iRequestService.getAllRequestOfCustomer());
@@ -310,29 +337,38 @@ public class AdminController {
         }
     }
 
-    // update yeu cau
-    @PutMapping("update/notice/{id}")
-    public ResponseEntity<?> updateRequest(@PathVariable int id) {
+    //Lấy tất cả yêu cầu của khách (true = đã xử lý / false = chưa xử lý)
+    @GetMapping("/request/{status}")
+    public ResponseEntity<?> getRequest(@PathVariable boolean status) {
         try {
-            iRequestService.updateRequest(id);
+            return ResponseEntity.ok(iRequestService.getAllRequestOfCustomerByStatus(status));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping("/request/{requestId}/update")
+    public ResponseEntity<?> updateRequest(@PathVariable int requestId) {
+        try {
+            iRequestService.updateRequest(requestId);
             return ResponseEntity.ok("Đã xử lý yêu cầu");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-    // lay phong ton tai va co nguoi thue roi
-    @GetMapping("get/room/bill")
-    public ResponseEntity<?> getRoomForBill() {
+    @DeleteMapping("/request/{requestId}/delete")
+    @Transactional
+    public ResponseEntity<?> deleteNoticeById(@PathVariable int requestId) {
         try {
-            return ResponseEntity.ok(iRoomService.getRoomForBill());
+            iRequestService.deleteCommunication(requestId);
+            return ResponseEntity.ok("Yêu cầu đã được xóa");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
-
-    // lay thong ke
-    @GetMapping("/get/statistical")
+    //===========================STATISTICAL===========================
+    @GetMapping("/statistical")
     public ResponseEntity<?> getStatistical() {
         try {
             Statistical sta = new Statistical();
@@ -348,20 +384,8 @@ public class AdminController {
         }
     }
 
-    // xoa notice
-    @DeleteMapping("remove/notice/{id}")
-    @Transactional
-    public ResponseEntity<?> deleteNoticeById(@PathVariable int id) {
-        try {
-            iRequestService.deleteCommunication(id);
-            return ResponseEntity.ok("Yêu cầu đã được xóa");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // lay lich su chuyen di
-    @GetMapping("get/history/all")
+    //===========================HISTORY ROOM===========================
+    @GetMapping("/history/all")
     public ResponseEntity<?> getAllHistory() {
         try {
             return ResponseEntity.ok(iHistoryCustomerService.getAllHistoryCustomer());
@@ -370,46 +394,8 @@ public class AdminController {
         }
     }
 
-    //     tinh hoa don
-    @PostMapping("add/bill")
-    @Transactional
-    public ResponseEntity<?> billCalculation(@RequestBody BillInRoom billInRoom) {
-        try {
-            iBillService.addBill(billInRoom);
-            return ResponseEntity.ok("Thêm hóa đơn thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    @GetMapping("/get/bill/{roomId}/{month}/{year}")
-    public ResponseEntity<?> getBillByRoom(
-            @PathVariable Integer roomId,
-            @PathVariable Integer month,
-            @PathVariable Integer year
-    ){
-        try{
-            if( month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
-            if( year > LocalDate.now().getYear() || year < 0 ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
-            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(roomId,month,year));
-        }catch ( Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    // Lấy thông tin phòng để tính hóa đơn
-    @GetMapping("get/invoiceInfo/{roomId}/{month}/{year}")
-    public ResponseEntity<?> getServiceByRoomIdAndDate(@PathVariable Integer roomId,
-                                                       @PathVariable Integer month,
-                                                       @PathVariable Integer year) {
-        try {
-            return ResponseEntity.ok(iBillService.getInfoToAddInvoice(roomId, month,year));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    @GetMapping("get/service/all")
+    //===========================SERVICE===========================
+    @GetMapping("/service/all")
     public ResponseEntity<?> getAllService() {
         try {
             return ResponseEntity.ok(iServiceService.getAllService());
@@ -418,7 +404,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("add/service")
+    @PostMapping("/service/add")
     @Transactional
     public ResponseEntity<?> saveService(@RequestBody Service service) {
         try {
@@ -429,31 +415,20 @@ public class AdminController {
         }
     }
 
-    @PutMapping("update/service/{id}")
+    @PutMapping("/service/{serviceId}/update")
     @Transactional
-    public ResponseEntity<?> updateService(@PathVariable Integer id, @RequestBody Service service) {
+    public ResponseEntity<?> updateService(@PathVariable Integer serviceId, @RequestBody Service service) {
         try {
-            iServiceService.updateService(id, service);
+            iServiceService.updateService(serviceId, service);
             return ResponseEntity.ok("Cập nhật dịch vụ thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-    @PostMapping("add/roomService/{id}")
-    @Transactional
-    public ResponseEntity<?> saveRoomService(@PathVariable Integer id,
-                                             @RequestBody InfoRoomService infoRoomService) {
-        try {
-            iRoomServiceService.saveRoomService(id, infoRoomService);
-            return ResponseEntity.ok("Thêm dịch vụ thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    @GetMapping("/get/roomService/{roomId}")
-    public ResponseEntity<?> getServiceByRoom(
+    //===========================ROOM SERVICE===========================
+    @GetMapping("/roomService/{roomId}")
+    public ResponseEntity<?> getServiceByRoomId(
             @PathVariable Integer roomId
     ){
         try{;
@@ -463,8 +438,20 @@ public class AdminController {
         }
     }
 
-    //////// xem hop dong
-    @GetMapping("getAllContract")
+    @PostMapping("/roomService/{roomServiceId}/add")
+    @Transactional
+    public ResponseEntity<?> saveRoomService(@PathVariable Integer roomServiceId,
+                                             @RequestBody InfoRoomService infoRoomService) {
+        try {
+            iRoomServiceService.saveRoomService(roomServiceId, infoRoomService);
+            return ResponseEntity.ok("Thêm dịch vụ thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    //===========================CONTRACT===========================
+    @GetMapping("/contract/all")
     public ResponseEntity<?> getAllContract() {
         try {
             return ResponseEntity.ok(iContracService.getAllContract());
@@ -473,7 +460,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("add/contract/{customerId}/{roomId}")
+    @PostMapping("/contract/{customerId}/{roomId}/add")
     public ResponseEntity<?> saveContract(@PathVariable Integer customerId,
                                           @PathVariable Integer roomId,
                                           @RequestBody InfoContract infoContract) {
