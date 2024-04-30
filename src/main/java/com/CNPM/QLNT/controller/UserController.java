@@ -5,6 +5,7 @@ import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.response.InfoContract;
 import com.CNPM.QLNT.response.InfoRoom;
 import com.CNPM.QLNT.response.InfoUser;
+import com.CNPM.QLNT.security.JwtSecurityConfig;
 import com.CNPM.QLNT.services.Inter.*;
 import com.CNPM.QLNT.services.Impl.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class UserController {
     private final IRequestService  iRequestService;
     private final IContracService iContracService;
     private final IHistoryCustomerService iHistoryCustomerService;
+    private final JwtSecurityConfig jwtSecurityConfig;
 
     // 3. xem thong tin phong
     @GetMapping("/room/{room_id}")
@@ -177,7 +179,21 @@ public class UserController {
         try {
             return ResponseEntity.ok(iHistoryCustomerService.getAllCustomerByRoom(roomId));
         }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    //cap nhat mat khau
+    @PostMapping("update/password/{customerId}")
+    public ResponseEntity<?> updatePassword(@RequestBody String password,
+                                            @PathVariable Integer customerId){
+        try {
+            Optional<Customer> customer = iCustomerService.getCustomer(customerId);
+            if( customer.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("customerId");
+            customer.get().getUserAuthId().setPassword(jwtSecurityConfig.passwordEncoder().encode(password));
+            return ResponseEntity.ok("Success");
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
