@@ -15,4 +15,5 @@ public interface ICustomerService {
     void updateCustomer(int id, InfoUser info);
     void deleteCustomer(int id);
     InfoLogin getLogin(String name);
+    void updatePassword(String password,Integer customerId);
 }

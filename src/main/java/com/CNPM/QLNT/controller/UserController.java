@@ -188,9 +188,7 @@ public class UserController {
     public ResponseEntity<?> updatePassword(@RequestBody String password,
                                             @PathVariable Integer customerId){
         try {
-            Optional<Customer> customer = iCustomerService.getCustomer(customerId);
-            if( customer.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("customerId");
-            customer.get().getUserAuthId().setPassword(jwtSecurityConfig.passwordEncoder().encode(password));
+            iCustomerService.updatePassword(password,customerId);
             return ResponseEntity.ok("Success");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
