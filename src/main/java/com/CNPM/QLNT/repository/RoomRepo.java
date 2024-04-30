@@ -9,8 +9,7 @@ import java.util.List;
 
 @Repository
 public interface RoomRepo extends JpaRepository<Room, Integer> {
-    @Query("select r from Room r where r.status = :status")
-    List<Room> getRoomByStatus(boolean status);
+
     @Query("select r from Room r where r.roomId in (select c.room.roomId from Contract c)")
     List<Room> getRoomWithContract();
 }

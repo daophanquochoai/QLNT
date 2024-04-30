@@ -22,12 +22,12 @@ public class HistoryCustomerService implements IHistoryCustomerService {
             if( h.getBeginDate() != null){
                 history.setBeginDate(h.getBeginDate());
             }else{
-                throw new ResourceNotFoundException("StayDay");
+                throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
             }
             if(h.getEndDate() == null){
                 history.setEndDate(null);
                 if( h.getRoomNew() != null){
-                    throw new ResourceNotFoundException("MoveDay");
+                    throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
                 }else{
                     history.setRoomNew(null);
                 }
@@ -35,12 +35,12 @@ public class HistoryCustomerService implements IHistoryCustomerService {
                 if( h.getEndDate().isAfter(h.getBeginDate())){
                     history.setEndDate(h.getEndDate());
                 }else{
-                    throw new ResourceNotFoundException("MoveDay");
+                    throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
                 }
             }
             if( h.getRoomOld() != null){
                 history.setRoomOld(h.getRoomOld());
-            }else throw new ResourceNotFoundException("OldRoom");
+            }else throw new ResourceNotFoundException("Phòng không hợp lệ");
             return history;
         }).collect(Collectors.toList());
         return list;

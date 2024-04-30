@@ -58,7 +58,7 @@ public class RequestService implements IRequestService {
     @Override
     public void updateRequest(int id) {
         Optional<Request> r = requestRepo.findById(id);
-        if( r.isEmpty()) throw new ResourceNotFoundException("Khong Tim Thay Yeu Cau");
+        if( r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy yêu cầu");
         r.get().setStatus(true);
         requestRepo.save(r.get());
     }
@@ -66,8 +66,8 @@ public class RequestService implements IRequestService {
     @Override
     public void deleteCommunication(int id) {
         Optional<Request> r = requestRepo.findById(id);
-        if( r.isEmpty()) throw new ResourceNotFoundException("Khong Tim Thay Yeu Cau");
-        if( r.get().getStatus() == false) throw new ResourceNotFoundException("Vui long dap ung yeu cay truoc");
+        if( r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy yêu cầu");
+        if( r.get().getStatus() == false) throw new ResourceNotFoundException("Vui lòng đáp ứng yêu cầu trước");
         requestRepo.delete(r.get());
     }
 

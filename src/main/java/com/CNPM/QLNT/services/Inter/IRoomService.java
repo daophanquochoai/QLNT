@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IRoomService {
-    List<RoomRes> allRoom();
-    Optional<Room> getRoom(Integer room_id);
+    List<RoomRes> getAllRoom();
+    Optional<Room> getRoomByRoomId(Integer roomId);
     void addRoom(RoomRes roomRes);
     void updateRoom(int id,RoomRes roomRes);
     void deleteRoom(int id) throws Exception;
-    List<RoomRes> getAllRoomByStatus(boolean status);
     List<RoomRes> getAllRoomByLimit(int type);
-    List<Room> getAllRoomWithoutContract();
+    List<Room> getAllRoomWithContract();
     List<RoomRes> getRoomForBill();
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DetailBill {
-    private Integer numberBill;
+    private Integer billId;
     private LocalDate beginDate;
     private LocalDate endDate;
     private Integer electricNumberBegin;
@@ -25,7 +25,7 @@ public class DetailBill {
     private Long total;
     private Boolean isPaid;
     private Integer roomId;
-    private Integer electronucPrice;
+    private Integer electricPrice;
     private Integer waterPrice;
     private Long roomPrice;
     private List<InfoService> service;

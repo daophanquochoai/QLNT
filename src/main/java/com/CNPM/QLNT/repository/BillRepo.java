@@ -10,11 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface BillRepo extends JpaRepository<Bill, Integer> {
-    @Query("select b from Bill b where b.room.roomId = :room")
-    List<Bill> getBillByIdRoom(int room);
+    @Query("select b from Bill b where b.room.roomId = :roomId")
+    List<Bill> getBillByRoomId(int roomId);
 
-    @Query("select b from Bill b where b.status = :status and b.room.roomId = :room")
-    List<Bill> getBillByStatus(boolean status, int room);
+    @Query("select b from Bill b where b.status = :status and b.room.roomId = :roomId")
+    List<Bill> getBillByStatus(boolean status, int roomId);
 
     @Query("select  b from Bill b where MONTH(b.beginDate)= :month and YEAR(b.beginDate) = :year")
     List<Bill> getReport(int month, int year);
