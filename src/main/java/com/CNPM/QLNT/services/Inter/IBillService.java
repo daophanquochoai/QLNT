@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface IBillService {
     List<Bill> getAllBill();
-    Report getReport( int month, int year);
-    List<BillInRoom> getAllBillByRoomId(int roomId);
+    List<DetailBill> getAllBillByRoomId(int roomId);
     List<BillInRoom> getAllBillByStatus(int roomId, boolean status);
     Long getRevenue(int year);
     void addBill( BillInRoom bill);
     DetailBill getBillByRoomInMonthInYear( Integer roomId, Integer Month, Integer Year);
+    List<DetailBill> getAllBillByMonthYear(Integer Month, Integer Year);
     InfoBill getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year);
 }

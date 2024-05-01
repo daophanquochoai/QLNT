@@ -10,7 +10,7 @@ import com.CNPM.QLNT.repository.CustomerRepository;
 import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.InfoContract;
-import com.CNPM.QLNT.services.Inter.IContracService;
+import com.CNPM.QLNT.services.Inter.IContractService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ContractService implements IContracService {
+public class ContractService implements IContractService {
     private final ContractRepo contractRepo;
     private final CustomerRepository customerRepo;
     private final RoomRepo roomRepo;
@@ -30,7 +30,7 @@ public class ContractService implements IContracService {
 
     @Override
     public List<Contract> getAllContract() {
-        return contractRepo.findAll();
+        return contractRepo.getAllContract();
     }
 
     @Override

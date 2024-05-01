@@ -15,6 +15,6 @@ public class InfoBill {
     private Integer waterNumberBegin;
     private Integer electricPrice;
     private Integer waterPrice;
-    private BigDecimal roomPrice;
+    private Long roomPrice;
     private List<InfoService> service;
 }

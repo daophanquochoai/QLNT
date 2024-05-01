@@ -29,85 +29,63 @@ public class BillService implements IBillService {
     private final IPriceService iPriceService;
     private final IRoomService iRoomService;
     private final RoomServiceRepo roomServiceRepo;
-    private final RoomRepo roomRepo;
 
     @Override
     public List<Bill> getAllBill() {
-        return billRepo.findAll();
+        return billRepo.getAllBill();
     }
 
     @Override
-    public Report getReport(int month, int year) {
-        try {
-            List<Bill> list = billRepo.getReport(month, year);
-            Report r = new Report();
-            List<Bill> l = list.stream().filter(b -> (b.getStatus() == Boolean.FALSE)).collect(Collectors.toList());
-            List<BillInRoom> unpaidList = (List<BillInRoom>) l.stream().map(b -> {
-                System.out.println(b);
-                BillInRoom br = new BillInRoom();
-                br.setElectricNumberBegin(b.getElectricNumberBegin());
-                br.setElectricNumberEnd(b.getElectricNumberEnd());
-                br.setNumberBill(b.getBillId());
-                br.setBeginDate(b.getBeginDate());
-                br.setEndDate(b.getEndDate());
-                br.setWaterNumberBegin(b.getWaterNumberBegin());
-                br.setWaterNumberEnd(b.getWaterNumberEnd());
-                br.setNote(b.getNote());
-                br.setTotal(
-                        b.getTotal()
-                );
-                br.setPaid(b.getStatus());
-                br.setRoomId(b.getRoom().getRoomId());
-                return br;
-            }).collect(Collectors.toList());
-            r.setUnpaidRoomList(unpaidList);
-
-            l = list.stream().filter(b -> (b.getStatus() == Boolean.TRUE)).collect(Collectors.toList());
-            List<BillInRoom> paidList = (List<BillInRoom>) l.stream().map(b -> {
-                BillInRoom br = new BillInRoom();
-                br.setElectricNumberBegin(b.getElectricNumberBegin());
-                br.setElectricNumberEnd(b.getElectricNumberEnd());
-                br.setNumberBill(b.getBillId());
-                br.setBeginDate(b.getBeginDate());
-                br.setEndDate(b.getEndDate());
-                br.setWaterNumberBegin(b.getWaterNumberBegin());
-                br.setWaterNumberEnd(b.getWaterNumberEnd());
-                br.setNote(b.getNote());
-                br.setTotal(
-                        b.getTotal()
-                );
-                br.setPaid(b.getStatus());
-                br.setRoomId(b.getRoom().getRoomId());
-                return br;
-            }).collect(Collectors.toList());
-            r.setPaidRoomList(paidList);
-            return r;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public List<BillInRoom> getAllBillByRoomId(int roomId) {
-        Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getBillByRoomId(roomId));
+    public List<DetailBill> getAllBillByRoomId(int roomId) {
+        Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getAllBillByRoomId(roomId));
         if (listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
-        List<BillInRoom> listBR = new ArrayList<>();
+        List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
+        List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
+        List<DetailBill> detailBillList = new ArrayList<>();
         listB.get().stream().forEach(b -> {
-            BillInRoom br = new BillInRoom();
-            br.setElectricNumberBegin(b.getElectricNumberBegin());
-            br.setElectricNumberEnd(b.getElectricNumberEnd());
-            br.setNumberBill(b.getBillId());
-            br.setBeginDate(b.getBeginDate());
-            br.setEndDate(b.getEndDate());
-            br.setWaterNumberBegin(b.getWaterNumberBegin());
-            br.setWaterNumberEnd(b.getWaterNumberEnd());
-            br.setNote(b.getNote());
-            br.setTotal(b.getTotal());
-            br.setPaid(b.getStatus());
-            br.setRoomId(b.getRoom().getRoomId());
-            listBR.add(br);
+            WaterPrice water = new WaterPrice();
+            for (WaterPrice w : waterList) {
+                if (w.getChangedDate().getYear() < b.getBeginDate().getYear()) {
+                    water = w;
+                    break;
+                } else if (w.getChangedDate().getYear() == b.getBeginDate().getYear() &&
+                        w.getChangedDate().getMonth().getValue() < b.getBeginDate().getMonthValue()) {
+                    water = w;
+                    break;
+                }
+            }
+            ElectricPrice electric = new ElectricPrice();
+            for (ElectricPrice e : electricList) {
+                if (e.getChangedDate().getYear() < b.getBeginDate().getYear()) {
+                    electric = e;
+                    break;
+                } else if (e.getChangedDate().getYear() == b.getBeginDate().getYear() &&
+                        e.getChangedDate().getMonth().getValue() < b.getBeginDate().getMonthValue()) {
+                    electric = e;
+                    break;
+                }
+            }
+            List<InfoService> service = roomServiceRepo
+                    .getAllServiceByRoomIdMonthYear(roomId, b.getBeginDate().getMonthValue(), b.getBeginDate().getYear());
+            DetailBill db = new DetailBill();
+            db.setElectricNumberBegin(b.getElectricNumberBegin());
+            db.setElectricNumberEnd(b.getElectricNumberEnd());
+            db.setBillId(b.getBillId());
+            db.setBeginDate(b.getBeginDate());
+            db.setEndDate(b.getEndDate());
+            db.setWaterNumberBegin(b.getWaterNumberBegin());
+            db.setWaterNumberEnd(b.getWaterNumberEnd());
+            db.setNote(b.getNote());
+            db.setWaterPrice(water.getPrice());
+            db.setElectricPrice(electric.getPrice());
+            db.setTotal(b.getTotal());
+            db.setIsPaid(b.getStatus());
+            db.setRoomId(b.getRoom().getRoomId());
+            db.setRoomPrice(b.getRoom().getPrice());
+            db.setService(service);
+            detailBillList.add(db);
         });
-        return listBR;
+        return detailBillList;
     }
 
     @Override
@@ -119,7 +97,7 @@ public class BillService implements IBillService {
             BillInRoom br = new BillInRoom();
             br.setElectricNumberBegin(b.getElectricNumberBegin());
             br.setElectricNumberEnd(b.getElectricNumberEnd());
-            br.setNumberBill(b.getBillId());
+            br.setBillId(b.getBillId());
             br.setBeginDate(b.getBeginDate());
             br.setEndDate(b.getEndDate());
             br.setWaterNumberBegin(b.getWaterNumberBegin());
@@ -237,6 +215,59 @@ public class BillService implements IBillService {
         detailBill.setRoomPrice(bill.get().getTotal() - total);
         detailBill.setService(service);
         return detailBill;
+    }
+
+    @Override
+    public List<DetailBill> getAllBillByMonthYear(Integer Month, Integer Year) {
+        Optional<List<Bill>> listB = Optional.ofNullable(billRepo.getAllBillByMonthYear(Month, Year));
+        if (listB.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
+        List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
+        List<DetailBill> detailBillList = new ArrayList<>();
+        listB.get().stream().forEach(b -> {
+            WaterPrice water = new WaterPrice();
+            for (WaterPrice w : waterList) {
+                if (w.getChangedDate().getYear() < Year) {
+                    water = w;
+                    break;
+                } else if (w.getChangedDate().getYear() == Year &&
+                        w.getChangedDate().getMonth().getValue() < Month) {
+                    water = w;
+                    break;
+                }
+            }
+            ElectricPrice electric = new ElectricPrice();
+            for (ElectricPrice e : electricList) {
+                if (e.getChangedDate().getYear() < Year) {
+                    electric = e;
+                    break;
+                } else if (e.getChangedDate().getYear() == Year &&
+                        e.getChangedDate().getMonth().getValue() < Month) {
+                    electric = e;
+                    break;
+                }
+            }
+            List<InfoService> service = roomServiceRepo
+                    .getAllServiceByRoomIdMonthYear(b.getRoom().getRoomId(), Month, Year);
+            DetailBill db = new DetailBill();
+            db.setElectricNumberBegin(b.getElectricNumberBegin());
+            db.setElectricNumberEnd(b.getElectricNumberEnd());
+            db.setBillId(b.getBillId());
+            db.setBeginDate(b.getBeginDate());
+            db.setEndDate(b.getEndDate());
+            db.setWaterNumberBegin(b.getWaterNumberBegin());
+            db.setWaterNumberEnd(b.getWaterNumberEnd());
+            db.setNote(b.getNote());
+            db.setWaterPrice(water.getPrice());
+            db.setElectricPrice(electric.getPrice());
+            db.setTotal(b.getTotal());
+            db.setIsPaid(b.getStatus());
+            db.setRoomId(b.getRoom().getRoomId());
+            db.setRoomPrice(b.getRoom().getPrice());
+            db.setService(service);
+            detailBillList.add(db);
+        });
+        return detailBillList;
     }
 
     @Override

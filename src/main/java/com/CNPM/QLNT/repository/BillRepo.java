@@ -10,16 +10,19 @@ import java.util.Optional;
 
 @Repository
 public interface BillRepo extends JpaRepository<Bill, Integer> {
+    @Query("select b from Bill b order by b.room.roomId")
+    List<Bill> getAllBill();
+
     @Query("select b from Bill b where b.room.roomId = :roomId")
-    List<Bill> getBillByRoomId(int roomId);
+    List<Bill> getAllBillByRoomId(int roomId);
 
     @Query("select b from Bill b where b.status = :status and b.room.roomId = :roomId")
     List<Bill> getBillByStatus(boolean status, int roomId);
 
-    @Query("select  b from Bill b where MONTH(b.beginDate)= :month and YEAR(b.beginDate) = :year")
-    List<Bill> getReport(int month, int year);
+    @Query("select  b from Bill b where MONTH(b.beginDate)= :month and YEAR(b.beginDate) = :year order by b.room.roomId asc")
+    List<Bill> getAllBillByMonthYear(int month, int year);
 
-    @Query("select b from Bill  b where YEAR(b.beginDate) = :year")
+    @Query("select b from Bill  b where YEAR(b.beginDate) = :year and b.status = true")
     List<Bill> getBillByYear( int year);
     @Query("select  b from Bill b where MONTH(b.beginDate) = :month and YEAR(b.beginDate) = :year and b.room.roomId = :roomId")
     Optional<Bill> getBillByRoomInMonthInYear(Integer roomId, Integer month, Integer year);

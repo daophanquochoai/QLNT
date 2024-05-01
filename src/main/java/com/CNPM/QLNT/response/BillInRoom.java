@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class BillInRoom {
-    private int numberBill;
+    private int billId;
     private LocalDate beginDate;
     private LocalDate endDate;
     private int electricNumberBegin;

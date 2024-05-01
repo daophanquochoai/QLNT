@@ -27,7 +27,7 @@ public class Room {
     private int limit;
 
     @Column(name = "price", nullable = false, columnDefinition = "money")
-    private BigDecimal price;
+    private Long price;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "room",  fetch = FetchType.EAGER)
     @JsonIgnore

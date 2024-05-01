@@ -14,5 +14,5 @@ public class RoomRes {
     private int roomId;
     private int limit;
     private int roomTypeId;
-    private BigDecimal price;
+    private Long price;
 }

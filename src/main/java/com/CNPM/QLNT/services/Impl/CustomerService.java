@@ -8,7 +8,7 @@ import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.InfoLogin;
 import com.CNPM.QLNT.response.InfoUser;
 import com.CNPM.QLNT.security.JwtSecurityConfig;
-import com.CNPM.QLNT.services.Inter.IContracService;
+import com.CNPM.QLNT.services.Inter.IContractService;
 import com.CNPM.QLNT.services.Inter.ICustomerService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class CustomerService implements ICustomerService {
     private final CustomerRepository customerRepository;
     private final IRoomService iRoomService;
-    private final IContracService iContracService;
+    private final IContractService iContractService;
     private final HistoryCustomerRepo historyCustomerRepo;
     private final RoomRepo roomRepo;
     private final JwtSecurityConfig security;
@@ -188,7 +188,7 @@ public class CustomerService implements ICustomerService {
         if (customer.getHistoryCustomer() != null) {
             room = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId();
         }
-        Optional<Contract> contract = iContracService.getContractByRoomId(room);
+        Optional<Contract> contract = iContractService.getContractByRoomId(room);
         if (contract.isPresent() && info.getRoomId() != room) {
             if (contract.get().getCustomer().getCustomerId() == customer.getCustomerId()) {
                 throw new ResourceNotFoundException("Khách thuê đang là chủ hợp đồng của phòng hiện tại");
@@ -266,7 +266,7 @@ public class CustomerService implements ICustomerService {
     @Override
     public void deleteCustomer(int customerId) {
         try {
-            List<Contract> listCT = iContracService.getAllContract();
+            List<Contract> listCT = iContractService.getAllContract();
             listCT.stream().forEach(c -> {
                 if (c.getCustomer().getCustomerId() == customerId && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus())) {
                     System.out.println(c.getEndDate().isBefore(LocalDate.now()));

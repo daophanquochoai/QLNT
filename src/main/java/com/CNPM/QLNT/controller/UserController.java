@@ -29,7 +29,7 @@ public class UserController {
     private final IPriceService iPriceService;
     private final IBillService iBillService;
     private final IRequestService  iRequestService;
-    private final IContracService iContracService;
+    private final IContractService iContractService;
     private final IHistoryCustomerService iHistoryCustomerService;
     private final JwtSecurityConfig jwtSecurityConfig;
 
@@ -40,7 +40,7 @@ public class UserController {
         if( theRoom.isEmpty() ){
             throw new ResourceNotFoundException("Not Found Room");
         }
-        Optional<Contract> contract = iContracService.getContractByRoomId(theRoom.get().getRoomId());
+        Optional<Contract> contract = iContractService.getContractByRoomId(theRoom.get().getRoomId());
         InfoRoom infoRoom = new InfoRoom();
         infoRoom.setRoom(theRoom.get());
         if( contract.isEmpty() ) infoRoom.setContract(null);
@@ -184,7 +184,7 @@ public class UserController {
     @GetMapping("/contract/{customerId}")
     public ResponseEntity<?> getContract(@PathVariable Integer customerId){
         try{
-            Contract c = iContracService.getContractByCustomerId(customerId);
+            Contract c = iContractService.getContractByCustomerId(customerId);
             InfoContract ic = new InfoContract();
             ic.setBeginDate(c.getBeginDate());
             ic.setCreatedDate(c.getCreatedDate());
