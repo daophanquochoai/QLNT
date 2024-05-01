@@ -1,10 +1,7 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Bill;
-import com.CNPM.QLNT.model.ElectricPrice;
-import com.CNPM.QLNT.model.Room;
-import com.CNPM.QLNT.model.WaterPrice;
+import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.repository.BillRepo;
 import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.repository.RoomServiceRepo;
@@ -168,6 +165,14 @@ public class BillService implements IBillService {
     }
 
     @Override
+    public void updateBillStatus(Integer roomId,Integer month, Integer year) {
+        Optional<Bill> b = billRepo.getBillByRoomInMonthInYear(roomId,month,year);
+        if( b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        b.get().setStatus(!b.get().getStatus());
+        billRepo.save(b.get());
+    }
+
+    @Override
     public DetailBill getBillByRoomInMonthInYear(Integer roomId, Integer Month, Integer Year) {
         List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
         List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
@@ -177,7 +182,7 @@ public class BillService implements IBillService {
             if (w.getChangedDate().getYear() < Year) {
                 water = w;
                 break;
-            } else if (w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() < Month) {
+            } else if (w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() <= Month) {
                 water = w;
                 break;
             }
@@ -187,7 +192,7 @@ public class BillService implements IBillService {
             if (e.getChangedDate().getYear() < Year) {
                 electric = e;
                 break;
-            } else if (e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() < Month) {
+            } else if (e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() <= Month) {
                 electric = e;
                 break;
             }
@@ -231,7 +236,7 @@ public class BillService implements IBillService {
                     water = w;
                     break;
                 } else if (w.getChangedDate().getYear() == Year &&
-                        w.getChangedDate().getMonth().getValue() < Month) {
+                        w.getChangedDate().getMonth().getValue() <= Month) {
                     water = w;
                     break;
                 }
@@ -242,7 +247,7 @@ public class BillService implements IBillService {
                     electric = e;
                     break;
                 } else if (e.getChangedDate().getYear() == Year &&
-                        e.getChangedDate().getMonth().getValue() < Month) {
+                        e.getChangedDate().getMonth().getValue() <= Month) {
                     electric = e;
                     break;
                 }
@@ -271,7 +276,7 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public InfoBill getInfoToAddInvoice(Integer roomId, Integer Month, Integer Year) {
+    public InfoBill getInfoToAddBill(Integer roomId, Integer Month, Integer Year) {
         List<WaterPrice> waterList = iPriceService.getAllWaterPrice();
         List<ElectricPrice> electricList = iPriceService.getAllElectricPrice();
         WaterPrice water = new WaterPrice();
@@ -279,7 +284,7 @@ public class BillService implements IBillService {
             if (w.getChangedDate().getYear() < Year) {
                 water = w;
                 break;
-            } else if (w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() < Month) {
+            } else if (w.getChangedDate().getYear() == Year && w.getChangedDate().getMonth().getValue() <= Month) {
                 water = w;
                 break;
             }
@@ -289,7 +294,7 @@ public class BillService implements IBillService {
             if (e.getChangedDate().getYear() < Year) {
                 electric = e;
                 break;
-            } else if (e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() < Month) {
+            } else if (e.getChangedDate().getYear() == Year && e.getChangedDate().getMonth().getValue() <= Month) {
                 electric = e;
                 break;
             }

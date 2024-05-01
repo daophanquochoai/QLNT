@@ -71,7 +71,7 @@ public class RoomService implements IRoomService {
         if (roomRes.getRoomTypeId() != 0) {
             r.setRoomType(iRoomTypeService.getRoomTypeByRoomTypeId(roomRes.getRoomTypeId()));
         }
-        if (roomRes.getLimit() != 0 && roomRes.getLimit() > 0) {
+        if (roomRes.getLimit() >= 0) {
             if (historyCustomerRepo.getCustomersByRoomId(roomId).size() > roomRes.getLimit()) {
                 throw new ResourceNotFoundException("Sức chứa bé hơn số người ở hiện tại");
             }

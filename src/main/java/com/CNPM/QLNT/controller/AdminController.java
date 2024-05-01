@@ -37,6 +37,7 @@ public class AdminController {
     public ResponseEntity<List<RoomRes>> getAllRoom() throws SQLException {
         return ResponseEntity.ok(iRoomService.getAllRoom());
     }
+
     @GetMapping("/room/{roomId}")
     public ResponseEntity<?> getRoom(@PathVariable int roomId) {
         Optional<Room> Room = iRoomService.getRoomByRoomId(roomId);
@@ -202,7 +203,7 @@ public class AdminController {
             Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
             if (h.isPresent()) {
                 InfoUser infoUser = new InfoUser();
-                iCustomerService.updateCustomer(customerId,infoUser);
+                iCustomerService.updateCustomer(customerId, infoUser);
             } else iCustomerService.deleteCustomer(customerId);
             return ResponseEntity.ok("Xóa khách thuê thành công");
         } catch (Exception ex) {
@@ -288,6 +289,19 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/bill/{roomId}/{month}/{year}/update")
+    public ResponseEntity<?> updateBillStatus(
+            @PathVariable Integer roomId,
+            @PathVariable Integer month,
+            @PathVariable Integer year) {
+        try {
+            iBillService.updateBillStatus(roomId,month,year);
+            return ResponseEntity.ok("Hóa đơn đã được cập nhật trạng thái");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
     @PostMapping("/bill/add")
     @Transactional
     public ResponseEntity<?> billCalculation(@RequestBody BillInRoom billInRoom) {
@@ -303,33 +317,51 @@ public class AdminController {
     public ResponseEntity<?> getBillByMonthYear(
             @PathVariable Integer month,
             @PathVariable Integer year
-    ){
-        try{
-            if( month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
-            if( year > LocalDate.now().getYear() || year < 0 ) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
-            return ResponseEntity.ok(iBillService.getAllBillByMonthYear(month,year));
-        }catch ( Exception ex){
+    ) {
+        try {
+            if (month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
+            if (year > LocalDate.now().getYear() || year < 0)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
+            return ResponseEntity.ok(iBillService.getAllBillByMonthYear(month, year));
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+
     @GetMapping("/bill/room/{roomId}")
     public ResponseEntity<?> getBillByRoomId(
             @PathVariable Integer roomId
-    ){
-        try{
+    ) {
+        try {
             return ResponseEntity.ok(iBillService.getAllBillByRoomId(roomId));
-        }catch ( Exception ex){
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
     // Lấy thông tin phòng để tính hóa đơn
     @GetMapping("bill/info/{roomId}/{month}/{year}")
-    public ResponseEntity<?> getServiceByRoomIdAndDate(@PathVariable Integer roomId,
-                                                       @PathVariable Integer month,
-                                                       @PathVariable Integer year) {
+    public ResponseEntity<?> getInfoBillByRoomId(@PathVariable Integer roomId,
+                                                 @PathVariable Integer month,
+                                                 @PathVariable Integer year) {
         try {
-            return ResponseEntity.ok(iBillService.getInfoToAddInvoice(roomId, month,year));
+            return ResponseEntity.ok(iBillService.getInfoToAddBill(roomId, month, year));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/bill/room/{roomId}/{month}/{year}")
+    public ResponseEntity<?> getBillByRoomId(
+            @PathVariable Integer roomId,
+            @PathVariable Integer month,
+            @PathVariable Integer year
+    ) {
+        try {
+            if (month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
+            if (year > LocalDate.now().getYear() || year < 0)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
+            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(roomId, month, year));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -375,6 +407,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
+
     //===========================STATISTICAL===========================
     @GetMapping("/statistical")
     public ResponseEntity<?> getStatistical() {
@@ -382,8 +415,8 @@ public class AdminController {
             List<DetailBill> l = iBillService.getAllBillByMonthYear(LocalDate.now().getMonth().getValue() - 1, LocalDate.now().getYear());
             Statistical sta = new Statistical();
             sta.setRevenue(iBillService.getRevenue(LocalDate.now().getYear()));
-            sta.setNumberOfPaidRoom((int)l.stream().filter(DetailBill::getIsPaid).count());
-            sta.setNumberOfUnpaidRoom((int)l.stream().filter(db -> !db.getIsPaid()).count());
+            sta.setNumberOfPaidRoom((int) l.stream().filter(DetailBill::getIsPaid).count());
+            sta.setNumberOfUnpaidRoom((int) l.stream().filter(db -> !db.getIsPaid()).count());
             sta.setNumberOfFullRoom(iRoomService.getAllRoomByLimit(3).size());
             sta.setNumberOfAvailableRoom(iRoomService.getAllRoomByLimit(2).size());
             sta.setNumberOfEmptyRoom(iRoomService.getAllRoomByLimit(1).size());
@@ -439,10 +472,11 @@ public class AdminController {
     @GetMapping("/roomService/{roomId}")
     public ResponseEntity<?> getServiceByRoomId(
             @PathVariable Integer roomId
-    ){
-        try{;
+    ) {
+        try {
+            ;
             return ResponseEntity.ok(iRoomServiceService.getServiceByRoomIdMonthYear(roomId));
-        }catch ( Exception ex){
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
