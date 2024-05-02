@@ -29,11 +29,11 @@ public class Room {
     @Column(name = "price", nullable = false, columnDefinition = "money")
     private Long price;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room",  fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "room",  fetch = FetchType.EAGER)
     @JsonIgnore
     private List<com.CNPM.QLNT.model.Bill> bill;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<RoomService> roomService;
 

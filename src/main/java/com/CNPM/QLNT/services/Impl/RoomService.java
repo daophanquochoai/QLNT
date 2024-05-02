@@ -7,8 +7,10 @@ import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.RoomRes;
 import com.CNPM.QLNT.services.Inter.IRoomTypeService;
 import com.CNPM.QLNT.services.Inter.IRoomService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -84,10 +86,16 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public void deleteRoom(int roomId) throws Exception {
-        Room Room = getRoomByRoomId(roomId).get();
-        Room.setRoomType(null);
-        roomRepo.delete(Room);
+    @Transactional
+    public void deleteRoom(int roomId) {
+        try {
+            Room Room = getRoomByRoomId(roomId).get();
+            Room.setRoomType(null);
+            roomRepo.delete(Room);
+            roomRepo.flush();
+        }catch(DataIntegrityViolationException e){
+            throw new ResourceNotFoundException("Không thể xóa phòng do còn dữ liệu liên quan");
+        }
     }
 
     @Override

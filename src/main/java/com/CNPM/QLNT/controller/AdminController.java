@@ -106,7 +106,6 @@ public class AdminController {
     }
 
     @DeleteMapping("/room/{roomId}/delete")
-    @Transactional
     public ResponseEntity<?> deleteRoom(@PathVariable int roomId) {
         try {
             iCustomerService.getAllCustomer().stream().forEach(
