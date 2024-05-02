@@ -390,7 +390,7 @@ public class AdminController {
 
     @DeleteMapping("/request/{requestId}/delete")
     @Transactional
-    public ResponseEntity<?> deleteNoticeById(@PathVariable int requestId) {
+    public ResponseEntity<?> deleteRequestByRequestId(@PathVariable int requestId) {
         try {
             iRequestService.deleteCommunication(requestId);
             return ResponseEntity.ok("Yêu cầu đã được xóa");
@@ -454,6 +454,17 @@ public class AdminController {
         try {
             iServiceService.updateService(serviceId, service);
             return ResponseEntity.ok("Cập nhật dịch vụ thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/service/{serviceId}/delete")
+    @Transactional
+    public ResponseEntity<?> deleteServiceByServiceId(@PathVariable int serviceId) {
+        try {
+            iServiceService.deleteService(serviceId);
+            return ResponseEntity.ok("Yêu cầu đã được xóa");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

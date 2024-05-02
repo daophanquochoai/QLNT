@@ -1,6 +1,7 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
+import com.CNPM.QLNT.model.Bill;
 import com.CNPM.QLNT.model.Service;
 import com.CNPM.QLNT.repository.ServiceRepo;
 import com.CNPM.QLNT.services.Inter.IService_Service;
@@ -33,6 +34,12 @@ public class Service_Service implements IService_Service {
         }
         ser.setServiceName(service.getServiceName());
         serviceRepo.save(ser);
+    }
+    @Override
+    public void deleteService(Integer serviceId) {
+        Optional<Service> service = serviceRepo.findById(serviceId);
+        if( service.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
+        serviceRepo.delete(service.get());
     }
 
     @Override

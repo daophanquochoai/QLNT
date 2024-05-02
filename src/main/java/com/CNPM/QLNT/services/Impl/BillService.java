@@ -175,7 +175,6 @@ public class BillService implements IBillService {
     public void deleteBill(Integer billId) {
         Optional<Bill> b = billRepo.findById(billId);
         if( b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
-        System.out.println(b.get());
         if(b.get().getStatus()) throw new ResourceNotFoundException("Không thể xóa do hóa đơn đã được thanh toán");
         billRepo.delete(b.get());
     }

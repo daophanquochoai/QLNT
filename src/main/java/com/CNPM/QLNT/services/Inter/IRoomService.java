@@ -11,7 +11,7 @@ public interface IRoomService {
     Optional<Room> getRoomByRoomId(Integer roomId);
     void addRoom(RoomRes roomRes);
     void updateRoom(int roomId,RoomRes roomRes);
-    void deleteRoom(int roomId) throws Exception;
+    void deleteRoom(int roomId);
     List<RoomRes> getAllRoomByLimit(int type);
     List<Room> getAllRoomWithContract();
     List<RoomRes> getRoomForBill();

@@ -6,5 +6,6 @@ import java.util.List;
 public interface IService_Service {
     void saveService(Service service);
     void updateService(Integer serviceId, Service service);
+    void deleteService(Integer serviceId);
     List<Service> getAllService();
 }
