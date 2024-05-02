@@ -32,6 +32,7 @@ public class UserController {
     private final IContractService iContractService;
     private final IHistoryCustomerService iHistoryCustomerService;
     private final JwtSecurityConfig jwtSecurityConfig;
+    private final IRoomService_Service iRoomServiceService;
 
     //===========================ROOM===========================
     @GetMapping("/room/{roomId}")
@@ -193,6 +194,17 @@ public class UserController {
             ic.setRoomId(c.getRoom().getRoomId());
             ic.setCustomerId(c.getCustomer().getCustomerId());
             return ResponseEntity.ok(ic);
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    //===========================SERVICE============================
+    // Xem service phong do dang ki
+    @GetMapping("/service/{roomId}")
+    public ResponseEntity<?> getServiceOfRoom( @PathVariable Integer roomId){
+        try{
+            return ResponseEntity.ok(iRoomServiceService.getServiceOfRoom(roomId));
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

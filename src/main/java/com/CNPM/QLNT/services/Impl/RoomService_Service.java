@@ -61,4 +61,11 @@ public class RoomService_Service implements IRoomService_Service {
         r.get().setEndDate(endDate);
         roomServiceRepo.save(r.get());
     }
+
+    @Override
+    public List<RoomService> getServiceOfRoom(Integer roomid) {
+        Optional<Room> room =  roomRepo.findById(roomid);
+        if( room.isEmpty()) throw new ResourceNotFoundException("roomId");
+        return room.get().getRoomService();
+    }
 }

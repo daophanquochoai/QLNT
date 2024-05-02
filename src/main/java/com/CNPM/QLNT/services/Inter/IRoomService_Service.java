@@ -1,4 +1,5 @@
 package com.CNPM.QLNT.services.Inter;
+import com.CNPM.QLNT.model.RoomService;
 import com.CNPM.QLNT.response.InfoRoomService;
 import com.CNPM.QLNT.response.InfoService;
 
@@ -9,4 +10,5 @@ public interface IRoomService_Service {
     List<InfoService> getServiceByRoomIdMonthYear(Integer roomId);
     void saveRoomService(Integer roomId, InfoRoomService infoRoomService);
     void updateRoomService(Integer roomServiceId,LocalDate endDate);
+    List<RoomService> getServiceOfRoom(Integer roomid);
 }
