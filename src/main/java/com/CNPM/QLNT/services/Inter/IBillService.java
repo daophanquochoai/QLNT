@@ -9,12 +9,22 @@ import java.util.List;
 
 public interface IBillService {
     List<Bill> getAllBill();
+
     List<DetailBill> getAllBillByRoomId(int roomId);
+
     List<BillInRoom> getAllBillByStatus(int roomId, boolean status);
+
     Long getRevenue(int year);
-    void addBill( BillInRoom bill);
-    void updateBillStatus( Integer roomId,Integer month, Integer year);
-    DetailBill getBillByRoomInMonthInYear( Integer roomId, Integer Month, Integer Year);
+
+    void addBill(BillInRoom bill);
+
+    void deleteBill(Integer billId);
+
+    void updateBillStatus(Integer billId);
+
+    DetailBill getBillByRoomInMonthInYear(Integer roomId, Integer Month, Integer Year);
+
     List<DetailBill> getAllBillByMonthYear(Integer Month, Integer Year);
+
     InfoBill getInfoToAddBill(Integer roomId, Integer Month, Integer Year);
 }

@@ -289,13 +289,10 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/bill/{roomId}/{month}/{year}/update")
-    public ResponseEntity<?> updateBillStatus(
-            @PathVariable Integer roomId,
-            @PathVariable Integer month,
-            @PathVariable Integer year) {
+    @PutMapping("/bill/{billId}/update")
+    public ResponseEntity<?> updateBillStatus(@PathVariable Integer billId) {
         try {
-            iBillService.updateBillStatus(roomId,month,year);
+            iBillService.updateBillStatus(billId);
             return ResponseEntity.ok("Hóa đơn đã được cập nhật trạng thái");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -308,6 +305,17 @@ public class AdminController {
         try {
             iBillService.addBill(billInRoom);
             return ResponseEntity.ok("Thêm hóa đơn thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/bill/{billId}/delete")
+    @Transactional
+    public ResponseEntity<?> deleteBillById(@PathVariable Integer billId) {
+        try {
+            iBillService.deleteBill(billId);
+            return ResponseEntity.ok("Hóa đơn đã được xóa");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -346,22 +354,6 @@ public class AdminController {
                                                  @PathVariable Integer year) {
         try {
             return ResponseEntity.ok(iBillService.getInfoToAddBill(roomId, month, year));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    @GetMapping("/bill/room/{roomId}/{month}/{year}")
-    public ResponseEntity<?> getBillByRoomId(
-            @PathVariable Integer roomId,
-            @PathVariable Integer month,
-            @PathVariable Integer year
-    ) {
-        try {
-            if (month > 12 || month <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("month");
-            if (year > LocalDate.now().getYear() || year < 0)
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("year");
-            return ResponseEntity.ok(iBillService.getBillByRoomInMonthInYear(roomId, month, year));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

@@ -67,7 +67,7 @@ public class RequestService implements IRequestService {
     public void deleteCommunication(int requestId) {
         Optional<Request> r = requestRepo.findById(requestId);
         if( r.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy yêu cầu");
-        if( r.get().getStatus() == false) throw new ResourceNotFoundException("Vui lòng đáp ứng yêu cầu trước");
+        if(!r.get().getStatus()) throw new ResourceNotFoundException("Vui lòng đáp ứng yêu cầu trước");
         requestRepo.delete(r.get());
     }
 

@@ -165,11 +165,19 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public void updateBillStatus(Integer roomId,Integer month, Integer year) {
-        Optional<Bill> b = billRepo.getBillByRoomInMonthInYear(roomId,month,year);
+    public void updateBillStatus(Integer billId) {
+        Optional<Bill> b = billRepo.findById(billId);
         if( b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
         b.get().setStatus(!b.get().getStatus());
         billRepo.save(b.get());
+    }
+    @Override
+    public void deleteBill(Integer billId) {
+        Optional<Bill> b = billRepo.findById(billId);
+        if( b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        System.out.println(b.get());
+        if(b.get().getStatus()) throw new ResourceNotFoundException("Không thể xóa do hóa đơn đã được thanh toán");
+        billRepo.delete(b.get());
     }
 
     @Override
@@ -252,6 +260,7 @@ public class BillService implements IBillService {
                     break;
                 }
             }
+
             List<InfoService> service = roomServiceRepo
                     .getAllServiceByRoomIdMonthYear(b.getRoom().getRoomId(), Month, Year);
             DetailBill db = new DetailBill();
@@ -268,7 +277,10 @@ public class BillService implements IBillService {
             db.setTotal(b.getTotal());
             db.setIsPaid(b.getStatus());
             db.setRoomId(b.getRoom().getRoomId());
-            db.setRoomPrice(b.getRoom().getPrice());
+            long total = 0L;
+            total += (long) db.getWaterPrice() * (b.getWaterNumberEnd() - b.getWaterNumberBegin()) + (long) db.getElectricPrice() * (b.getElectricNumberEnd() - b.getElectricNumberBegin());
+            total += service.stream().mapToLong(s -> s.getQuantity() * s.getPrice()).sum();
+            db.setRoomPrice(b.getTotal() - total);
             db.setService(service);
             detailBillList.add(db);
         });
