@@ -13,5 +13,4 @@ public interface IRequestService {
     void deleteCommunication(int requestId);
     List<Request> getRequestOfAdmin(Integer customerId);
     List<Request> getRequestOfCustomer(Integer customerId);
-
 }
