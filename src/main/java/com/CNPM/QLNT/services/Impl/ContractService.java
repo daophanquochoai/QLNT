@@ -81,6 +81,15 @@ public class ContractService implements IContractService {
     }
 
     @Override
+    public void deleteContract(Integer contractId){
+        Optional<Contract> contract = contractRepo.findById(contractId);
+        if (contract.isPresent()){
+            contract.get().setStatus(false);
+            contractRepo.save(contract.get());
+        }
+    }
+
+    @Override
     public Optional<Contract> getContractByRoomId(Integer roomId) {
         return contractRepo.getContractsByRoomId(roomId);
     }

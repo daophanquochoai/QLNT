@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface ContractRepo extends JpaRepository<Contract, Integer> {
-    @Query("select c from Contract c order by c.room.roomId asc")
+    @Query("select c from Contract c where c.status = true order by c.room.roomId asc")
     List<Contract> getAllContract();
     @Query("select c from Contract c where c.customer.customerId = :customerId")
     Contract getContractByCustomerId(Integer customerId);

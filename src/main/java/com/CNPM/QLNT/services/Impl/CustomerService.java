@@ -269,7 +269,6 @@ public class CustomerService implements ICustomerService {
             List<Contract> listCT = iContractService.getAllContract();
             listCT.stream().forEach(c -> {
                 if (c.getCustomer().getCustomerId() == customerId && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus())) {
-                    System.out.println(c.getEndDate().isBefore(LocalDate.now()));
                     throw new ResourceNotFoundException("Không thể xóa do tồn tại hợp đồng");
                 }
             });

@@ -491,18 +491,27 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/roomService/{roomServiceId}/add")
+    @PostMapping("/roomService/add")
     @Transactional
-    public ResponseEntity<?> saveRoomService(@PathVariable Integer roomServiceId,
-                                             @RequestBody InfoRoomService infoRoomService) {
+    public ResponseEntity<?> saveRoomService(@RequestBody List<InfoRoomService> infoRoomService) {
         try {
-            iRoomServiceService.saveRoomService(roomServiceId, infoRoomService);
+            iRoomServiceService.addRoomService(infoRoomService);
             return ResponseEntity.ok("Thêm dịch vụ thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
+    @PutMapping("/roomService/{roomId}/update")
+    @Transactional
+    public ResponseEntity<?> updateRoomService(@PathVariable Integer roomId,@RequestBody List<InfoRoomService> infoRoomService) {
+        try {
+            iRoomServiceService.updateRoomService(roomId,infoRoomService);
+            return ResponseEntity.ok("Cập nhật dịch vụ phòng thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
     //===========================CONTRACT===========================
     @GetMapping("/contract/all")
     public ResponseEntity<?> getAllContract() {
@@ -520,6 +529,17 @@ public class AdminController {
         try {
             iContractService.saveContract(customerId, roomId, infoContract);
             return ResponseEntity.ok("Lưu hợp đồng thành công");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping("/contract/{contractId}/delete")
+    @Transactional
+    public ResponseEntity<?> deleteContract(@PathVariable Integer contractId) {
+        try {
+            iContractService.deleteContract(contractId);
+            return ResponseEntity.ok("Hủy hợp đồng thành công");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

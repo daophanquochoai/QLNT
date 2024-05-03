@@ -10,5 +10,6 @@ public interface IContractService {
     List<Contract> getAllContract();
     Contract getContractByCustomerId(Integer customerId);
     void saveContract(Integer customerId, Integer roomId, InfoContract infoContract);
+    void deleteContract(Integer contractId);
     Optional<Contract> getContractByRoomId( Integer roomId);
 }

@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface IRoomService_Service {
     List<InfoService> getServiceByRoomId(Integer roomId);
-    void saveRoomService(Integer roomId, InfoRoomService infoRoomService);
-    void updateRoomService(Integer roomServiceId,LocalDate endDate);
+    void addRoomService(List<InfoRoomService> infoRoomService);
+    void updateRoomService(Integer roomId, List<InfoRoomService> infoRoomService);
     List<RoomService> getServiceOfRoom(Integer roomId);
     List<RoomService> getAllRoomServiceInUse();
 
