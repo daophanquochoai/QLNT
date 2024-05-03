@@ -14,4 +14,7 @@ public interface RoomServiceRepo extends JpaRepository<RoomService, Integer> {
             "from RoomService r where r.room.roomId = :roomId and (  YEAR(r.beginDate) < :year or (MONTH(r.beginDate) <= :month and YEAR(r.beginDate) = :year ))" +
             "and ( (YEAR(r.endDate) > :year) or ((MONTH(r.endDate) >= :month and YEAR(r.endDate) = :year)) or r.endDate is null )")
     List<InfoService> getAllServiceByRoomIdMonthYear(Integer roomId, Integer month, Integer year);
+
+    @Query ("select rs from RoomService rs where rs.endDate is null")
+    List<RoomService> getAllRoomServiceInUse ();
 }

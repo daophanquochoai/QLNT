@@ -471,13 +471,21 @@ public class AdminController {
     }
 
     //===========================ROOM SERVICE===========================
-    @GetMapping("/roomService/{roomId}")
+    @GetMapping("/roomService/room/{roomId}")
     public ResponseEntity<?> getServiceByRoomId(
             @PathVariable Integer roomId
     ) {
         try {
-            ;
-            return ResponseEntity.ok(iRoomServiceService.getServiceByRoomIdMonthYear(roomId));
+            return ResponseEntity.ok(iRoomServiceService.getServiceByRoomId(roomId));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/roomService/all")
+    public ResponseEntity<?> getAllServiceRoomByServiceId() {
+        try {
+            return ResponseEntity.ok(iRoomServiceService.getAllRoomServiceInUse());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

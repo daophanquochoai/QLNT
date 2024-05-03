@@ -7,8 +7,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface IRoomService_Service {
-    List<InfoService> getServiceByRoomIdMonthYear(Integer roomId);
+    List<InfoService> getServiceByRoomId(Integer roomId);
     void saveRoomService(Integer roomId, InfoRoomService infoRoomService);
     void updateRoomService(Integer roomServiceId,LocalDate endDate);
-    List<RoomService> getServiceOfRoom(Integer roomid);
+    List<RoomService> getServiceOfRoom(Integer roomId);
+    List<RoomService> getAllRoomServiceInUse();
+
 }
