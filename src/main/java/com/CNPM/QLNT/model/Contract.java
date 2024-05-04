@@ -19,14 +19,14 @@ public class Contract {
     @Column(name = "contractId")
     private int contractId;
 
-    @OneToOne( fetch = FetchType.EAGER)
+    @ManyToOne( fetch = FetchType.EAGER)
     @Cascade({org.hibernate.annotations.CascadeType.DETACH})
     @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false)
     private Customer customer;
 
-    @OneToOne
+    @ManyToOne
     @Cascade({org.hibernate.annotations.CascadeType.DETACH})
-    @JoinColumn(name = "roomId", referencedColumnName = "roomId", nullable = false, unique = true)
+    @JoinColumn(name = "roomId", referencedColumnName = "roomId", nullable = false)
     private Room room;
 
     @Column(name = "createdDate", nullable = false, columnDefinition = "DATE")
