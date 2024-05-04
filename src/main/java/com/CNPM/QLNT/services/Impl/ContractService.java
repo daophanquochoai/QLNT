@@ -34,11 +34,10 @@ public class ContractService implements IContractService {
     }
 
     @Override
-    public Contract getContractByCustomerId(Integer customerId) {
+    public Optional<Contract> getContractByCustomerId(Integer customerId) {
         log.info("{}",contractRepo.getContractByCustomerId(customerId));
         Optional<Contract> c = Optional.ofNullable(contractRepo.getContractByCustomerId(customerId));
-        if( c.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
-        return c.get();
+        return c;
     }
 
     @Override
@@ -55,18 +54,6 @@ public class ContractService implements IContractService {
         if( infoContract.getEndDate().isBefore(infoContract.getBeginDate())) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
         if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
         if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoomId(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Phòng đã đầy");
-        Optional<HistoryCustomer> h = historyCustomerRepo.getHistoryCustomerByCustomerId(customerId);
-        if( h.isPresent() ){
-            // neu dang o chuyen qua phong moi va ghi lai
-            h.get().setEndDate(LocalDate.now());
-            h.get().setRoomNew(room.get());
-            historyCustomerRepo.save(h.get());
-        }
-        // tao ban ghi phong moi
-        HistoryCustomer h1 = new HistoryCustomer();
-        h1.setBeginDate(LocalDate.now());
-        h1.setCustomer(customer.get());
-        h1.setRoomOld(room.get());
 
         // tao hop dong
         contract.setCustomer(customer.get());
@@ -76,7 +63,6 @@ public class ContractService implements IContractService {
         contract.setRoom(room.get());
         contract.setStatus(true);
 
-        historyCustomerRepo.save(h1);
         contractRepo.save(contract);
     }
 

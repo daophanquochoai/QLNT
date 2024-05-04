@@ -185,7 +185,9 @@ public class UserController {
     @GetMapping("/contract/{customerId}")
     public ResponseEntity<?> getContract(@PathVariable Integer customerId){
         try{
-            Contract c = iContractService.getContractByCustomerId(customerId);
+            Optional<Contract> contract = iContractService.getContractByCustomerId(customerId);
+            if (contract.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
+            Contract c = contract.get();
             InfoContract ic = new InfoContract();
             ic.setBeginDate(c.getBeginDate());
             ic.setCreatedDate(c.getCreatedDate());

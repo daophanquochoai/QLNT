@@ -188,7 +188,7 @@ public class CustomerService implements ICustomerService {
         if (customer.getHistoryCustomer() != null) {
             room = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId();
         }
-        Optional<Contract> contract = iContractService.getContractByRoomId(room);
+        Optional<Contract> contract = iContractService.getContractByCustomerId(customerId);
         if (contract.isPresent() && info.getRoomId() != room) {
             if (contract.get().getCustomer().getCustomerId() == customer.getCustomerId()) {
                 throw new ResourceNotFoundException("Khách thuê đang là chủ hợp đồng của phòng hiện tại");
