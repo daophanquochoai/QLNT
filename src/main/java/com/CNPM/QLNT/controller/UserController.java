@@ -150,30 +150,13 @@ public class UserController {
 
     //===========================REQUEST===========================
     //7 . Nhan yeu cau tu chu tro
-    @GetMapping("/request/{customerId}")
-    public ResponseEntity<?> getRequest(@PathVariable Integer customerId){
-        try {
-            return ResponseEntity.ok(iRequestService.getRequestOfAdmin(customerId));
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
 
-    @GetMapping("get/notice/history/{customerId}")
-    public ResponseEntity<?> getNoticeForMySelf( @PathVariable Integer customerId){
+    @GetMapping("request/history/{customerId}/{isSend}")
+    public ResponseEntity<?> getMyRequestHistory(
+            @PathVariable Integer customerId,
+            @PathVariable boolean isSend){
         try{
-            return ResponseEntity.ok(iRequestService.getRequestOfAdmin(customerId));
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
-    @GetMapping("request/history/{customerId}")
-    public ResponseEntity<?> getMyRequestHistory( @PathVariable Integer customerId){
-        try{
-            return ResponseEntity.ok(iRequestService.getRequestOfCustomer(customerId));
+            return ResponseEntity.ok(iRequestService.getRequestHistoryByIsSend(customerId,isSend));
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());

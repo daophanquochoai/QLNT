@@ -10,8 +10,6 @@ public interface RequestRepo extends JpaRepository<Request, Integer> {
     List<Request> getRequestOfCustomerByStatus(boolean status);
     @Query("select r from Request r where r.isSend = true")
     List<Request> getAllRequestOfCustomer();
-    @Query("select r from Request r where r.isSend = false and (r.customer is null or r.customer.customerId = :customerId)")
-    List<Request> getAllRequestOfAdmin(Integer customerId);
-    @Query("select r from Request r where r.isSend = true and (r.customer is null or r.customer.customerId = :customerId)")
-    List<Request> getAllRequestOfCustomer(Integer customerId);
+    @Query("select r from Request r where r.isSend = :isSend and (r.customer is null or r.customer.customerId = :customerId)")
+    List<Request> getAllRequestOfCustomer(Integer customerId,boolean isSend);
 }

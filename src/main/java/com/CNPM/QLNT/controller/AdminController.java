@@ -491,17 +491,6 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/roomService/add")
-    @Transactional
-    public ResponseEntity<?> saveRoomService(@RequestBody List<InfoRoomService> infoRoomService) {
-        try {
-            iRoomServiceService.addRoomService(infoRoomService);
-            return ResponseEntity.ok("Thêm dịch vụ thành công");
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
     @PutMapping("/roomService/{roomId}/update")
     @Transactional
     public ResponseEntity<?> updateRoomService(@PathVariable Integer roomId,@RequestBody List<InfoRoomService> infoRoomService) {

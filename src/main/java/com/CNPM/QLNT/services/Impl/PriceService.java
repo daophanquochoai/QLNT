@@ -12,6 +12,7 @@ import com.CNPM.QLNT.services.Inter.IPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,12 +42,14 @@ public class PriceService implements IPriceService {
     @Override
     public void saveElectricPrice(ElectricPrice e) {
         if( e.getPrice() < 0 ) throw new ResourceNotFoundException("Giá điện phải lớn hơn 0");
+        e.setChangedDate(LocalDateTime.now());
         electricPriceRepo.save(e);
     }
 
     @Override
     public void saveWaterPrice(WaterPrice w) {
         if( w.getPrice() < 0 ) throw new ResourceNotFoundException("Giá nước phải lớn hơn 0");
+        w.setChangedDate(LocalDateTime.now());
         waterPriceRepo.save(w);
     }
 }

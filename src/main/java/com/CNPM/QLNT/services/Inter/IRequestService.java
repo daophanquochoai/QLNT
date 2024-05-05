@@ -11,6 +11,5 @@ public interface IRequestService {
     List<Request> getAllRequestOfCustomer();
     void updateRequest(int requestId);
     void deleteCommunication(int requestId);
-    List<Request> getRequestOfAdmin(Integer customerId);
-    List<Request> getRequestOfCustomer(Integer customerId);
+    List<Request> getRequestHistoryByIsSend(Integer customerId,boolean isSend);
 }

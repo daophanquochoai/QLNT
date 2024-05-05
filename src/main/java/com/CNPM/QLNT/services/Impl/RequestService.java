@@ -72,12 +72,7 @@ public class RequestService implements IRequestService {
     }
 
     @Override
-    public List<Request> getRequestOfAdmin(Integer customerId) {
-        return requestRepo.getAllRequestOfAdmin(customerId);
-    }
-
-    @Override
-    public List<Request> getRequestOfCustomer(Integer customerId) {
-        return requestRepo.getAllRequestOfCustomer(customerId);
+    public List<Request> getRequestHistoryByIsSend(Integer customerId, boolean isSend) {
+        return requestRepo.getAllRequestOfCustomer(customerId,isSend);
     }
 }

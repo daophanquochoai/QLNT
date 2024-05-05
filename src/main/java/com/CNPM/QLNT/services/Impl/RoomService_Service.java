@@ -30,37 +30,43 @@ public class RoomService_Service implements IRoomService_Service {
         return roomServiceRepo.getAllServiceInUseByRoomId(roomId);
     }
 
+
     @Override
-    public void addRoomService(List<InfoRoomService> infoRoomServiceList) {
-        //Kểm tra phòng có dịch vụ đó chưa
-        infoRoomServiceList.forEach(infoRoomService -> {
-            RoomService check = roomServiceRepo
-                    .getRoomServiceByRoomIdAndServiceId(infoRoomService.getRoomId(), infoRoomService.getServiceId());
-            //Nếu có tồn tại roomService theo roomId và serviceId thì ktra có còn sử dụng ko bằng endDate
-            if (check != null) {
-                if (check.getEndDate() == null) {
-                    throw new ResourceNotFoundException("Phòng đã đăng kí dịch vụ \"" + check.getService().getServiceName() + "\"");
-                }
+    public void updateRoomService(Integer roomId, List<InfoRoomService> infoRoomServiceList) {
+        //Lấy ra danh sách dịch vụ phòng đang sử dụng để kiểm tra
+        roomServiceRepo.getAllRoomServiceInUseByRoomId(roomId).forEach(roomService -> {
+            //Tìm trong đống dịch vụ vừa đăng kí có tồn tại dịch đang đăng kí ko
+            Optional<InfoRoomService> irs = infoRoomServiceList.stream()
+                    .filter(infoRoomService -> infoRoomService.getServiceId() == roomService.getService().getServiceId()).findFirst();
+            //Nếu ko tồn tại nghĩa là dịch vụ đang đăng kí đó đã bị hủy
+            if (irs.isEmpty()) {
+                roomService.setEndDate(LocalDate.now());
+                roomServiceRepo.save(roomService);
             }
         });
         infoRoomServiceList.forEach((infoRoomService) -> {
             try {
+                //Kểm tra phòng đã từng dùng dịch vụ đó chưa trong list dịch vụ vừa đăng kí
                 RoomService check = roomServiceRepo
                         .getRoomServiceByRoomIdAndServiceId(infoRoomService.getRoomId(), infoRoomService.getServiceId());
-                //Kiểm tra roomService theo roomId và serviceId có từng tồn tại chưa
-                //Có thì cập nhật lại roomService đó
+                //Nếu có thì cập nhật lại thông tin dịch vụ phòng đó
                 if (check != null) {
-                    check.setBeginDate(infoRoomService.getBeginDate());
-                    check.setEndDate(null);
+                    //Nếu đã từng đăng kí thì đăng kí lại
+                    if (check.getEndDate() != null) {
+                        check.setBeginDate(infoRoomService.getBeginDate());
+                        check.setEndDate(null);
+                    }
+                    //Không thì cập nhật lại thông tin dịch vụ phòng đó đang dùng
                     check.setQuantity(infoRoomService.getQuantity());
                     roomServiceRepo.save(check);
                 }
-                //Không thì tại roomService mới
+                //Nếu không thì đăng kí dịch vụ mới cho phòng
                 else {
                     RoomService roomService = new RoomService();
                     roomService.setBeginDate(infoRoomService.getBeginDate());
                     roomService.setEndDate(null);
-                    if (infoRoomService.getQuantity() < 0) throw new ResourceNotFoundException("Số lượng phải lớn hơn 0");
+                    if (infoRoomService.getQuantity() < 0)
+                        throw new ResourceNotFoundException("Số lượng phải lớn hơn 0");
                     roomService.setQuantity(infoRoomService.getQuantity());
                     if (serviceRepo.findById(infoRoomService.getServiceId()).isEmpty())
                         throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
@@ -76,22 +82,6 @@ public class RoomService_Service implements IRoomService_Service {
                 throw new ResourceNotFoundException(ex.getMessage());
             }
         });
-    }
-
-    @Override
-    public void updateRoomService(Integer roomId, List<InfoRoomService> infoRoomServiceList) {
-        roomServiceRepo.getAllRoomServiceInUseByRoomId(roomId).forEach(roomService -> {
-            Optional<InfoRoomService> irs = infoRoomServiceList.stream()
-                    .filter(infoRoomService -> infoRoomService.getServiceId()==roomService.getService().getServiceId()).findFirst();
-            Optional<RoomService> rs = roomServiceRepo.findById(roomService.getRoomServiceId());
-            if (irs.isPresent()){
-                rs.get().setQuantity(irs.get().getQuantity());
-            }else {
-                rs.get().setEndDate(LocalDate.now());
-            }
-            roomServiceRepo.save(rs.get());
-        });
-
     }
 
     @Override
