@@ -75,4 +75,9 @@ public class RequestService implements IRequestService {
     public List<Request> getRequestOfAdmin(Integer customerId) {
         return requestRepo.getAllRequestOfAdmin(customerId);
     }
+
+    @Override
+    public List<Request> getRequestOfCustomer(Integer customerId) {
+        return requestRepo.getAllRequestOfCustomer(customerId);
+    }
 }

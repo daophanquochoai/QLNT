@@ -38,6 +38,7 @@ public class CustomerService implements ICustomerService {
     private final String Email_Regex = "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
 
     private final Pattern pattern = Pattern.compile(Email_Regex);
+    private final RequestService requestService;
 
     @Override
     public List<InfoUser> getAllCustomer() {
@@ -288,6 +289,7 @@ public class CustomerService implements ICustomerService {
     public void updatePassword(String password, Integer customerId) {
         Optional<Customer> customer = getCustomer(customerId);
         if( customer.isEmpty() ) throw new ResourceNotFoundException("customerId");
+        System.out.println(password);
         customer.get().getUserAuthId().setPassword(security.passwordEncoder().encode(password));
         customerRepository.save(customer.get());
     }

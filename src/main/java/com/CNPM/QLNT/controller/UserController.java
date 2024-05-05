@@ -160,6 +160,26 @@ public class UserController {
         }
     }
 
+    @GetMapping("get/notice/history/{customerId}")
+    public ResponseEntity<?> getNoticeForMySelf( @PathVariable Integer customerId){
+        try{
+            return ResponseEntity.ok(iRequestService.getRequestOfAdmin(customerId));
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("request/history/{customerId}")
+    public ResponseEntity<?> getMyRequestHistory( @PathVariable Integer customerId){
+        try{
+            return ResponseEntity.ok(iRequestService.getRequestOfCustomer(customerId));
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
     // 8. Gui yeu cau den chu tro
     @PostMapping("/request/{customerId}/add")
 //    @Transactional
