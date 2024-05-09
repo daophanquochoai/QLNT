@@ -103,7 +103,7 @@ public class RoomService implements IRoomService {
         List<Room> l;
         List<Room> r = roomRepo.findAll();
         if (type == 1) {
-            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() == 0).collect(Collectors.toList());
+            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).isEmpty()).collect(Collectors.toList());
         } else if (type == 2) {
             l = r.stream().filter(temp -> (historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() < temp.getLimit() && historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() > 0)).collect(Collectors.toList());
         } else {
@@ -130,11 +130,11 @@ public class RoomService implements IRoomService {
     @Override
     public List<RoomRes> getRoomForBill() {
         List<Room> list = roomRepo.findAll();
-        list = list.stream().filter(r -> historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).size() != 0 &&
+        list = list.stream().filter(r -> !historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).isEmpty() &&
                         !r.getBill().stream().anyMatch(b -> b.getBeginDate().getMonth().getValue() == LocalDate.now().getMonth().getValue() - 1
                                 && b.getBeginDate().getYear() == LocalDate.now().getYear()
                         ))
-                .collect(Collectors.toList());
+                .toList();
         List<RoomRes> l = list.stream().map(
                 r ->
                 {

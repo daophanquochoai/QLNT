@@ -35,7 +35,7 @@ public class RoomService_Service implements IRoomService_Service {
     public void updateRoomService(Integer roomId, List<InfoRoomService> infoRoomServiceList) {
         //Lấy ra danh sách dịch vụ phòng đang sử dụng để kiểm tra
         roomServiceRepo.getAllRoomServiceInUseByRoomId(roomId).forEach(roomService -> {
-            //Tìm trong đống dịch vụ vừa đăng kí có tồn tại dịch đang đăng kí ko
+            //Tìm trong đống dịch vụ vừa đăng kí có tồn tại dịch vụ đang đăng kí ko
             Optional<InfoRoomService> irs = infoRoomServiceList.stream()
                     .filter(infoRoomService -> infoRoomService.getServiceId() == roomService.getService().getServiceId()).findFirst();
             //Nếu ko tồn tại nghĩa là dịch vụ đang đăng kí đó đã bị hủy
@@ -46,14 +46,14 @@ public class RoomService_Service implements IRoomService_Service {
         });
         infoRoomServiceList.forEach((infoRoomService) -> {
             try {
-                //Kểm tra phòng đã từng dùng dịch vụ đó chưa trong list dịch vụ vừa đăng kí
+                //Kiểm tra phòng đã từng dùng dịch vụ đó chưa trong list dịch vụ vừa đăng kí
                 RoomService check = roomServiceRepo
                         .getRoomServiceByRoomIdAndServiceId(infoRoomService.getRoomId(), infoRoomService.getServiceId());
                 //Nếu có thì cập nhật lại thông tin dịch vụ phòng đó
                 if (check != null) {
                     //Nếu đã từng đăng kí thì đăng kí lại
                     if (check.getEndDate() != null) {
-                        check.setBeginDate(infoRoomService.getBeginDate());
+                        check.setBeginDate(LocalDate.now());
                         check.setEndDate(null);
                     }
                     //Không thì cập nhật lại thông tin dịch vụ phòng đó đang dùng
@@ -63,7 +63,7 @@ public class RoomService_Service implements IRoomService_Service {
                 //Nếu không thì đăng kí dịch vụ mới cho phòng
                 else {
                     RoomService roomService = new RoomService();
-                    roomService.setBeginDate(infoRoomService.getBeginDate());
+                    roomService.setBeginDate(LocalDate.now());
                     roomService.setEndDate(null);
                     if (infoRoomService.getQuantity() < 0)
                         throw new ResourceNotFoundException("Số lượng phải lớn hơn 0");

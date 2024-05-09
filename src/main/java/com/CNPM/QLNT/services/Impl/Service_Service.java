@@ -38,7 +38,7 @@ public class Service_Service implements IService_Service {
     @Override
     public void deleteService(Integer serviceId) {
         Optional<Service> service = serviceRepo.findById(serviceId);
-        if( service.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
+        if(service.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
         serviceRepo.delete(service.get());
     }
 

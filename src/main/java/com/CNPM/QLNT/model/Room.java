@@ -31,7 +31,7 @@ public class Room {
 
     @OneToMany(mappedBy = "room",  fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<com.CNPM.QLNT.model.Bill> bill;
+    private List<Bill> bill;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER)
     @JsonIgnore
