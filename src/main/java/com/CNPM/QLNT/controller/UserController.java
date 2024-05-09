@@ -204,6 +204,25 @@ public class UserController {
         }
     }
 
+    @GetMapping("/contract/room/{roomId}")
+    public ResponseEntity<?> getContractByRoomId(@PathVariable Integer roomId){
+        try{
+            Optional<Contract> contract = iContractService.getContractByRoomId(roomId);
+            if (contract.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
+            Contract c = contract.get();
+            InfoContract ic = new InfoContract();
+            ic.setBeginDate(c.getBeginDate());
+            ic.setCreatedDate(c.getCreatedDate());
+            ic.setEndDate(c.getEndDate());
+            ic.setStatus(c.getStatus());
+            ic.setRoomId(c.getRoom().getRoomId());
+            ic.setCustomerId(c.getCustomer().getCustomerId());
+            return ResponseEntity.ok(ic);
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
     //===========================SERVICE============================
     // Xem service phong do dang ki
     @GetMapping("/service/{roomId}")
