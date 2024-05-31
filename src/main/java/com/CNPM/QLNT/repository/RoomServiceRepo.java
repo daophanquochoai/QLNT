@@ -11,8 +11,10 @@ import java.util.List;
 public interface RoomServiceRepo extends JpaRepository<RoomService, Integer> {
 
     @Query("select new com.CNPM.QLNT.response.InfoService(r.service.serviceId,r.service.serviceName, r.service.price, r.quantity) " +
-            "from RoomService r where r.room.roomId = :roomId and (  YEAR(r.beginDate) < :year or (MONTH(r.beginDate) <= :month and YEAR(r.beginDate) = :year ))" +
-            "and ( (YEAR(r.endDate) > :year) or ((MONTH(r.endDate) >= :month and YEAR(r.endDate) = :year)) or r.endDate is null )")
+        "from RoomService r where r.room.roomId = :roomId " +
+        "and (YEAR(r.beginDate) < :year or (MONTH(r.beginDate) <= :month and YEAR(r.beginDate) = :year ))" +
+        "and ((YEAR(r.endDate) > :year) or ((MONTH(r.endDate) >= :month and YEAR(r.endDate) = :year)) " +
+        "or r.endDate is null )")
     List<InfoService> getAllServiceByRoomIdMonthYear(Integer roomId, Integer month, Integer year);
     @Query("select new com.CNPM.QLNT.response.InfoService(r.service.serviceId,r.service.serviceName, r.service.price, r.quantity) " +
             "from RoomService r where r.room.roomId = :roomId and r.endDate is null ")

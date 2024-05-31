@@ -3,7 +3,7 @@ package com.CNPM.QLNT.security;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Customer;
 import com.CNPM.QLNT.model.UserAuth;
-import com.CNPM.QLNT.repository.CustomerRepository;
+import com.CNPM.QLNT.repository.CustomerRepo;
 import com.CNPM.QLNT.repository.UserAuthRepo;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class JwtAuthenticationController {
 
     private JwtTokenService tokenService;
-    private CustomerRepository customerRepository;
+    private CustomerRepo customerRepo;
     private AuthenticationManager authenticationManager;
     private UserAuthRepo userAuthRepo;
 
@@ -30,11 +30,11 @@ public class JwtAuthenticationController {
     @Autowired
     public JwtAuthenticationController(JwtTokenService tokenService,
                                        AuthenticationManager authenticationManager,
-                                       CustomerRepository customerRepository,
+                                       CustomerRepo customerRepo,
                                        UserAuthRepo userAuthRepo) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
-        this.customerRepository = customerRepository;
+        this.customerRepo = customerRepo;
         this.userAuthRepo = userAuthRepo;
     }
 
@@ -56,7 +56,7 @@ public class JwtAuthenticationController {
             return ResponseEntity.ok(new JwtTokenResponse(token,"ADMIN"));
         }
         else{
-            Customer c = customerRepository.getInfoCustomer(u.getId());
+            Customer c = customerRepo.getInfoCustomer(u.getId());
             return ResponseEntity.ok(new JwtTokenResponse(token, c));
         }
     }

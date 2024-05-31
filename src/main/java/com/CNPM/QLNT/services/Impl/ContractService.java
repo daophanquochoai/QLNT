@@ -3,12 +3,9 @@ package com.CNPM.QLNT.services.Impl;
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Contract;
 import com.CNPM.QLNT.model.Customer;
-import com.CNPM.QLNT.model.HistoryCustomer;
 import com.CNPM.QLNT.model.Room;
-import com.CNPM.QLNT.repository.ContractRepo;
-import com.CNPM.QLNT.repository.CustomerRepository;
-import com.CNPM.QLNT.repository.HistoryCustomerRepo;
-import com.CNPM.QLNT.repository.RoomRepo;
+import com.CNPM.QLNT.model.UserAuth;
+import com.CNPM.QLNT.repository.*;
 import com.CNPM.QLNT.response.InfoContract;
 import com.CNPM.QLNT.services.Inter.IContractService;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +21,35 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ContractService implements IContractService {
     private final ContractRepo contractRepo;
-    private final CustomerRepository customerRepo;
+    private final CustomerRepo customerRepo;
     private final RoomRepo roomRepo;
+    private final RoomServiceRepo roomServiceRepo;
     private final HistoryCustomerRepo historyCustomerRepo;
+    private final UserAuthRepo userAuthRepo;
 
     @Override
     public List<Contract> getAllContract() {
-        return contractRepo.getAllContract();
+        List<Contract> listAllContract = contractRepo.getAllContract();
+        // Lấy ra các hợp đồng đã hết hạn để thay đổi trạng thái hợp đồng và thông tin người ở, dịch vụ
+        List<Contract> listAllContractExpired = listAllContract.stream()
+            .filter(c -> c.getEndDate().isBefore(LocalDate.now())).toList();
+        listAllContractExpired.forEach(c -> {
+            c.setStatus(false);
+            historyCustomerRepo.getHistoryCustomerByRoomId(c.getRoom().getRoomId()).forEach(h -> {
+                h.setEndDate(c.getEndDate());
+                historyCustomerRepo.save(h);
+                UserAuth ua = userAuthRepo.findByUserAuthId(h.getCustomer().getUserAuthId().getId()).get();
+                ua.setActive(false);
+                userAuthRepo.save(ua);
+            });
+            roomServiceRepo.getAllRoomServiceInUseByRoomId(c.getRoom().getRoomId()).forEach(rs -> {
+                rs.setEndDate(c.getEndDate());
+                roomServiceRepo.save(rs);
+            });
+            contractRepo.save(c);
+        });
+
+        return listAllContract;
     }
 
     @Override
@@ -72,6 +91,17 @@ public class ContractService implements IContractService {
         if (contract.isPresent()){
             contract.get().setStatus(false);
             contractRepo.save(contract.get());
+            historyCustomerRepo.getHistoryCustomerByRoomId(contract.get().getRoom().getRoomId()).forEach(h -> {
+                h.setEndDate(contract.get().getEndDate());
+                historyCustomerRepo.save(h);
+                UserAuth ua = userAuthRepo.findByUserAuthId(h.getCustomer().getUserAuthId().getId()).get();
+                ua.setActive(false);
+                userAuthRepo.save(ua);
+            });
+            roomServiceRepo.getAllRoomServiceInUseByRoomId(contract.get().getRoom().getRoomId()).forEach(rs -> {
+                rs.setEndDate(contract.get().getEndDate());
+                roomServiceRepo.save(rs);
+            });
         }
     }
 
