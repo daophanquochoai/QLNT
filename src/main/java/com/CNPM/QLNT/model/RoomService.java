@@ -22,7 +22,7 @@ public class RoomService {
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "roomId",referencedColumnName = "roomId")
     private Room room;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "serviceId",referencedColumnName = "serviceId")
     private Service service;
     private int quantity;

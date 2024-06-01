@@ -2,9 +2,10 @@ package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.*;
-import com.CNPM.QLNT.repository.CustomerRepository;
+import com.CNPM.QLNT.repository.CustomerRepo;
 import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.repository.RoomRepo;
+import com.CNPM.QLNT.repository.UserAuthRepo;
 import com.CNPM.QLNT.response.InfoLogin;
 import com.CNPM.QLNT.response.InfoUser;
 import com.CNPM.QLNT.security.JwtSecurityConfig;
@@ -29,103 +30,135 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomerService implements ICustomerService {
-    private final CustomerRepository customerRepository;
-    private final IRoomService iRoomService;
+    private final JwtSecurityConfig security;
     private final IContractService iContractService;
+    private final CustomerRepo customerRepo;
     private final HistoryCustomerRepo historyCustomerRepo;
     private final RoomRepo roomRepo;
-    private final JwtSecurityConfig security;
+    private final UserAuthRepo userAuthRepo;
     private final String Email_Regex = "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
 
     private final Pattern pattern = Pattern.compile(Email_Regex);
+    private final RequestService requestService;
 
     @Override
     public List<InfoUser> getAllCustomer() {
 
-        List<Customer> list = customerRepository.findAll();
+        List<Customer> list = customerRepo.findAll();
         List<InfoUser> l = list.stream()
-                .filter(c -> c.getUserAuthId().getRole().equals("USER"))
-                .map(
-                        c ->
-                        {
-                            Integer roomId = 0;
-                            if (c.getHistoryCustomer() != null) {
-                                Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter(t -> (t.getEndDate() == null && t.getCustomer().getCustomerId() == c.getCustomerId())).findFirst();
-                                if (h.isPresent()) roomId = h.get().getRoomOld().getRoomId();
-                            }
-                            InfoUser user = new InfoUser(
-                                    c.getCustomerId(),
-                                    c.getFirstName(),
-                                    c.getLastName(),
-                                    c.getIdentifier(),
-                                    c.getDateOfBirth(),
-                                    c.getSex(),
-                                    c.getInfoAddress(),
-                                    c.getPhoneNumber(),
-                                    c.getEmail(),
-                                    roomId,
-                                    c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
-                                    c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
-                            );
-                            return user;
-                        }
-                ).collect(Collectors.toList());
+            .filter(c -> c.getUserAuthId().getRole().equals("USER"))
+            .map(
+                c ->
+                {
+                    int roomId = 0;
+                    if (c.getHistoryCustomer() != null) {
+                        Optional<HistoryCustomer> h = c.getHistoryCustomer().stream().filter(t -> (t.getEndDate() == null && t.getCustomer().getCustomerId() == c.getCustomerId())).findFirst();
+                        if (h.isPresent()) roomId = h.get().getRoomOld().getRoomId();
+                    }
+                    InfoUser user = new InfoUser(
+                        c.getCustomerId(),
+                        c.getFirstName(),
+                        c.getLastName(),
+                        c.getIdentifier(),
+                        c.getDateOfBirth(),
+                        c.getSex(),
+                        c.getInfoAddress(),
+                        c.getPhoneNumber(),
+                        c.getEmail(),
+                        roomId,
+                        c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
+                        c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
+                    );
+                    return user;
+                }
+            ).collect(Collectors.toList());
         return l;
     }
 
     @Override
     public Optional<Customer> getCustomer(int customerId) {
-        return Optional.of(customerRepository.findById(customerId).get());
+        return Optional.of(customerRepo.findById(customerId).get());
     }
 
     @Override
     public List<InfoUser> getCustomerByRoomId(Integer roomId) {
         List<Customer> list = historyCustomerRepo.getCustomersByRoomId(roomId);
         List<InfoUser> l = list.stream().map(
-                c ->
-                {
-                    InfoUser user = new InfoUser(
-                            c.getCustomerId(),
-                            c.getFirstName(),
-                            c.getLastName(),
-                            c.getIdentifier(),
-                            c.getDateOfBirth(),
-                            c.getSex(),
-                            c.getInfoAddress(),
-                            c.getPhoneNumber(),
-                            c.getEmail(),
-                            roomId,
-                            c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
-                            c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
-                    );
-                    return user;
-                }
+            c ->
+            {
+                InfoUser user = new InfoUser(
+                    c.getCustomerId(),
+                    c.getFirstName(),
+                    c.getLastName(),
+                    c.getIdentifier(),
+                    c.getDateOfBirth(),
+                    c.getSex(),
+                    c.getInfoAddress(),
+                    c.getPhoneNumber(),
+                    c.getEmail(),
+                    roomId,
+                    c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getUsername(),
+                    c.getUserAuthId() == null ? "Chưa có tài khoản" : c.getUserAuthId().getPassword()
+                );
+                return user;
+            }
         ).collect(Collectors.toList());
         return l;
     }
 
     @Override
-    public Boolean addCustomer(InfoUser info) throws Exception {
-        List<InfoUser> listCus = getAllCustomer();
+    public Boolean addCustomer(InfoUser info) {
         Customer c = new Customer();
-        if (!listCus.isEmpty()) {
-            listCus.forEach(cus -> {
-                if (cus.getIdentifier().equals(info.getIdentifier()))
-                    throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
-                if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
-                    throw new ResourceNotFoundException("Số điện thoại đã tồn tại");
-                if (cus.getEmail().equals(info.getEmail()))
-                    throw new ResourceNotFoundException("Email đã tồn tại");
-            });
-        }
-        List<InfoUser> list = getCustomerByRoomId(info.getRoomId());
-        if (info.getRoomId() != 0 && !iRoomService.getAllRoom().isEmpty()) {
-            Room Room = iRoomService.getRoomByRoomId(info.getRoomId()).get();
-            if (Room.getLimit() == list.size()) {
-                return false;
+        HistoryCustomer historyCustomer = new HistoryCustomer();
+        Room r = roomRepo.findById(info.getRoomId()).get();
+        if (roomRepo.findById(info.getRoomId()).isEmpty())
+            throw new ResourceNotFoundException("Phòng không tồn tại");
+        if (r.getLimit() < historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).size())
+            throw new ResourceNotFoundException("Phòng đã đầy");
+
+        List<InfoUser> listAllCustomer = getAllCustomer();
+        // Kiểm tra xem đã từng ở chưa (ko tính đang ở) bằng CCCD
+        // Nếu chưa từng ở thì kiểm tra như bình thường
+        // Nếu đã từng ở thì bỏ qua kiểm tra và cập nhật lại thông tin
+        if (historyCustomerRepo.getPreviousCustomerByIdentifier(info.getIdentifier()).isEmpty()) {
+            if (!listAllCustomer.isEmpty()) {
+                for (InfoUser cus : listAllCustomer) {
+                    if (cus.getIdentifier().equals(info.getIdentifier()))
+                        throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
+                    if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
+                        throw new ResourceNotFoundException("Số điện thoại đã tồn tại");
+                    if (cus.getEmail().equals(info.getEmail()))
+                        throw new ResourceNotFoundException("Email đã tồn tại");
+                }
             }
+
+            //Thêm khách thuê vào bảng history customer
+            historyCustomer.setRoomOld(r);
+            historyCustomer.setBeginDate(LocalDate.now());
+
+            //Tạo tài khoản cho khách thuê
+            UserAuth ua = new UserAuth();
+            ua.setUsername(info.getUsername());
+            ua.setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
+            ua.setActive(true);
+            ua.setRole("USER");
+            c.setUserAuthId(ua);
+
+        } else {
+            c = customerRepo.getCustomerByIdentifier(info.getIdentifier());
+            historyCustomer = historyCustomerRepo.getPreviousCustomerByIdentifier(c.getIdentifier()).get(0);
+            historyCustomer.setRoomOld(r);
+            historyCustomer.setBeginDate(LocalDate.now());
+            historyCustomer.setEndDate(null);
+
+            UserAuth ua = userAuthRepo.findByUserAuthId(c.getUserAuthId().getId()).get();
+            ua.setUsername(info.getUsername());
+            ua.setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
+            ua.setActive(true);
+            userAuthRepo.save(ua);
         }
 
+        //Thêm thông tin khách thuê
         c.setFirstName(info.getFirstName());
         c.setLastName(info.getLastName());
         if (info.getIdentifier() == null || info.getIdentifier().length() != 12) {
@@ -133,7 +166,8 @@ public class CustomerService implements ICustomerService {
         }
         c.setIdentifier(info.getIdentifier());
         if (info.getDateOfBirth() != null) {
-            if (info.getDateOfBirth().isAfter(LocalDate.now())) throw new ResourceNotFoundException("Ngày sinh không hợp lệ");
+            if (info.getDateOfBirth().isAfter(LocalDate.now()))
+                throw new ResourceNotFoundException("Ngày sinh không hợp lệ");
             c.setDateOfBirth(info.getDateOfBirth());
         }
         if (info.getSex() != null) {
@@ -152,29 +186,10 @@ public class CustomerService implements ICustomerService {
             if (!matcher.matches()) throw new ResourceNotFoundException("Email không hợp lệ");
             c.setEmail(info.getEmail());
         }
-        HistoryCustomer historyCustomer = new HistoryCustomer();
-        if (info.getRoomId() != 0) {
-            if (roomRepo.findById(info.getRoomId()).isEmpty()) throw new ResourceNotFoundException("Phòng không tồn tại");
-            else {
-                Room r = roomRepo.findById(info.getRoomId()).get();
-                if (r.getLimit() < historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).size())
-                    throw new ResourceNotFoundException("Phòng đã đầy");
-                historyCustomer.setRoomOld(r);
-                historyCustomer.setBeginDate(LocalDate.now());
-            }
-        }
 
-        UserAuth ua = new UserAuth();
-        ua.setUsername(info.getUsername());
-        ua.setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
-        ua.setActive(true);
-        ua.setRole("USER");
-        c.setUserAuthId(ua);
-        Customer customer = customerRepository.save(c);
-        if (info.getRoomId() != 0) {
-            historyCustomer.setCustomer(customer);
-            historyCustomerRepo.save(historyCustomer);
-        }
+        Customer customer = customerRepo.save(c);
+        historyCustomer.setCustomer(customer);
+        historyCustomerRepo.save(historyCustomer);
         return true;
     }
 
@@ -188,14 +203,14 @@ public class CustomerService implements ICustomerService {
         if (customer.getHistoryCustomer() != null) {
             room = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst().get().getRoomOld().getRoomId();
         }
-        Optional<Contract> contract = iContractService.getContractByRoomId(room);
+        Optional<Contract> contract = iContractService.getContractByCustomerId(customerId);
         if (contract.isPresent() && info.getRoomId() != room) {
             if (contract.get().getCustomer().getCustomerId() == customer.getCustomerId()) {
                 throw new ResourceNotFoundException("Khách thuê đang là chủ hợp đồng của phòng hiện tại");
             }
         }
         getAllCustomer().forEach(cus -> {
-            if(cus.getCustomerId() != customerId){
+            if (cus.getCustomerId() != customerId) {
                 if (cus.getIdentifier().equals(info.getIdentifier()))
                     throw new ResourceNotFoundException("Mã CCCD đã tồn tại");
                 if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
@@ -220,7 +235,8 @@ public class CustomerService implements ICustomerService {
             customer.setInfoAddress(info.getInfoAddress());
         }
         if (info.getDateOfBirth() != null) {
-            if (info.getDateOfBirth().isAfter(LocalDate.now())) throw new ResourceNotFoundException("Ngày sinh không hợp lệ");
+            if (info.getDateOfBirth().isAfter(LocalDate.now()))
+                throw new ResourceNotFoundException("Ngày sinh không hợp lệ");
             customer.setDateOfBirth(info.getDateOfBirth());
         }
         if (info.getSex() != null) {
@@ -260,7 +276,7 @@ public class CustomerService implements ICustomerService {
             Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
             h.ifPresent(historyCustomer -> historyCustomer.setEndDate(LocalDate.now()));
         }
-        customerRepository.save(customer);
+        customerRepo.save(customer);
     }
 
     @Override
@@ -269,12 +285,11 @@ public class CustomerService implements ICustomerService {
             List<Contract> listCT = iContractService.getAllContract();
             listCT.stream().forEach(c -> {
                 if (c.getCustomer().getCustomerId() == customerId && (c.getEndDate().isAfter(LocalDate.now()) || !c.getStatus())) {
-                    System.out.println(c.getEndDate().isBefore(LocalDate.now()));
                     throw new ResourceNotFoundException("Không thể xóa do tồn tại hợp đồng");
                 }
             });
             Customer Customer = getCustomer(customerId).get();
-            customerRepository.delete(Customer);
+            customerRepo.delete(Customer);
         } catch (Exception ex) {
             throw new ResourceNotFoundException(ex.getMessage());
         }
@@ -282,15 +297,16 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public InfoLogin getLogin(String name) {
-        return customerRepository.getLogin(name);
+        return customerRepo.getLogin(name);
     }
 
     @Override
     public void updatePassword(String password, Integer customerId) {
         Optional<Customer> customer = getCustomer(customerId);
-        if( customer.isEmpty() ) throw new ResourceNotFoundException("customerId");
+        if (customer.isEmpty()) throw new ResourceNotFoundException("customerId");
+        System.out.println(password);
         customer.get().getUserAuthId().setPassword(security.passwordEncoder().encode(password));
-        customerRepository.save(customer.get());
+        customerRepo.save(customer.get());
     }
 
 }

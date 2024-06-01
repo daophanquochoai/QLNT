@@ -54,12 +54,10 @@ public class JwtSecurityConfig{
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .authorizeHttpRequests(auth -> auth
-//                	.requestMatchers("/authenticate").permitAll()
-//                        .requestMatchers("/swagger-ui").permitAll()
-//                        .requestMatchers("/user/**").hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN")
-//                        .requestMatchers("/admin/**").hasAuthority("SCOPE_ADMIN")
-//                    .anyRequest().authenticated())
-                        .anyRequest().permitAll())
+                	.requestMatchers("/authenticate", "/swagger-ui/**", "/admin/email/**").permitAll()
+                        .requestMatchers("/user/**").hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN")
+                        .requestMatchers("/admin/**").hasAuthority("SCOPE_ADMIN")
+                    .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.
                 	sessionCreationPolicy(SessionCreationPolicy.STATELESS))

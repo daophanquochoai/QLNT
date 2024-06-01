@@ -33,7 +33,6 @@ public class UserController {
     private final IHistoryCustomerService iHistoryCustomerService;
     private final JwtSecurityConfig jwtSecurityConfig;
     private final IRoomService_Service iRoomServiceService;
-    private final IRoomService iRoomService;
 
     //===========================ROOM===========================
     @GetMapping("/room/{roomId}")
@@ -151,10 +150,13 @@ public class UserController {
 
     //===========================REQUEST===========================
     //7 . Nhan yeu cau tu chu tro
-    @GetMapping("/request/{customerId}")
-    public ResponseEntity<?> getRequest(@PathVariable Integer customerId){
-        try {
-            return ResponseEntity.ok(iRequestService.getRequestOfAdmin(customerId));
+
+    @GetMapping("request/history/{customerId}/{isSend}")
+    public ResponseEntity<?> getMyRequestHistory(
+            @PathVariable Integer customerId,
+            @PathVariable boolean isSend){
+        try{
+            return ResponseEntity.ok(iRequestService.getRequestHistoryByIsSend(customerId,isSend));
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -181,36 +183,33 @@ public class UserController {
         }
     }
 
-    // xem request chu tro gui
-    @GetMapping("get/notice/history/receiver/{customerId}")
-    public ResponseEntity<?> getNoticeReceive( @PathVariable Integer customerId){
+    //===========================CONTRACT===========================
+    //9. Xem hop dong cua minh
+    @GetMapping("/contract/{customerId}")
+    public ResponseEntity<?> getContract(@PathVariable Integer customerId){
         try{
-            return ResponseEntity.ok(iRequestService.getRequestOfAdmin(customerId));
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-    // xem request da gui
-    @GetMapping("get/notice/history/sender/{customerId}")
-    public ResponseEntity<?> getNoticeSender( @PathVariable Integer customerId){
-        try{
-            return ResponseEntity.ok(iRequestService.getRequestOfCustomer(customerId));
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+            Optional<Contract> contract = iContractService.getContractByCustomerId(customerId);
+            if (contract.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
+            Contract c = contract.get();
+            InfoContract ic = new InfoContract();
+            ic.setBeginDate(c.getBeginDate());
+            ic.setCreatedDate(c.getCreatedDate());
+            ic.setEndDate(c.getEndDate());
+            ic.setStatus(c.getStatus());
+            ic.setRoomId(c.getRoom().getRoomId());
+            ic.setCustomerId(c.getCustomer().getCustomerId());
+            return ResponseEntity.ok(ic);
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 
-    //===========================CONTRACT===========================
-    //9. Xem hop dong cua minh
-    @GetMapping("/contract/{roomid}")
-    public ResponseEntity<?> getContract(@PathVariable Integer roomid){
+    @GetMapping("/contract/room/{roomId}")
+    public ResponseEntity<?> getContractByRoomId(@PathVariable Integer roomId){
         try{
-            Optional<Contract> cOp = iContractService.getContractByRoomid(roomid);
-            Contract c = null;
-            if( cOp.isEmpty() ) return ResponseEntity.ok(null);
-            c = cOp.get();
+            Optional<Contract> contract = iContractService.getContractByRoomId(roomId);
+            if (contract.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hợp đồng");
+            Contract c = contract.get();
             InfoContract ic = new InfoContract();
             ic.setBeginDate(c.getBeginDate());
             ic.setCreatedDate(c.getCreatedDate());

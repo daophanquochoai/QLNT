@@ -14,5 +14,5 @@ public interface IRoomService {
     void deleteRoom(int roomId);
     List<RoomRes> getAllRoomByLimit(int type);
     List<Room> getAllRoomWithContract();
-    List<RoomRes> getRoomForBill();
+    List<RoomRes> getRoomForBillByMonth(int month,int year);
 }

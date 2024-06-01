@@ -2,6 +2,7 @@ package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Room;
+import com.CNPM.QLNT.repository.ContractRepo;
 import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.repository.RoomRepo;
 import com.CNPM.QLNT.response.RoomRes;
@@ -23,8 +24,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RoomService implements IRoomService {
-    private final RoomRepo roomRepo;
     private final IRoomTypeService iRoomTypeService;
+    private final RoomRepo roomRepo;
+    private final ContractRepo contractRepo;
     private final HistoryCustomerRepo historyCustomerRepo;
 
     @Override
@@ -103,7 +105,7 @@ public class RoomService implements IRoomService {
         List<Room> l;
         List<Room> r = roomRepo.findAll();
         if (type == 1) {
-            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() == 0).collect(Collectors.toList());
+            l = r.stream().filter(temp -> historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).isEmpty()).collect(Collectors.toList());
         } else if (type == 2) {
             l = r.stream().filter(temp -> (historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() < temp.getLimit() && historyCustomerRepo.getCustomersByRoomId(temp.getRoomId()).size() > 0)).collect(Collectors.toList());
         } else {
@@ -128,13 +130,10 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public List<RoomRes> getRoomForBill() {
-        List<Room> list = roomRepo.findAll();
-        list = list.stream().filter(r -> historyCustomerRepo.getCustomersByRoomId(r.getRoomId()).size() != 0 &&
-                        !r.getBill().stream().anyMatch(b -> b.getBeginDate().getMonth().getValue() == LocalDate.now().getMonth().getValue() - 1
-                                && b.getBeginDate().getYear() == LocalDate.now().getYear()
-                        ))
-                .collect(Collectors.toList());
+    public List<RoomRes> getRoomForBillByMonth(int month, int year) {
+        List<Room> list = roomRepo.getRoomWithContractByTime(month,year);
+        list = list.stream().filter(r -> r.getBill().stream().noneMatch(b -> b.getBeginDate().getMonthValue() == month
+                                && b.getBeginDate().getYear() == year)).toList();
         List<RoomRes> l = list.stream().map(
                 r ->
                 {

@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InfoService {
-    private  int serviceId;
-    private String serviceName;
-    private Long price;
-    private int quantity;
+public class Identify {
+    private String email;
+    private String identify;
 }

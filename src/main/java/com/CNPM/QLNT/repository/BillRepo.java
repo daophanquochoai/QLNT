@@ -26,4 +26,6 @@ public interface BillRepo extends JpaRepository<Bill, Integer> {
     List<Bill> getBillByYear( int year);
     @Query("select  b from Bill b where MONTH(b.beginDate) = :month and YEAR(b.beginDate) = :year and b.room.roomId = :roomId")
     Optional<Bill> getBillByRoomInMonthInYear(Integer roomId, Integer month, Integer year);
+    @Query("select  b from Bill b where b.room.roomId = :roomId order by b.beginDate desc")
+    Optional<Bill> getPreviousBillByRoomId(Integer roomId);
 }
