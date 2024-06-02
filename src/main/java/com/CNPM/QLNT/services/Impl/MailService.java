@@ -36,7 +36,7 @@ public class MailService implements IMailService {
     private String emailSender;
     @Value("${email.admin}")
     private String emailAdmin;
-    private final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
+    private final String CHARACTERS = "0123456789";
 
     @Override
     public Boolean sendMail(String emailReceiver) {
@@ -50,7 +50,7 @@ public class MailService implements IMailService {
         }
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
-        for( int i  = 0 ; i < 6 ; i++ ){
+        for( int i  = 0 ; i < 4 ; i++ ){
             int randomNumber = random.nextInt(CHARACTERS.length());
             char ramdomChar = CHARACTERS.charAt(randomNumber);
             sb.append(ramdomChar);

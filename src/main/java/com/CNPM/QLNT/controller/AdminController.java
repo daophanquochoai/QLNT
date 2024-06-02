@@ -545,7 +545,7 @@ public class AdminController {
             if(iMailService.sendMail(email)){
                 return ResponseEntity.ok("Gui email thanh cong");
             }else{
-                return ResponseEntity.ok("Email khong ton tai");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Gui khong thanh cong");
             }
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -557,7 +557,7 @@ public class AdminController {
             if(iMailService.xacnhan(identify.getEmail(), identify.getIdentify())){
                 return ResponseEntity.ok("Xac nhan thanh cong");
             }else{
-                return ResponseEntity.ok("Xac nhan khong thanh cong");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Xac nhan khong thanh cong");
             }
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -569,7 +569,7 @@ public class AdminController {
             if(iMailService.doimatkhau(password.getEmail(),password.getPassword())){
                 return ResponseEntity.ok("Doi mat khau thanh cong");
             }else{
-                return ResponseEntity.ok("Doi mat khau khong thanh cong");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Doi mat khau khong thanh cong");
             }
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

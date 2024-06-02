@@ -55,7 +55,7 @@ public class JwtSecurityConfig{
         return httpSecurity
                 .authorizeHttpRequests(auth -> auth
                 	.requestMatchers("/authenticate", "/swagger-ui/**", "/admin/email/**").permitAll()
-                        .requestMatchers("/user/**").hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN")
+                        .requestMatchers("/user/**", "/admin/customer/**").hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("SCOPE_ADMIN")
                     .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)

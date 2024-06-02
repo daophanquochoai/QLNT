@@ -15,7 +15,7 @@ public class PassworkToken {
     @Id
     private String email;
     private Boolean status;
-    @Column(columnDefinition = "char(6)")
+    @Column(columnDefinition = "char(4)")
     private String identify;
     private LocalDateTime createTime;
 }
