@@ -32,7 +32,7 @@ public class ContractService implements IContractService {
         List<Contract> listAllContract = contractRepo.getAllContract();
         // Lấy ra các hợp đồng đã hết hạn để thay đổi trạng thái hợp đồng và thông tin người ở, dịch vụ
         List<Contract> listAllContractExpired = listAllContract.stream()
-            .filter(c -> c.getEndDate().isBefore(LocalDate.now())).toList();
+            .filter(c -> c.getEndDate().isBefore(LocalDate.now()) && c.getStatus()).toList();
         listAllContractExpired.forEach(c -> {
             c.setStatus(false);
             historyCustomerRepo.getHistoryCustomerByRoomId(c.getRoom().getRoomId()).forEach(h -> {
@@ -55,8 +55,7 @@ public class ContractService implements IContractService {
     @Override
     public Optional<Contract> getContractByCustomerId(Integer customerId) {
         log.info("{}",contractRepo.getContractByCustomerId(customerId));
-        Optional<Contract> c = Optional.ofNullable(contractRepo.getContractByCustomerId(customerId));
-        return c;
+        return contractRepo.getContractByCustomerId(customerId);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class ContractService implements IContractService {
         if( infoContract.getEndDate() == null ) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
         if( infoContract.getBeginDate().isBefore(infoContract.getCreatedDate())) throw new ResourceNotFoundException("Ngày bắt đầu không hợp lệ");
         if( infoContract.getEndDate().isBefore(infoContract.getBeginDate())) throw new ResourceNotFoundException("Ngày kết thúc không hợp lệ");
-        if( contractRepo.getContractsByCusIdAndStatus(customerId, true).isPresent()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
+        if( contractRepo.getContractByCustomerId(customerId).isPresent()) throw new ResourceNotFoundException("Không tìm thấy khách thuê");
         if( room.get().getLimit() < historyCustomerRepo.getCustomersByRoomId(room.get().getRoomId()).size()) throw new ResourceNotFoundException("Phòng đã đầy");
 
         // tao hop dong
