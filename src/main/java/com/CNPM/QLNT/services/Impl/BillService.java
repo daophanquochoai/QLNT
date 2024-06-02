@@ -312,7 +312,7 @@ public class BillService implements IBillService {
         }
         InfoBill infoBill = new InfoBill();
         Optional<Room> room = iRoomService.getRoomByRoomId(roomId);
-        Optional<Bill> bill = billRepo.getPreviousBillByRoomId(roomId);
+        Optional<Bill> bill = billRepo.getPreviousBillByRoomId(roomId).stream().findFirst();
         List<InfoService> service = roomServiceRepo.getAllServiceByRoomIdMonthYear(roomId, Month, Year);
         if (bill.isEmpty()) {
             infoBill.setElectricNumberBegin(0);
