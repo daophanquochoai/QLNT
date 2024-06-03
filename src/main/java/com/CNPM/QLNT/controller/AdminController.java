@@ -467,7 +467,7 @@ public class AdminController {
     public ResponseEntity<?> deleteServiceByServiceId(@PathVariable int serviceId) {
         try {
             iServiceService.deleteService(serviceId);
-            return ResponseEntity.ok("Yêu cầu đã được xóa");
+            return ResponseEntity.ok("Dịch vụ đã được xóa");
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

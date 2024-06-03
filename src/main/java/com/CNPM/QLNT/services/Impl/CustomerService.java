@@ -118,8 +118,7 @@ public class CustomerService implements ICustomerService {
 
         List<InfoUser> listAllCustomer = getAllCustomer();
         // Kiểm tra xem đã từng ở chưa (ko tính đang ở) bằng CCCD
-        // Nếu chưa từng ở thì kiểm tra như bình thường
-        // Nếu đã từng ở thì bỏ qua kiểm tra và cập nhật lại thông tin
+        // Nếu chưa từng ở thì kiểm tra thông tin và thêm khách thuê mới
         if (historyCustomerRepo.getPreviousCustomerByIdentifier(info.getIdentifier()).isEmpty()) {
             if (!listAllCustomer.isEmpty()) {
                 for (InfoUser cus : listAllCustomer) {
@@ -144,7 +143,9 @@ public class CustomerService implements ICustomerService {
             ua.setRole("USER");
             c.setUserAuthId(ua);
 
-        } else {
+        }
+        // Nếu đã từng ở thì chỉ cần cập nhật lại thông tin khách thuê đó
+        else {
             c = customerRepo.getCustomerByIdentifier(info.getIdentifier());
             historyCustomer = historyCustomerRepo.getPreviousCustomerByIdentifier(c.getIdentifier()).get(0);
             historyCustomer.setRoomOld(r);

@@ -18,6 +18,9 @@ public class Service_Service implements IService_Service {
 
     @Override
     public void saveService(Service service) {
+        List<Service> listAllService = serviceRepo.findAll();
+        if (listAllService.stream().anyMatch(s -> s.getServiceName().equals(service.getServiceName())))
+            throw new ResourceNotFoundException("Dịch vụ đã tồn tại");
         if( service.getPrice() < 0){
             throw new ResourceNotFoundException("Giá phải lớn hơn 0");
         }
@@ -28,7 +31,11 @@ public class Service_Service implements IService_Service {
     public void updateService(Integer serviceId, Service service) {
         Optional<Service> s = serviceRepo.findById(serviceId);
         if( s.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy dịch vụ");
+        List<Service> listAllService = serviceRepo.findAll();
         Service ser = s.get();
+        if (listAllService.stream().anyMatch(sv -> sv.getServiceId()!= service.getServiceId()
+            && sv.getServiceName().equals(service.getServiceName())))
+            throw new ResourceNotFoundException("Dịch vụ đã tồn tại");
         if( service.getPrice() >= 0){
             ser.setPrice(service.getPrice());
         }
