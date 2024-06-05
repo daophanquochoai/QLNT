@@ -112,7 +112,8 @@ public class BillService implements IBillService {
     public Long[] getRevenue(int year) {
         Long[] revenue = new Long[12];
         for (int i = 0; i < 12; i++) {
-            revenue[i] = billRepo.getAllBillByMonthYear(i + 1, year).stream().mapToLong(Bill::getTotal).sum();
+            revenue[i] = billRepo.getAllBillByMonthYear(i + 1, year).stream().filter(Bill::getStatus)
+                .mapToLong(Bill::getTotal).sum();
         }
         return revenue;
     }
