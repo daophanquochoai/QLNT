@@ -260,8 +260,9 @@ public class CustomerService implements ICustomerService {
             Matcher matcher = pattern.matcher(info.getEmail());
             if (!matcher.matches()) throw new ResourceNotFoundException("Email không hợp lệ");
             customer.setEmail(info.getEmail());
+            customer.getUserAuthId().setUsername(info.getEmail());
         }
-        customer.getUserAuthId().setUsername(info.getEmail());
+
         if (info.getPassword() != null) {
             customer.getUserAuthId().setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
         }
@@ -282,6 +283,9 @@ public class CustomerService implements ICustomerService {
         if (info.getRoomId() == 0) {
             Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
             h.ifPresent(historyCustomer -> historyCustomer.setEndDate(LocalDate.now()));
+            UserAuth ua = userAuthRepo.findByUserAuthId(customer.getUserAuthId().getId()).get();
+            ua.setActive(false);
+            userAuthRepo.save(ua);
         }
         customerRepo.save(customer);
     }

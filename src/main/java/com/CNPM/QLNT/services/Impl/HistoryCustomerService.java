@@ -2,6 +2,7 @@ package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
 import com.CNPM.QLNT.model.Customer;
+import com.CNPM.QLNT.model.HistoryCustomer;
 import com.CNPM.QLNT.repository.HistoryCustomerRepo;
 import com.CNPM.QLNT.response.History;
 import com.CNPM.QLNT.services.Inter.IHistoryCustomerService;
@@ -44,6 +45,10 @@ public class HistoryCustomerService implements IHistoryCustomerService {
             return history;
         }).collect(Collectors.toList());
         return list;
+    }
+    @Override
+    public List<HistoryCustomer> getHistoryByCustomerId(Integer customerId) {
+        return historyCustomerRepo.getHistoryByCustomerId(customerId);
     }
 
     @Override

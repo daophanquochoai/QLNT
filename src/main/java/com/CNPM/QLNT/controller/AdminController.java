@@ -206,8 +206,11 @@ public class AdminController {
             if (h.isPresent()) {
                 InfoUser infoUser = new InfoUser();
                 iCustomerService.updateCustomer(customerId, infoUser);
-            } else iCustomerService.deleteCustomer(customerId);
-            return ResponseEntity.ok("Xóa khách thuê thành công");
+                return ResponseEntity.ok("Khách thuê đã trả phòng thành công");
+            } else {
+                iCustomerService.deleteCustomer(customerId);
+                return ResponseEntity.ok("Xóa khách thuê thành công");
+            }
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
@@ -425,6 +428,15 @@ public class AdminController {
     public ResponseEntity<?> getAllHistory() {
         try {
             return ResponseEntity.ok(iHistoryCustomerService.getAllHistoryCustomer());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/history/{customerId}")
+    public ResponseEntity<?> getHistoryByCustomerId(@PathVariable Integer customerId) {
+        try {
+            return ResponseEntity.ok(iHistoryCustomerService.getHistoryByCustomerId(customerId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }

@@ -91,7 +91,7 @@ public class ContractService implements IContractService {
             contract.get().setStatus(false);
             contractRepo.save(contract.get());
             historyCustomerRepo.getHistoryCustomerByRoomId(contract.get().getRoom().getRoomId()).forEach(h -> {
-                h.setEndDate(contract.get().getEndDate());
+                h.setEndDate(LocalDate.now());
                 historyCustomerRepo.save(h);
                 UserAuth ua = userAuthRepo.findByUserAuthId(h.getCustomer().getUserAuthId().getId()).get();
                 ua.setActive(false);

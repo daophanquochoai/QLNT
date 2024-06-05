@@ -14,7 +14,7 @@ public interface IBillService {
 
     List<BillInRoom> getAllBillByStatus(int roomId, boolean status);
 
-    Long getRevenue(int year);
+    Long[] getRevenue(int year);
 
     void addBill(BillInRoom bill);
 

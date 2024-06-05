@@ -46,7 +46,7 @@ public class BillService implements IBillService {
                     water = w;
                     break;
                 } else if (w.getChangedDate().getYear() == b.getBeginDate().getYear() &&
-                        w.getChangedDate().getMonth().getValue() < b.getBeginDate().getMonthValue()) {
+                    w.getChangedDate().getMonth().getValue() < b.getBeginDate().getMonthValue()) {
                     water = w;
                     break;
                 }
@@ -57,13 +57,13 @@ public class BillService implements IBillService {
                     electric = e;
                     break;
                 } else if (e.getChangedDate().getYear() == b.getBeginDate().getYear() &&
-                        e.getChangedDate().getMonth().getValue() < b.getBeginDate().getMonthValue()) {
+                    e.getChangedDate().getMonth().getValue() < b.getBeginDate().getMonthValue()) {
                     electric = e;
                     break;
                 }
             }
             List<InfoService> service = roomServiceRepo
-                    .getAllServiceByRoomIdMonthYear(roomId, b.getBeginDate().getMonthValue(), b.getBeginDate().getYear());
+                .getAllServiceByRoomIdMonthYear(roomId, b.getBeginDate().getMonthValue(), b.getBeginDate().getYear());
             DetailBill db = new DetailBill();
             db.setElectricNumberBegin(b.getElectricNumberBegin());
             db.setElectricNumberEnd(b.getElectricNumberEnd());
@@ -109,13 +109,12 @@ public class BillService implements IBillService {
     }
 
     @Override
-    public Long getRevenue(int year) {
-        return billRepo.getBillByYear(year)
-                .stream()
-                .mapToLong(bill -> {
-                    return bill.getTotal();
-                })
-                .sum();
+    public Long[] getRevenue(int year) {
+        Long[] revenue = new Long[12];
+        for (int i = 0; i < 12; i++) {
+            revenue[i] = billRepo.getAllBillByMonthYear(i + 1, year).stream().mapToLong(Bill::getTotal).sum();
+        }
+        return revenue;
     }
 
     @Override
@@ -167,15 +166,16 @@ public class BillService implements IBillService {
     @Override
     public void updateBillStatus(Integer billId) {
         Optional<Bill> b = billRepo.findById(billId);
-        if( b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        if (b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
         b.get().setStatus(!b.get().getStatus());
         billRepo.save(b.get());
     }
+
     @Override
     public void deleteBill(Integer billId) {
         Optional<Bill> b = billRepo.findById(billId);
-        if( b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
-        if(b.get().getStatus()) throw new ResourceNotFoundException("Không thể xóa do hóa đơn đã được thanh toán");
+        if (b.isEmpty()) throw new ResourceNotFoundException("Không tìm thấy hóa đơn");
+        if (b.get().getStatus()) throw new ResourceNotFoundException("Không thể xóa do hóa đơn đã được thanh toán");
         billRepo.delete(b.get());
     }
 
@@ -243,7 +243,7 @@ public class BillService implements IBillService {
                     water = w;
                     break;
                 } else if (w.getChangedDate().getYear() == Year &&
-                        w.getChangedDate().getMonth().getValue() <= Month) {
+                    w.getChangedDate().getMonth().getValue() <= Month) {
                     water = w;
                     break;
                 }
@@ -254,14 +254,14 @@ public class BillService implements IBillService {
                     electric = e;
                     break;
                 } else if (e.getChangedDate().getYear() == Year &&
-                        e.getChangedDate().getMonth().getValue() <= Month) {
+                    e.getChangedDate().getMonth().getValue() <= Month) {
                     electric = e;
                     break;
                 }
             }
 
             List<InfoService> service = roomServiceRepo
-                    .getAllServiceByRoomIdMonthYear(b.getRoom().getRoomId(), Month, Year);
+                .getAllServiceByRoomIdMonthYear(b.getRoom().getRoomId(), Month, Year);
             DetailBill db = new DetailBill();
             db.setElectricNumberBegin(b.getElectricNumberBegin());
             db.setElectricNumberEnd(b.getElectricNumberEnd());

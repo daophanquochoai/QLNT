@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Statistical {
-    private Long revenue;
+    private Long[] revenue;
     private int numberOfUnpaidRoom;
     private int numberOfPaidRoom;
     private int numberOfFullRoom;
