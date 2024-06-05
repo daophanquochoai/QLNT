@@ -80,6 +80,15 @@ public class UserController {
        }
     }
 
+    @GetMapping("/customer/getAll")
+    public ResponseEntity<?> getAllCustomer(){
+        try{
+            return ResponseEntity.ok(iCustomerService.getAllCustomer());
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
     // xem thong nguoi cua tat cả nguoi chung phong
     @GetMapping("/customer/room/{roomId}")
     public ResponseEntity<?> getAllCustomerByRoomId(@PathVariable Integer roomId){
