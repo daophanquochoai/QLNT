@@ -146,6 +146,14 @@ public class CustomerService implements ICustomerService {
         }
         // Nếu đã từng ở thì chỉ cần cập nhật lại thông tin khách thuê đó
         else {
+            getAllCustomer().forEach(cus -> {
+                if (!cus.getIdentifier().equals(info.getIdentifier())) {
+                    if (cus.getPhoneNumber().equals(info.getPhoneNumber()))
+                        throw new ResourceNotFoundException("Số điện thoại đã tồn tại");
+                    if (cus.getEmail().equals(info.getEmail()))
+                        throw new ResourceNotFoundException("Email đã tồn tại");
+                }
+            });
             c = customerRepo.getCustomerByIdentifier(info.getIdentifier());
             historyCustomer = historyCustomerRepo.getPreviousCustomerByIdentifier(c.getIdentifier()).get(0);
             historyCustomer.setRoomOld(r);
@@ -253,9 +261,7 @@ public class CustomerService implements ICustomerService {
             if (!matcher.matches()) throw new ResourceNotFoundException("Email không hợp lệ");
             customer.setEmail(info.getEmail());
         }
-        if (info.getUsername() != null) {
-            customer.getUserAuthId().setUsername(info.getUsername());
-        }
+        customer.getUserAuthId().setUsername(info.getEmail());
         if (info.getPassword() != null) {
             customer.getUserAuthId().setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
         }

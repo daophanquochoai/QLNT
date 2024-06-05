@@ -22,7 +22,7 @@ public class Service_Service implements IService_Service {
         if (listAllService.stream().anyMatch(s -> s.getServiceName().equals(service.getServiceName())))
             throw new ResourceNotFoundException("Dịch vụ đã tồn tại");
         if( service.getPrice() < 0){
-            throw new ResourceNotFoundException("Giá phải lớn hơn 0");
+            throw new ResourceNotFoundException("Giá dịch vụ không thể bé hơn 0");
         }
         serviceRepo.save(service);
     }
@@ -36,9 +36,10 @@ public class Service_Service implements IService_Service {
         if (listAllService.stream().anyMatch(sv -> sv.getServiceId()!= service.getServiceId()
             && sv.getServiceName().equals(service.getServiceName())))
             throw new ResourceNotFoundException("Dịch vụ đã tồn tại");
-        if( service.getPrice() >= 0){
-            ser.setPrice(service.getPrice());
-        }
+        if( service.getPrice() < 0)
+            throw new ResourceNotFoundException("Giá dịch vụ không thể bé hơn 0");
+        ser.setPrice(service.getPrice());
+
         ser.setServiceName(service.getServiceName());
         serviceRepo.save(ser);
     }
