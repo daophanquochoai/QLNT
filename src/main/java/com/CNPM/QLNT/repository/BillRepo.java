@@ -13,7 +13,10 @@ public interface BillRepo extends JpaRepository<Bill, Integer> {
     @Query("select b from Bill b order by b.room.roomId")
     List<Bill> getAllBill();
 
-    @Query("select b from Bill b where b.room.roomId = :roomId")
+    @Query("select b from Bill b inner join Contract c on (c.room.roomId = :roomId and c.status = true) " +
+        "where b.room.roomId = :roomId " +
+        "and (YEAR(c.beginDate) < YEAR(b.beginDate) " +
+        "or (MONTH(c.beginDate) <= MONTH(b.beginDate) and YEAR(c.beginDate) = YEAR(b.beginDate) ))")
     List<Bill> getAllBillByRoomId(int roomId);
 
     @Query("select b from Bill b where b.status = :status and b.room.roomId = :roomId")

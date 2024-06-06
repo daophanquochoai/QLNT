@@ -341,17 +341,6 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/bill/room/{roomId}")
-    public ResponseEntity<?> getBillByRoomId(
-        @PathVariable Integer roomId
-    ) {
-        try {
-            return ResponseEntity.ok(iBillService.getAllBillByRoomId(roomId));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
-
     // Lấy thông tin phòng để tính hóa đơn
     @GetMapping("bill/info/{roomId}/{month}/{year}")
     public ResponseEntity<?> getInfoBillByRoomId(@PathVariable Integer roomId,

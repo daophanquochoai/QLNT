@@ -160,11 +160,8 @@ public class CustomerService implements ICustomerService {
             historyCustomer.setBeginDate(LocalDate.now());
             historyCustomer.setEndDate(null);
 
-            UserAuth ua = userAuthRepo.findByUserAuthId(c.getUserAuthId().getId()).get();
-            ua.setUsername(info.getUsername());
-            ua.setPassword(new BCryptPasswordEncoder().encode(info.getPassword()));
-            ua.setActive(true);
-            userAuthRepo.save(ua);
+            c.getUserAuthId().setActive(true);
+            c.getUserAuthId().setUsername(info.getEmail());
         }
 
         //Thêm thông tin khách thuê
@@ -283,9 +280,7 @@ public class CustomerService implements ICustomerService {
         if (info.getRoomId() == 0) {
             Optional<HistoryCustomer> h = customer.getHistoryCustomer().stream().filter(t -> t.getEndDate() == null).findFirst();
             h.ifPresent(historyCustomer -> historyCustomer.setEndDate(LocalDate.now()));
-            UserAuth ua = userAuthRepo.findByUserAuthId(customer.getUserAuthId().getId()).get();
-            ua.setActive(false);
-            userAuthRepo.save(ua);
+            customer.getUserAuthId().setActive(false);
         }
         customerRepo.save(customer);
     }

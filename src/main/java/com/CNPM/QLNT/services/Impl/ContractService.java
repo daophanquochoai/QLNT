@@ -1,10 +1,7 @@
 package com.CNPM.QLNT.services.Impl;
 
 import com.CNPM.QLNT.exception.ResourceNotFoundException;
-import com.CNPM.QLNT.model.Contract;
-import com.CNPM.QLNT.model.Customer;
-import com.CNPM.QLNT.model.Room;
-import com.CNPM.QLNT.model.UserAuth;
+import com.CNPM.QLNT.model.*;
 import com.CNPM.QLNT.repository.*;
 import com.CNPM.QLNT.response.InfoContract;
 import com.CNPM.QLNT.services.Inter.IContractService;
@@ -24,6 +21,7 @@ public class ContractService implements IContractService {
     private final CustomerRepo customerRepo;
     private final RoomRepo roomRepo;
     private final RoomServiceRepo roomServiceRepo;
+    private final BillRepo billRepo;
     private final HistoryCustomerRepo historyCustomerRepo;
     private final UserAuthRepo userAuthRepo;
 
@@ -88,6 +86,9 @@ public class ContractService implements IContractService {
     public void deleteContract(Integer contractId){
         Optional<Contract> contract = contractRepo.findById(contractId);
         if (contract.isPresent()){
+            List<Bill> listBill = billRepo.getAllBillByRoomId(contract.get().getRoom().getRoomId());
+            if (listBill.stream().anyMatch(b-> !b.getStatus()))
+                throw new ResourceNotFoundException("Không thể hủy hợp đồng do phòng có hóa đơn chưa thanh toán");
             contract.get().setStatus(false);
             contractRepo.save(contract.get());
             historyCustomerRepo.getHistoryCustomerByRoomId(contract.get().getRoom().getRoomId()).forEach(h -> {
